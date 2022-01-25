@@ -3,10 +3,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using RestSharp;
+using RestSharp.Authenticators;
 using RestSharp.Serializers;
 
 namespace Cortside.RestSharpClient {
-    public class RestSharpClient {
+    public class RestSharpClient : IDisposable {
         private readonly IDistributedCache cache;
         private readonly ILogger logger;
         private readonly RestClient client;
@@ -64,6 +65,15 @@ namespace Cortside.RestSharpClient {
             client.UseSerializer(() => serializer);
         }
 
+        public IAuthenticator Authenticator {
+            get {
+                return client.Authenticator;
+            }
+            set {
+                client.UseAuthenticator(value);
+            }
+        }
+
         private void TimeoutCheck(RestRequest request, RestResponse response) {
             if (response.StatusCode == 0) {
                 LogError(request, response);
@@ -82,10 +92,10 @@ namespace Cortside.RestSharpClient {
             return response;
         }
 
-        public async Task<T> GetAsync<T>(RestRequest request) where T : new() {
+        public async Task<RestResponse<T>> GetAsync<T>(RestRequest request) where T : new() {
             var response = await client.ExecuteAsync<T>(request).ConfigureAwait(false);
             if (response.StatusCode == System.Net.HttpStatusCode.OK) {
-                return response.Data;
+                return response;
             } else {
                 LogError(request, response);
                 return default;
@@ -111,6 +121,7 @@ namespace Cortside.RestSharpClient {
                     return default;
                 }
             }
+
             return item;
         }
 
@@ -135,6 +146,11 @@ namespace Cortside.RestSharpClient {
 
             //Log the exception and info message
             logger.LogError(ex, info);
+        }
+
+        public void Dispose() {
+            client?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

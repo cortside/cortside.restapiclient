@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Options;
 using RestSharp;
 
 namespace Cortside.RestSharpClient.Tests {
-    public class GitHubClient {
+    public class GitHubClient : IDisposable {
         readonly RestSharpClient client;
 
         public GitHubClient(ILogger<GitHubClient> logger) {
@@ -23,6 +24,11 @@ namespace Cortside.RestSharpClient.Tests {
             var request = new RestRequest("users/cortside/repos", Method.Get);
             var repos = await client.GetWithCacheAsync<List<GitHubRepo>>(request).ConfigureAwait(false);
             return repos;
+        }
+
+        public void Dispose() {
+            client?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }
