@@ -1,0 +1,28 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using RestSharp;
+
+namespace Cortside.RestSharpClient.Tests {
+    public class GitHubClient {
+        readonly RestSharpClient client;
+
+        public GitHubClient(ILogger<GitHubClient> logger) {
+            var cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
+            client = new RestSharpClient("https://api.github.com", logger, new JsonNetSerializer(), cache);
+        }
+
+        public GitHubClient(ILogger<GitHubClient> logger, IDistributedCache cache) {
+            client = new RestSharpClient("https://api.github.com", logger, new JsonNetSerializer(), cache);
+        }
+
+        public async Task<List<GitHubRepo>> GetReposAsync() {
+            var request = new RestRequest("users/cortside/repos", Method.Get);
+            var repos = await client.GetWithCacheAsync<List<GitHubRepo>>(request).ConfigureAwait(false);
+            return repos;
+        }
+    }
+}
