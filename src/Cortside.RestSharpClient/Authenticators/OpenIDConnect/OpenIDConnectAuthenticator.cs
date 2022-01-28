@@ -4,12 +4,15 @@ using RestSharp.Authenticators;
 
 namespace Cortside.RestSharpClient.Authenticators.OpenIDConnect {
     public class OpenIDConnectAuthenticator : AuthenticatorBase {
-        private readonly string authorityUrl;
         private readonly TokenRequest tokenRequest;
 
+        public OpenIDConnectAuthenticator(TokenRequest tokenRequest) : base("") {
+            this.tokenRequest = tokenRequest;
+        }
+
         public OpenIDConnectAuthenticator(string authorityUrl, string grantType, string clientId, string clientSecret, string scope) : base("") {
-            this.authorityUrl = authorityUrl;
             tokenRequest = new TokenRequest {
+                AuthorityUrl = authorityUrl,
                 GrantType = grantType,
                 Scope = scope,
                 ClientId = clientId,
@@ -23,7 +26,7 @@ namespace Cortside.RestSharpClient.Authenticators.OpenIDConnect {
         }
 
         private async Task<string> GetTokenAsync() {
-            var options = new RestClientOptions(authorityUrl);
+            var options = new RestClientOptions(tokenRequest.AuthorityUrl);
 
             using (var client = new RestClient(options)) {
                 var request = new RestRequest("connect/token", Method.Post)
