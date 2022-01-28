@@ -8,61 +8,52 @@ using RestSharp.Serializers;
 
 namespace Cortside.RestSharpClient {
     public class RestSharpClient : IDisposable {
-        private readonly IDistributedCache cache;
         private readonly ILogger logger;
         private readonly RestClient client;
-        private readonly IRestSerializer serializer;
+        private IRestSerializer serializer;
 
         public RestSharpClient(string baseUrl, ILogger logger) {
-            cache = new NullDistributedCache();
+            Cache = new NullDistributedCache();
             this.logger = logger;
 
             var options = new RestClientOptions {
                 BaseUrl = new Uri(baseUrl)
             };
 
-            serializer = new JsonNetSerializer();
-
             client = new RestClient(options);
-            client.UseSerializer(() => serializer);
+            Serializer = new JsonNetSerializer();
         }
 
         public RestSharpClient(RestClientOptions options, ILogger logger) {
-            cache = new NullDistributedCache();
+            Cache = new NullDistributedCache();
             this.logger = logger;
 
-            serializer = new JsonNetSerializer();
-
             client = new RestClient(options);
-            client.UseSerializer(() => serializer);
+            Serializer = new JsonNetSerializer();
         }
 
         public RestSharpClient(string baseUrl, ILogger logger, IRestSerializer serializer) {
-            cache = new NullDistributedCache();
+            Cache = new NullDistributedCache();
             this.logger = logger;
 
             var options = new RestClientOptions {
                 BaseUrl = new Uri(baseUrl)
             };
 
-            this.serializer = serializer;
-
             client = new RestClient(options);
-            client.UseSerializer(() => serializer);
+            Serializer = serializer;
         }
 
         public RestSharpClient(string baseUrl, ILogger logger, IRestSerializer serializer, IDistributedCache cache) {
-            this.cache = cache;
+            this.Cache = cache;
             this.logger = logger;
 
             var options = new RestClientOptions {
                 BaseUrl = new Uri(baseUrl)
             };
 
-            this.serializer = serializer;
-
             client = new RestClient(options);
-            client.UseSerializer(() => serializer);
+            Serializer = serializer;
         }
 
         public IAuthenticator Authenticator {
@@ -73,6 +64,18 @@ namespace Cortside.RestSharpClient {
                 client.UseAuthenticator(value);
             }
         }
+
+        public IRestSerializer Serializer {
+            get {
+                return serializer;
+            }
+            set {
+                serializer = value;
+                client.UseSerializer(() => value);
+            }
+        }
+
+        public IDistributedCache Cache { get; set; }
 
         private void TimeoutCheck(RestRequest request, RestResponse response) {
             if (response.StatusCode == 0) {
@@ -110,11 +113,11 @@ namespace Cortside.RestSharpClient {
         public async Task<T> GetWithCacheAsync<T>(RestRequest request, string cacheKey) where T : class, new() {
             var cacheOptions = new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) };
 
-            var item = await cache.GetValueAsync<T>(cacheKey, serializer).ConfigureAwait(false);
+            var item = await Cache.GetValueAsync<T>(cacheKey, serializer).ConfigureAwait(false);
             if (item == null) {
                 var response = await client.ExecuteAsync<T>(request).ConfigureAwait(false);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK) {
-                    await cache.SetValueAsync(cacheKey, response.Data, serializer, cacheOptions).ConfigureAwait(false);
+                    await Cache.SetValueAsync(cacheKey, response.Data, serializer, cacheOptions).ConfigureAwait(false);
                     item = response.Data;
                 } else {
                     LogError(request, response);
