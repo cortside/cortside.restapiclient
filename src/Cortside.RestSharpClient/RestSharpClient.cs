@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,14 @@ namespace Cortside.RestSharpClient {
         private readonly ILogger logger;
         private readonly RestClient client;
         private IRestSerializer serializer;
+
+        public RestSharpClient(HttpMessageHandler handler, ILogger logger) {
+            Cache = new NullDistributedCache();
+            this.logger = logger;
+
+            client = new RestClient(handler);
+            Serializer = new JsonNetSerializer();
+        }
 
         public RestSharpClient(string baseUrl, ILogger logger) {
             Cache = new NullDistributedCache();
