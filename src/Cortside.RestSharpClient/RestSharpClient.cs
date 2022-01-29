@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -12,14 +11,6 @@ namespace Cortside.RestSharpClient {
         private readonly ILogger logger;
         private readonly RestClient client;
         private IRestSerializer serializer;
-
-        public RestSharpClient(HttpMessageHandler handler, ILogger logger) {
-            Cache = new NullDistributedCache();
-            this.logger = logger;
-
-            client = new RestClient(handler);
-            Serializer = new JsonNetSerializer();
-        }
 
         public RestSharpClient(string baseUrl, ILogger logger) {
             Cache = new NullDistributedCache();
@@ -39,30 +30,6 @@ namespace Cortside.RestSharpClient {
 
             client = new RestClient(options);
             Serializer = new JsonNetSerializer();
-        }
-
-        public RestSharpClient(string baseUrl, ILogger logger, IRestSerializer serializer) {
-            Cache = new NullDistributedCache();
-            this.logger = logger;
-
-            var options = new RestClientOptions {
-                BaseUrl = new Uri(baseUrl)
-            };
-
-            client = new RestClient(options);
-            Serializer = serializer;
-        }
-
-        public RestSharpClient(string baseUrl, ILogger logger, IRestSerializer serializer, IDistributedCache cache) {
-            this.Cache = cache;
-            this.logger = logger;
-
-            var options = new RestClientOptions {
-                BaseUrl = new Uri(baseUrl)
-            };
-
-            client = new RestClient(options);
-            Serializer = serializer;
         }
 
         public IAuthenticator Authenticator {
@@ -85,6 +52,8 @@ namespace Cortside.RestSharpClient {
         }
 
         public IDistributedCache Cache { get; set; }
+
+        public Uri BuildUri(RestRequest request) => client.BuildUri(request);
 
         private void TimeoutCheck(RestRequest request, RestResponse response) {
             if (response.StatusCode == 0) {

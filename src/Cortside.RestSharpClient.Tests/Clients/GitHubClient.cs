@@ -13,11 +13,17 @@ namespace Cortside.RestSharpClient.Tests {
 
         public GitHubClient(ILogger<GitHubClient> logger) {
             var cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
-            client = new RestSharpClient("https://api.github.com", logger, new JsonNetSerializer(), cache);
+            client = new RestSharpClient("https://api.github.com", logger) {
+                Serializer = new JsonNetSerializer(),
+                Cache = cache
+            };
         }
 
         public GitHubClient(ILogger<GitHubClient> logger, IDistributedCache cache) {
-            client = new RestSharpClient("https://api.github.com", logger, new JsonNetSerializer(), cache);
+            client = new RestSharpClient("https://api.github.com", logger) {
+                Serializer = new JsonNetSerializer(),
+                Cache = cache
+            };
         }
 
         public async Task<List<GitHubRepo>> GetReposAsync() {
