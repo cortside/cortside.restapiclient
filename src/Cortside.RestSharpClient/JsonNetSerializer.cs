@@ -1,3 +1,4 @@
+using System;
 using Cortside.Common.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -30,8 +31,6 @@ namespace Cortside.RestSharpClient {
 
         public T Deserialize<T>(RestResponse response) => JsonConvert.DeserializeObject<T>(response.Content, settings);
 
-        public string[] SupportedContentTypes { get; } = { "application/json", "text/json", "text/x-json", "text/javascript", "*+json" };
-
         public string ContentType { get; set; } = "application/json";
 
         public DataFormat DataFormat { get; } = DataFormat.Json;
@@ -39,5 +38,11 @@ namespace Cortside.RestSharpClient {
         public ISerializer Serializer => this;
 
         public IDeserializer Deserializer => this;
+
+        public string[] SupportedContentTypes => RestSharp.Serializers.ContentType.JsonAccept;
+
+        public string[] AcceptedContentTypes => RestSharp.Serializers.ContentType.JsonAccept;
+
+        public SupportsContentType SupportsContentType => contentType => contentType.EndsWith("json", StringComparison.InvariantCultureIgnoreCase);
     }
 }
