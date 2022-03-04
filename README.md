@@ -6,3 +6,11 @@
 
 Fully featured REST client for .Net using RestSharp
 
+Support [synchronous communication](https://github.com/cortside/guidelines/blob/master/docs/architecture/Microservices.md#synchronous-communication) between services handled by use of HTTP requests and responses responses.  The [base client](src/cortside.restsharpclient/RestSharpClient.cs) by making use of [RestSharp](https://github.com/restsharp/RestSharp).  The base client itself handles:
+
+* authentication
+* logging of operations
+* correlation
+* serialization
+* caching
+* error handling
