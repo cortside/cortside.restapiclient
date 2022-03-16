@@ -14,3 +14,5 @@ Support [synchronous communication](https://github.com/cortside/guidelines/blob/
 * serialization
 * caching
 * error handling
+
+Some inspiration taken from this [article](https://exceptionnotfound.net/building-the-ultimate-restsharp-client-in-asp-net-and-csharp/).
