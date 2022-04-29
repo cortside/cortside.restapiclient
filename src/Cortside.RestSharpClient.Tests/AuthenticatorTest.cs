@@ -9,7 +9,7 @@ namespace Cortside.RestSharpClient.Tests {
         [Fact]
         public async Task ShouldAddAuthorizationHeaderAsync() {
             // arrange
-            var authenticator = new OpenIDConnectAuthenticator("https://demo.identityserver.io", "client_credentials", "m2m", "secret", "api");
+            var authenticator = new OpenIDConnectAuthenticator("https://demo.duendesoftware.com", "client_credentials", "m2m", "secret", "api");
 
             var client = new RestClient("http://api.github.com");
             var request = new RestRequest("foo", Method.Get);
@@ -18,8 +18,9 @@ namespace Cortside.RestSharpClient.Tests {
             await authenticator.Authenticate(client, request).ConfigureAwait(false);
 
             // assert
-            Assert.Contains(request.Parameters, x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization);
-            Assert.True(request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization).Value.ToString().Trim().Length > 1);
+            var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
+            Assert.NotNull(authorization);
+            Assert.True(authorization.Trim().Length > 1);
         }
     }
 }
