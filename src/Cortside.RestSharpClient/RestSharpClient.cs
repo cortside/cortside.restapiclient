@@ -3,66 +3,57 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using RestSharp;
+using RestSharp.Authenticators;
 using RestSharp.Serializers;
 
 namespace Cortside.RestSharpClient {
-    public class RestSharpClient {
-        private readonly IDistributedCache cache;
+    public class RestSharpClient : IDisposable {
         private readonly ILogger logger;
         private readonly RestClient client;
-        private readonly IRestSerializer serializer;
+        private IRestSerializer serializer;
 
         public RestSharpClient(string baseUrl, ILogger logger) {
-            cache = new NullDistributedCache();
+            Cache = new NullDistributedCache();
             this.logger = logger;
 
             var options = new RestClientOptions {
                 BaseUrl = new Uri(baseUrl)
             };
 
-            serializer = new JsonNetSerializer();
-
             client = new RestClient(options);
-            client.UseSerializer(() => serializer);
+            Serializer = new JsonNetSerializer();
         }
 
         public RestSharpClient(RestClientOptions options, ILogger logger) {
-            cache = new NullDistributedCache();
+            Cache = new NullDistributedCache();
             this.logger = logger;
 
-            serializer = new JsonNetSerializer();
-
             client = new RestClient(options);
-            client.UseSerializer(() => serializer);
+            Serializer = new JsonNetSerializer();
         }
 
-        public RestSharpClient(string baseUrl, ILogger logger, IRestSerializer serializer) {
-            cache = new NullDistributedCache();
-            this.logger = logger;
-
-            var options = new RestClientOptions {
-                BaseUrl = new Uri(baseUrl)
-            };
-
-            this.serializer = serializer;
-
-            client = new RestClient(options);
-            client.UseSerializer(() => serializer);
+        public IAuthenticator Authenticator {
+            get {
+                return client.Authenticator;
+            }
+            set {
+                client.UseAuthenticator(value);
+            }
         }
 
-        public RestSharpClient(string baseUrl, ILogger logger, IRestSerializer serializer, IDistributedCache cache) {
-            this.cache = cache;
-            this.logger = logger;
-
-            var options = new RestClientOptions {
-                BaseUrl = new Uri(baseUrl)
-            };
-
-            this.serializer = serializer;
-
-            client = new RestClient(options);
-            client.UseSerializer(() => serializer);
+        public IRestSerializer Serializer {
+            get {
+                return serializer;
+            }
+            set {
+                serializer = value;
+                client.UseSerializer(() => value);
+            }
         }
+
+        public IDistributedCache Cache { get; set; }
+
+        public Uri BuildUri(RestRequest request) => client.BuildUri(request);
 
         private void TimeoutCheck(RestRequest request, RestResponse response) {
             if (response.StatusCode == 0) {
@@ -82,10 +73,10 @@ namespace Cortside.RestSharpClient {
             return response;
         }
 
-        public async Task<T> GetAsync<T>(RestRequest request) where T : new() {
+        public async Task<RestResponse<T>> GetAsync<T>(RestRequest request) where T : new() {
             var response = await client.ExecuteAsync<T>(request).ConfigureAwait(false);
             if (response.StatusCode == System.Net.HttpStatusCode.OK) {
-                return response.Data;
+                return response;
             } else {
                 LogError(request, response);
                 return default;
@@ -100,17 +91,18 @@ namespace Cortside.RestSharpClient {
         public async Task<T> GetWithCacheAsync<T>(RestRequest request, string cacheKey) where T : class, new() {
             var cacheOptions = new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) };
 
-            var item = await cache.GetValueAsync<T>(cacheKey, serializer).ConfigureAwait(false);
+            var item = await Cache.GetValueAsync<T>(cacheKey, serializer).ConfigureAwait(false);
             if (item == null) {
                 var response = await client.ExecuteAsync<T>(request).ConfigureAwait(false);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK) {
-                    await cache.SetValueAsync(cacheKey, response.Data, serializer, cacheOptions).ConfigureAwait(false);
+                    await Cache.SetValueAsync(cacheKey, response.Data, serializer, cacheOptions).ConfigureAwait(false);
                     item = response.Data;
                 } else {
                     LogError(request, response);
                     return default;
                 }
             }
+
             return item;
         }
 
@@ -135,6 +127,11 @@ namespace Cortside.RestSharpClient {
 
             //Log the exception and info message
             logger.LogError(ex, info);
+        }
+
+        public void Dispose() {
+            client?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

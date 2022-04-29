@@ -2,7 +2,7 @@
 
 image: Visual Studio 2019
 
-version: 1.1.{build}
+version: 1.0.{build}
 
 configuration:
 - Debug
@@ -28,7 +28,7 @@ assembly_info:
   assembly_informational_version: '{version}'
 
 before_build:
-- appveyor-retry dotnet restore src/Cortside.DomainEvent.sln -v Minimal
+- appveyor-retry dotnet restore src -v Minimal
 - set DNX_BUILD_VERSION=%APPVEYOR_BUILD_NUMBER%
 - dotnet --info
 
@@ -41,12 +41,10 @@ build:
 
 build_script:
 - dotnet tool install --global dotnet-sonarscanner --version 5.0.4
-- dotnet sonarscanner begin /o:"cortside" /k:"cortside_cortside.domainevent" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="88c88c857e5710d2a8ec472b7b5c2e91eb79fc4d" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
-- dotnet build src/Cortside.DomainEvent.sln --configuration %Configuration% /property:Version=%APPVEYOR_BUILD_VERSION%
-- dotnet test src/Cortside.DomainEvent.Tests/Cortside.DomainEvent.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-- dotnet test src/Cortside.DomainEvent.EntityFramework.IntegrationTests/Cortside.DomainEvent.EntityFramework.IntegrationTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-- dotnet test src/Cortside.DomainEvent.IntegrationTests/Cortside.DomainEvent.IntegrationTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-- dotnet sonarscanner end /d:sonar.login="88c88c857e5710d2a8ec472b7b5c2e91eb79fc4d"
+- dotnet sonarscanner begin /o:"cortside" /k:"cortside_cortside.restsharpclient" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="33b175754cf174e1df1b0a7780682a0eea0715c6" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+- dotnet build src --configuration %Configuration% /property:Version=%APPVEYOR_BUILD_VERSION%
+- dotnet test src /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+- dotnet sonarscanner end /d:sonar.login="33b175754cf174e1df1b0a7780682a0eea0715c6"
 
 after_build:
 - ps: >-
@@ -55,7 +53,7 @@ after_build:
     if($branch -ne 'master') {
         $fileVersion = "${fileVersion}-${branch}"; 
     }   
-    dotnet pack src/cortside.domainevent.sln --include-symbols -p:SymbolPackageFormat=snupkg --configuration $env:configuration -o ((get-location).Path + '\artifacts') /property:Version=$fileVersion 
+    dotnet pack src/cortside.restsharpclient.sln --include-symbols -p:SymbolPackageFormat=snupkg --configuration $env:configuration -o ((get-location).Path + '\artifacts') /property:Version=$fileVersion 
     
 artifacts:
 - path: artifacts\**\*.*
