@@ -16,14 +16,11 @@ namespace Cortside.RestSharpClient.Tests {
     public class RetryTest {
         [Fact]
         public async Task ShouldRetry() {
-            // Assign
+            // arrange
             var _server = WireMockServer.Start();
-
             _server.Given(Request.Create().WithPath("/200retry").UsingGet()).RespondWith(new CustomResponse());
-
             string url = "http://localhost:" + _server.Ports[0];
 
-            // arrange
             var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), url);
 
             // act
@@ -33,29 +30,6 @@ namespace Cortside.RestSharpClient.Tests {
             Assert.NotEmpty(repos);
         }
     }
-
-    //        _server.Given(Request.Create()
-    //            .WithPath("/200retry")
-    //            .UsingGet())
-    //            .InScenario("MyScenario")
-    //            .WhenStateIs("Started")
-    //            .WillSetStateTo("Something")
-    //            .RespondWith(
-    //                Response.Create()
-    //                    .WithStatusCode(200)
-    //                    .WithBody("Hello world!"));
-
-    //        _server.Given(Request.Create()
-    //.WithPath("/200retry")
-    //.UsingGet())
-    //.InScenario("MyScenario")
-    //.WhenStateIs("Something")
-    //.WillSetStateTo("Started")
-    //.RespondWith(
-    //    Response.Create()
-    //        .WithStatusCode(500)
-    //        .WithBody("Error"));
-
 
     public class CustomResponse : IResponseProvider {
         private static int _count = 0;
