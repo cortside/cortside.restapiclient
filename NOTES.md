@@ -15,3 +15,6 @@ scrutor
 https://andrewlock.net/adding-decorated-classes-to-the-asp.net-core-di-container-using-scrutor/#manually-creating-decorators-with-the-asp-net-core-di-container
 
 
+# mock apis
+https://mockbin.org
+https://geekflare.com/mock-rest-api/

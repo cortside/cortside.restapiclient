@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RestSharp;
 
-namespace Cortside.RestSharpClient.Tests {
+namespace Cortside.RestSharpClient.Tests.Clients {
     public class GitHubClient : IDisposable {
         readonly RestSharpClient client;
 

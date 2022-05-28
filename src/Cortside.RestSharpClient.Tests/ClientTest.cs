@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Cortside.RestSharpClient.Tests.Clients;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -19,7 +20,7 @@ namespace Cortside.RestSharpClient.Tests {
             // assert
             Assert.NotEmpty(repos);
             Assert.Contains(repos, x => x.Name == "cortside.restsharpclient");
-            Assert.NotNull(cache.Get("RestRequest::https://api.github.com/users/cortside/repos::"));
+            Assert.NotNull(await cache.GetAsync("RestRequest::https://api.github.com/users/cortside/repos::").ConfigureAwait(false));
         }
     }
 }
