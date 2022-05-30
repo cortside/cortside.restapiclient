@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Polly;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Serializers;
@@ -11,6 +12,7 @@ namespace Cortside.RestSharpClient {
         private readonly ILogger logger;
         private readonly RestClient client;
         private IRestSerializer serializer;
+        private IAsyncPolicy<RestResponse> policy = Policy.NoOpAsync<RestResponse>();
 
         public RestSharpClient(string baseUrl, ILogger logger) {
             Cache = new NullDistributedCache();
@@ -61,20 +63,46 @@ namespace Cortside.RestSharpClient {
             }
         }
 
+        public RestSharpClient WithPolicy(IAsyncPolicy<RestResponse> policy) {
+            this.policy = policy;
+            return this;
+        }
+
         public async Task<RestResponse> ExecuteAsync(RestRequest request) {
-            var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+            var response = await policy.ExecuteAsync(async () => {
+                var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+                if (response == null || response.StatusCode == 0) {
+                    throw new TimeoutException();
+                }
+                return response;
+            }).ConfigureAwait(false);
+
             TimeoutCheck(request, response);
             return response;
         }
 
         public async Task<RestResponse<T>> ExecuteAsync<T>(RestRequest request) {
-            var response = await client.ExecuteAsync<T>(request).ConfigureAwait(false);
+            var response = await policy.ExecuteAsync(async () => {
+                var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+                if (response == null || response.StatusCode == 0) {
+                    throw new TimeoutException();
+                }
+                return response;
+            }).ConfigureAwait(false);
+
             TimeoutCheck(request, response);
-            return response;
+            return client.Deserialize<T>(response);
         }
 
         public async Task<RestResponse> GetAsync(RestRequest request) {
-            var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+            var response = await policy.ExecuteAsync(async () => {
+                var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+                if (response == null || response.StatusCode == 0) {
+                    throw new TimeoutException();
+                }
+                return response;
+            }).ConfigureAwait(false);
+
             if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                 return response;
             } else {
@@ -84,9 +112,16 @@ namespace Cortside.RestSharpClient {
         }
 
         public async Task<RestResponse<T>> GetAsync<T>(RestRequest request) where T : new() {
-            var response = await client.ExecuteAsync<T>(request).ConfigureAwait(false);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK) {
+            var response = await policy.ExecuteAsync(async () => {
+                var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+                if (response == null || response.StatusCode == 0) {
+                    throw new TimeoutException();
+                }
                 return response;
+            }).ConfigureAwait(false);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK) {
+                return client.Deserialize<T>(response);
             } else {
                 LogError(request, response);
                 return default;
@@ -103,10 +138,18 @@ namespace Cortside.RestSharpClient {
 
             var item = await Cache.GetValueAsync<T>(cacheKey, serializer).ConfigureAwait(false);
             if (item == null) {
-                var response = await client.ExecuteAsync<T>(request).ConfigureAwait(false);
+                var response = await policy.ExecuteAsync(async () => {
+                    var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+                    if (response == null || response.StatusCode == 0) {
+                        throw new TimeoutException();
+                    }
+                    return response;
+                }).ConfigureAwait(false);
+
                 if (response.StatusCode == System.Net.HttpStatusCode.OK) {
-                    await Cache.SetValueAsync(cacheKey, response.Data, serializer, cacheOptions).ConfigureAwait(false);
-                    item = response.Data;
+                    var rr = client.Deserialize<T>(response);
+                    await Cache.SetValueAsync(cacheKey, rr.Data, serializer, cacheOptions).ConfigureAwait(false);
+                    item = rr.Data;
                 } else {
                     LogError(request, response);
                     return default;
@@ -138,28 +181,6 @@ namespace Cortside.RestSharpClient {
             //Log the exception and info message
             logger.LogError(ex, info);
         }
-
-        //private static int _maxRetryAttempts = 5;
-        //private static TimeSpan _pauseBetweenFailures = TimeSpan.FromSeconds(10);
-
-        //private RestResponse RestResponseWithPolicy(RestClient restClient, RestRequest restRequest, Func<string, Task> logFunction) {
-        //    var retryPolicy = Policy
-        //        .HandleResult<RestResponse>(x => !x.IsSuccessful)
-        //        .WaitAndRetry(_maxRetryAttempts, x => _pauseBetweenFailures, async (iRestResponse, timeSpan, retryCount, context) => {
-        //            await logFunction($"The request failed. HttpStatusCode={iRestResponse.Result.StatusCode}. Waiting {timeSpan} seconds before retry. Number attempt {retryCount}. Uri={iRestResponse.Result.ResponseUri}; RequestResponse={iRestResponse.Result.Content}");
-        //        });
-
-        //    var circuitBreakerPolicy = Policy
-        //        .HandleResult<RestResponse>(x => x.StatusCode == HttpStatusCode.ServiceUnavailable)
-        //        .CircuitBreaker(1, TimeSpan.FromSeconds(60), onBreak: async (iRestResponse, timespan, context) => {
-        //            await logFunction($"Circuit went into a fault state. Reason: {iRestResponse.Result.Content}");
-        //        },
-        //        onReset: async (context) => {
-        //            await logFunction($"Circuit left the fault state.");
-        //        });
-
-        //    return retryPolicy.Wrap(circuitBreakerPolicy).Execute(() => restClient.Execute(restRequest));
-        //}
 
         public void Dispose() {
             client?.Dispose();

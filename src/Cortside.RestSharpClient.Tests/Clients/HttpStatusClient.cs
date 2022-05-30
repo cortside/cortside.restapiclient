@@ -32,38 +32,17 @@ namespace Cortside.RestSharpClient.Tests.Clients {
             var request = new RestRequest("200retry", Method.Get);
             request.Timeout = 1000;
             var policy = GetRetryPolicy();
-
-            // execute the policy
-            var response = await policy.ExecuteAsync(async () => {
-                logger.LogInformation($"attempt with timeout = {request.Timeout}");
-                var response = await client.GetAsync(request).ConfigureAwait(false);
-                request.Timeout += 2000;
-                if (response == null || response.StatusCode == 0) {
-                    throw new TimeoutException();
-                }
-                return response;
-            }).ConfigureAwait(false);
+            var response = await client.WithPolicy(policy).GetAsync(request).ConfigureAwait(false);
 
             return response?.Content;
         }
 
         static IAsyncPolicy<RestResponse> GetRetryPolicy() {
-            //return HttpPolicyExtensions
-            //    .HandleTransientHttpError()
-            //    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
-            //    .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-
-            // define the policy using WaitAndRetry (try 3 times, waiting an increasing numer of seconds if exception is thrown)
-            return Policy<RestResponse>
-                .Handle<Exception>()
-                //.WaitAndRetryAsync(new[]
-                //    {
-                //    TimeSpan.FromSeconds(1),
-                //    TimeSpan.FromSeconds(2),
-                //    TimeSpan.FromSeconds(3)
-                //    }
-                //);
-                .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+            return PolicyBuilderExtensions
+                    .HandleTransientHttpError()
+                    .Or<TimeoutException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 5));
         }
 
         public void Dispose() {
