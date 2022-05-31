@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Cortside.Common.Correlation;
 using Microsoft.Extensions.Caching.Distributed;
@@ -150,6 +151,23 @@ namespace Cortside.RestSharpClient {
             }
 
             return item;
+        }
+
+        /// <summary>
+        /// Follows expected redirect and includes the authentication header in the redirect, which RestSharp does not do.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<RestResponse<T>> ExecuteAndFollowAsync<T>(RestRequest request) {
+            // TODO: this was moved to RestClientOptions, but I don't see how to set it per request or on the client
+            //FollowRedirects = false;
+            var response = await InnerExecuteAsync(request).ConfigureAwait(false);
+            var url = response.Headers.FirstOrDefault(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
+            logger.LogInformation($"Following redirect to {url}");
+            var redirectRequest = new RestRequest(url, Method.Get);
+            var redirectResponse = await InnerExecuteAsync(redirectRequest).ConfigureAwait(false);
+            return client.Deserialize<T>(redirectResponse);
         }
 
         private void LogError(RestRequest request, RestResponse response) {
