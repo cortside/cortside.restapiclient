@@ -9,10 +9,11 @@ using RestSharp;
 
 namespace Cortside.RestSharpClient.Tests.Clients {
     public class GitHubClient : IDisposable {
-        readonly RestSharpClient client;
+        private readonly RestSharpClient client;
+        private readonly IDistributedCache cache;
 
         public GitHubClient(ILogger<GitHubClient> logger) {
-            var cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
+            cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
             client = new RestSharpClient("https://api.github.com", logger) {
                 Serializer = new JsonNetSerializer(),
                 Cache = cache
@@ -20,16 +21,18 @@ namespace Cortside.RestSharpClient.Tests.Clients {
         }
 
         public GitHubClient(ILogger<GitHubClient> logger, IDistributedCache cache) {
+            this.cache = cache;
             client = new RestSharpClient("https://api.github.com", logger) {
                 Serializer = new JsonNetSerializer(),
                 Cache = cache
             };
         }
 
-        public async Task<List<GitHubRepo>> GetReposAsync() {
+        public IDistributedCache Cache => cache;
+
+        public Task<List<GitHubRepo>> GetReposAsync() {
             var request = new RestRequest("users/cortside/repos", Method.Get);
-            var repos = await client.GetWithCacheAsync<List<GitHubRepo>>(request).ConfigureAwait(false);
-            return repos;
+            return client.GetWithCacheAsync<List<GitHubRepo>>(request, TimeSpan.FromMinutes(1));
         }
 
         public void Dispose() {

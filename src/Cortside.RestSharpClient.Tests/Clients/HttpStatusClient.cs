@@ -32,7 +32,7 @@ namespace Cortside.RestSharpClient.Tests.Clients {
             var request = new RestRequest("200retry", Method.Get);
             request.Timeout = 1000;
             var policy = GetRetryPolicy();
-            var response = await client.WithPolicy(policy).GetAsync(request).ConfigureAwait(false);
+            var response = await client.UsePolicy(policy).GetAsync(request).ConfigureAwait(false);
 
             return response?.Content;
         }

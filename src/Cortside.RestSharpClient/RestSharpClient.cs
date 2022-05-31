@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Cortside.Common.Correlation;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -34,6 +35,7 @@ namespace Cortside.RestSharpClient {
             Serializer = new JsonNetSerializer();
         }
 
+        //TODO: use builder pattern
         public IAuthenticator Authenticator {
             get {
                 return client.Authenticator;
@@ -63,45 +65,42 @@ namespace Cortside.RestSharpClient {
             }
         }
 
-        public RestSharpClient WithPolicy(IAsyncPolicy<RestResponse> policy) {
+        public RestSharpClient UsePolicy(IAsyncPolicy<RestResponse> policy) {
             this.policy = policy;
             return this;
         }
 
-        public async Task<RestResponse> ExecuteAsync(RestRequest request) {
+        protected async Task<RestResponse> InnerExecuteAsync(RestRequest request) {
+            var correlationId = CorrelationContext.GetCorrelationId();
+            request.AddHeader("Request-Id", correlationId);
+            request.AddHeader("X-Correlation-Id", correlationId);
+
+            int retry = 0;
             var response = await policy.ExecuteAsync(async () => {
+                logger.LogInformation($"Attempt {retry++}");
+
                 var response = await client.ExecuteAsync(request).ConfigureAwait(false);
-                if (response == null || response.StatusCode == 0) {
-                    throw new TimeoutException();
-                }
+                logger.LogInformation("Response {retry}: Status Code = {StatusCode} Data = {Content}", retry, response.StatusCode, response.Content);
+                TimeoutCheck(request, response);
                 return response;
             }).ConfigureAwait(false);
 
-            TimeoutCheck(request, response);
+            logger.LogDebug("Response to {url} returned with status code {StatusCode} and content: {Content}", client.BuildUri(request), response.StatusCode, response.Content);
             return response;
         }
 
-        public async Task<RestResponse<T>> ExecuteAsync<T>(RestRequest request) {
-            var response = await policy.ExecuteAsync(async () => {
-                var response = await client.ExecuteAsync(request).ConfigureAwait(false);
-                if (response == null || response.StatusCode == 0) {
-                    throw new TimeoutException();
-                }
-                return response;
-            }).ConfigureAwait(false);
+        public Task<RestResponse> ExecuteAsync(RestRequest request) {
+            return InnerExecuteAsync(request);
+        }
 
-            TimeoutCheck(request, response);
+        public async Task<RestResponse<T>> ExecuteAsync<T>(RestRequest request) {
+            var response = await InnerExecuteAsync(request).ConfigureAwait(false);
             return client.Deserialize<T>(response);
         }
 
         public async Task<RestResponse> GetAsync(RestRequest request) {
-            var response = await policy.ExecuteAsync(async () => {
-                var response = await client.ExecuteAsync(request).ConfigureAwait(false);
-                if (response == null || response.StatusCode == 0) {
-                    throw new TimeoutException();
-                }
-                return response;
-            }).ConfigureAwait(false);
+            request.Method = Method.Get;
+            var response = await InnerExecuteAsync(request).ConfigureAwait(false);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                 return response;
@@ -112,13 +111,8 @@ namespace Cortside.RestSharpClient {
         }
 
         public async Task<RestResponse<T>> GetAsync<T>(RestRequest request) where T : new() {
-            var response = await policy.ExecuteAsync(async () => {
-                var response = await client.ExecuteAsync(request).ConfigureAwait(false);
-                if (response == null || response.StatusCode == 0) {
-                    throw new TimeoutException();
-                }
-                return response;
-            }).ConfigureAwait(false);
+            request.Method = Method.Get;
+            var response = await InnerExecuteAsync(request).ConfigureAwait(false);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                 return client.Deserialize<T>(response);
@@ -128,23 +122,18 @@ namespace Cortside.RestSharpClient {
             }
         }
 
-        public Task<T> GetWithCacheAsync<T>(RestRequest request) where T : class, new() {
+        public Task<T> GetWithCacheAsync<T>(RestRequest request, TimeSpan? duration = null) where T : class, new() {
             var cacheKey = $"RestRequest::{client.BuildUri(request)}::{request.QueryParameters()}";
-            return GetWithCacheAsync<T>(request, cacheKey);
+            return GetWithCacheAsync<T>(request, cacheKey, duration);
         }
 
-        public async Task<T> GetWithCacheAsync<T>(RestRequest request, string cacheKey) where T : class, new() {
-            var cacheOptions = new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) };
+        public async Task<T> GetWithCacheAsync<T>(RestRequest request, string cacheKey, TimeSpan? duration = null) where T : class, new() {
+            duration ??= TimeSpan.FromMinutes(10);
+            var cacheOptions = new DistributedCacheEntryOptions() { AbsoluteExpirationRelativeToNow = duration };
 
             var item = await Cache.GetValueAsync<T>(cacheKey, serializer).ConfigureAwait(false);
             if (item == null) {
-                var response = await policy.ExecuteAsync(async () => {
-                    var response = await client.ExecuteAsync(request).ConfigureAwait(false);
-                    if (response == null || response.StatusCode == 0) {
-                        throw new TimeoutException();
-                    }
-                    return response;
-                }).ConfigureAwait(false);
+                var response = await InnerExecuteAsync(request).ConfigureAwait(false);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                     var rr = client.Deserialize<T>(response);
@@ -152,6 +141,10 @@ namespace Cortside.RestSharpClient {
                     item = rr.Data;
                 } else {
                     LogError(request, response);
+                    var ex = response.ErrorException;
+                    if (ex != null) {
+                        throw ex;
+                    }
                     return default;
                 }
             }

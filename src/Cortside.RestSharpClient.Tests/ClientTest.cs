@@ -9,6 +9,21 @@ using Xunit;
 namespace Cortside.RestSharpClient.Tests {
     public class ClientTest {
         [Fact]
+        public async Task ShouldGetRepositoriesDefaultCacheAsync() {
+            // arrange
+            using (var client = new GitHubClient(new NullLogger<GitHubClient>())) {
+
+                // act
+                var repos = await client.GetReposAsync().ConfigureAwait(false);
+
+                // assert
+                Assert.NotEmpty(repos);
+                Assert.Contains(repos, x => x.Name == "cortside.restsharpclient");
+                Assert.NotNull(await client.Cache.GetAsync("RestRequest::https://api.github.com/users/cortside/repos::").ConfigureAwait(false));
+            }
+        }
+
+        [Fact]
         public async Task ShouldGetRepositoriesAsync() {
             // arrange
             var cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));

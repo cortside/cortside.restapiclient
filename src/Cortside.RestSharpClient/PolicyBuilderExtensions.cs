@@ -19,6 +19,10 @@ namespace Cortside.RestSharpClient {
             return Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(firstRetrySeconds), retryCount: retryCount);
         }
 
+        public static PolicyBuilder<RestResponse> Handle<T>() where T : Exception {
+            return Policy<RestResponse>.Handle<T>();
+        }
+
         /// <summary>
         /// Builds a <see cref="PolicyBuilder{RestResponse}"/> to configure a <see cref="Policy{RestResponse}"/> which will handle <see cref="RestClient"/> requests that fail with conditions indicating a transient failure. 
         /// <para>The conditions configured to be handled are:
@@ -33,9 +37,6 @@ namespace Cortside.RestSharpClient {
         public static PolicyBuilder<RestResponse> HandleTransientHttpError() {
             return Policy<RestResponse>.Handle<HttpRequestException>().OrTransientHttpStatusCode();
         }
-        public static PolicyBuilder<RestResponse> HandleHttpError() {
-            return Policy<RestResponse>.Handle<HttpRequestException>();
-        }
 
         /// <summary>
         /// Configures the <see cref="PolicyBuilder{RestResponse}"/> to handle <see cref="RestClient"/> requests that fail with <see cref="HttpStatusCode"/>s indicating a transient failure. 
@@ -48,6 +49,24 @@ namespace Cortside.RestSharpClient {
         /// </summary>
         /// <returns>The <see cref="PolicyBuilder{RestResponse}"/> pre-configured to handle <see cref="RestClient"/> requests that fail with <see cref="HttpStatusCode"/>s indicating a transient failure. </returns>
         public static PolicyBuilder<RestResponse> OrTransientHttpStatusCode(this PolicyBuilder policyBuilder) {
+            if (policyBuilder == null) {
+                throw new ArgumentNullException(nameof(policyBuilder));
+            }
+
+            return policyBuilder.OrResult(TransientHttpStatusCodePredicate);
+        }
+
+        /// <summary>
+        /// Configures the <see cref="PolicyBuilder{RestResponse}"/> to handle <see cref="RestClient"/> requests that fail with <see cref="HttpStatusCode"/>s indicating a transient failure. 
+        /// <para>The <see cref="HttpStatusCode"/>s configured to be handled are:
+        /// <list type="bullet">
+        /// <item><description>HTTP 5XX status codes (server errors)</description></item>
+        /// <item><description>HTTP 408 status code (request timeout)</description></item>
+        /// </list>
+        /// </para>
+        /// </summary>
+        /// <returns>The <see cref="PolicyBuilder{RestResponse}"/> pre-configured to handle <see cref="RestClient"/> requests that fail with <see cref="HttpStatusCode"/>s indicating a transient failure. </returns>
+        public static PolicyBuilder<RestResponse> OrTransientHttpStatusCode(this PolicyBuilder<RestResponse> policyBuilder) {
             if (policyBuilder == null) {
                 throw new ArgumentNullException(nameof(policyBuilder));
             }
@@ -72,24 +91,6 @@ namespace Cortside.RestSharpClient {
             }
 
             return policyBuilder.Or<HttpRequestException>().OrTransientHttpStatusCode();
-        }
-
-        /// <summary>
-        /// Configures the <see cref="PolicyBuilder{RestResponse}"/> to handle <see cref="RestClient"/> requests that fail with <see cref="HttpStatusCode"/>s indicating a transient failure. 
-        /// <para>The <see cref="HttpStatusCode"/>s configured to be handled are:
-        /// <list type="bullet">
-        /// <item><description>HTTP 5XX status codes (server errors)</description></item>
-        /// <item><description>HTTP 408 status code (request timeout)</description></item>
-        /// </list>
-        /// </para>
-        /// </summary>
-        /// <returns>The <see cref="PolicyBuilder{RestResponse}"/> pre-configured to handle <see cref="RestClient"/> requests that fail with <see cref="HttpStatusCode"/>s indicating a transient failure. </returns>
-        public static PolicyBuilder<RestResponse> OrTransientHttpStatusCode(this PolicyBuilder<RestResponse> policyBuilder) {
-            if (policyBuilder == null) {
-                throw new ArgumentNullException(nameof(policyBuilder));
-            }
-
-            return policyBuilder.OrResult(TransientHttpStatusCodePredicate);
         }
 
         /// <summary>
