@@ -11,7 +11,8 @@ namespace Cortside.RestSharpClient.Tests {
         [Fact]
         public async Task ShouldGetRepositoriesDefaultCacheAsync() {
             // arrange
-            using (var client = new GitHubClient(new NullLogger<GitHubClient>())) {
+            var cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
+            using (var client = new GitHubClient(new NullLogger<GitHubClient>(), cache)) {
 
                 // act
                 var repos = await client.GetReposAsync().ConfigureAwait(false);

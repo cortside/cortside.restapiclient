@@ -10,11 +10,11 @@ using RestSharp.Authenticators;
 using RestSharp.Serializers;
 
 namespace Cortside.RestSharpClient {
-    public class RestSharpClient : IDisposable {
+    public class RestSharpClient : IDisposable, IRestSharpClient {
         private readonly ILogger logger;
         private readonly RestClient client;
         private IRestSerializer serializer;
-        private IAsyncPolicy<RestResponse> policy = Policy.NoOpAsync<RestResponse>();
+        private IAsyncPolicy<RestResponse> policy = Polly.Policy.NoOpAsync<RestResponse>();
 
         public RestSharpClient(string baseUrl, ILogger logger) {
             Cache = new NullDistributedCache();
@@ -71,7 +71,22 @@ namespace Cortside.RestSharpClient {
             return this;
         }
 
-        protected async Task<RestResponse> InnerExecuteAsync(RestRequest request) {
+        public IAsyncPolicy<RestResponse> Policy {
+            get {
+                return policy;
+            }
+            set {
+                policy = value;
+            }
+        }
+
+        protected Task<RestResponse> InnerExecuteAsync(RestRequest request) {
+            return InnerExecuteAsync(request, policy);
+        }
+
+        protected async Task<RestResponse> InnerExecuteAsync(RestRequest request, IAsyncPolicy<RestResponse> policy) {
+            policy ??= this.policy;
+
             var correlationId = CorrelationContext.GetCorrelationId();
             request.AddHeader("Request-Id", correlationId);
             request.AddHeader("X-Correlation-Id", correlationId);
@@ -97,6 +112,18 @@ namespace Cortside.RestSharpClient {
         public async Task<RestResponse<T>> ExecuteAsync<T>(RestRequest request) {
             var response = await InnerExecuteAsync(request).ConfigureAwait(false);
             return client.Deserialize<T>(response);
+        }
+
+        public async Task<RestResponse> GetAsync(RestApiRequest request) {
+            request.Method = Method.Get;
+            var response = await InnerExecuteAsync(request.RestRequest, request.Policy).ConfigureAwait(false);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK) {
+                return response;
+            } else {
+                LogError(request.RestRequest, response);
+                return default;
+            }
         }
 
         public async Task<RestResponse> GetAsync(RestRequest request) {
