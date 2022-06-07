@@ -8,21 +8,22 @@ using RestSharp;
 
 namespace Cortside.RestSharpClient.Tests.Clients {
     public class GitHubClient : IDisposable {
-        private readonly RestSharpClient client;
-        private readonly IDistributedCache cache;
+        private readonly RestApiClient client;
+        private readonly RestApiClientOptions options;
 
         public GitHubClient(ILogger<GitHubClient> logger, IDistributedCache cache) {
-            this.cache = cache;
-            client = new RestSharpClient("https://api.github.com", logger) {
-                Serializer = new JsonNetSerializer(),
+            var options = new RestApiClientOptions("https://api.github.com") {
                 Cache = cache
             };
+            this.options = options;
+
+            client = new RestApiClient(options, logger);
         }
 
-        public IDistributedCache Cache => cache;
+        public IDistributedCache Cache => options.Cache;
 
         public Task<List<GitHubRepo>> GetReposAsync() {
-            var request = new RestRequest("users/cortside/repos", Method.Get);
+            var request = new RestApiRequest("users/cortside/repos", Method.Get);
             return client.GetWithCacheAsync<List<GitHubRepo>>(request, TimeSpan.FromMinutes(1));
         }
 

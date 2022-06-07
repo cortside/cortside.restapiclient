@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using RestSharp;
 
-namespace RestSharp {
+namespace Cortside.RestSharpClient {
     public interface IRestRequest {
         Func<HttpResponseMessage, RestResponse> AdvancedResponseWriter { get; set; }
         bool AlwaysMultipartFormData { get; set; }
@@ -24,7 +25,7 @@ namespace RestSharp {
         string RootElement { get; set; }
         int Timeout { get; set; }
 
-        RestRequest AddParameter(Parameter parameter);
+        //RestRequest AddParameter(Parameter parameter);
         void RemoveParameter(Parameter parameter);
     }
 }

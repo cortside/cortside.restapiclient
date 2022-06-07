@@ -85,12 +85,17 @@ namespace Cortside.RestSharpClient {
 
         public RestRequest RestRequest => request;
 
-        public RestRequest AddParameter(Parameter parameter) {
-            return request.AddParameter(parameter);
+        public RestApiRequest AddParameter(Parameter parameter) {
+            request.AddParameter(parameter);
+            return this;
         }
 
         public void RemoveParameter(Parameter parameter) {
             request.RemoveParameter(parameter);
+        }
+
+        public RestApiRequest AddHeader(string name, string value) {
+            return AddParameter(new HeaderParameter(name, value));
         }
     }
 }

@@ -25,3 +25,6 @@ https://github.com/App-vNext/Polly.Extensions.Http
 
 https://josef.codes/httpclient-error-handling-a-test-driven-approach/
 https://github.com/joseftw/JOS.HttpClient
+
+# xml test api
+https://www.appsloveworld.com/free-online-sample-xml-api-for-testing-purpose/
