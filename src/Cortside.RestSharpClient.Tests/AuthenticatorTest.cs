@@ -88,6 +88,5 @@ namespace Cortside.RestSharpClient.Tests {
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
             Assert.Null(authorization);
         }
-
     }
 }

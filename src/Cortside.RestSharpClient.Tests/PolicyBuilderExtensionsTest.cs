@@ -15,7 +15,7 @@ namespace Cortside.RestSharpClient.Tests {
         }
 
         [Fact]
-        public void HandleTransientHttpError_should_handle_HttpRequestException() {
+        public async Task HandleTransientHttpError_should_handle_HttpRequestExceptionAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = PolicyBuilderExtensions.HandleTransientHttpError()
                 .FallbackAsync(_ => {
@@ -23,13 +23,13 @@ namespace Cortside.RestSharpClient.Tests {
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => throw new HttpRequestException());
+            await policy.ExecuteAsync(() => throw new HttpRequestException()).ConfigureAwait(false);
 
             policyHandled.Should().BeTrue();
         }
 
         [Fact]
-        public void HandleTransientHttpError_should_handle_HttpStatusCode_RequestTimeout() {
+        public async Task HandleTransientHttpError_should_handle_HttpStatusCode_RequestTimeoutAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = PolicyBuilderExtensions.HandleTransientHttpError()
                 .FallbackAsync(_ => {
@@ -37,13 +37,13 @@ namespace Cortside.RestSharpClient.Tests {
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.RequestTimeout)));
+            await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.RequestTimeout))).ConfigureAwait(false);
 
             policyHandled.Should().BeTrue();
         }
 
         [Fact]
-        public void HandleTransientHttpError_should_handle_HttpStatusCode_InternalServerError() {
+        public async Task HandleTransientHttpError_should_handle_HttpStatusCode_InternalServerErrorAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = PolicyBuilderExtensions.HandleTransientHttpError()
                 .FallbackAsync(_ => {
@@ -51,13 +51,13 @@ namespace Cortside.RestSharpClient.Tests {
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.InternalServerError)));
+            await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.InternalServerError))).ConfigureAwait(false);
 
             policyHandled.Should().BeTrue();
         }
 
         [Fact]
-        public void HandleTransientHttpError_should_not_handle_HttpStatusCode_BadRequest() {
+        public async Task HandleTransientHttpError_should_not_handle_HttpStatusCode_BadRequestAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = PolicyBuilderExtensions.HandleTransientHttpError()
                 .FallbackAsync(_ => {
@@ -65,7 +65,7 @@ namespace Cortside.RestSharpClient.Tests {
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.BadRequest)));
+            await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.BadRequest))).ConfigureAwait(false);
 
             policyHandled.Should().BeFalse();
         }
@@ -77,7 +77,7 @@ namespace Cortside.RestSharpClient.Tests {
         }
 
         [Fact]
-        public void OrTransientHttpError_should_handle_HttpRequestException() {
+        public async Task OrTransientHttpError_should_handle_HttpRequestExceptionAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = Policy.Handle<CustomException>().OrTransientHttpError()
                 .FallbackAsync(_ => {
@@ -85,13 +85,13 @@ namespace Cortside.RestSharpClient.Tests {
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => throw new HttpRequestException());
+            await policy.ExecuteAsync(() => throw new HttpRequestException()).ConfigureAwait(false);
 
             policyHandled.Should().BeTrue();
         }
 
         [Fact]
-        public void OrTransientHttpError_should_handle_HttpStatusCode_RequestTimeout() {
+        public async Task OrTransientHttpError_should_handle_HttpStatusCode_RequestTimeoutAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = Policy.Handle<CustomException>().OrTransientHttpError()
                 .FallbackAsync(_ => {
@@ -99,35 +99,35 @@ namespace Cortside.RestSharpClient.Tests {
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.RequestTimeout)));
+            await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.RequestTimeout))).ConfigureAwait(false);
 
             policyHandled.Should().BeTrue();
         }
 
         [Fact]
-        public void OrTransientHttpError_should_handle_HttpStatusCode_InternalServerError() {
+        public async Task OrTransientHttpError_should_handle_HttpStatusCode_InternalServerErrorAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = Policy.Handle<CustomException>().OrTransientHttpError()
-                .FallbackAsync(token => {
+                .FallbackAsync(_ => {
                     policyHandled = true;
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.InternalServerError)));
+            await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.InternalServerError))).ConfigureAwait(false);
 
             policyHandled.Should().BeTrue();
         }
 
         [Fact]
-        public void OrTransientHttpError_should_not_handle_HttpStatusCode_BadRequest() {
+        public async Task OrTransientHttpError_should_not_handle_HttpStatusCode_BadRequestAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = Policy.Handle<CustomException>().OrTransientHttpError()
-                .FallbackAsync(token => {
+                .FallbackAsync(_ => {
                     policyHandled = true;
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.BadRequest)));
+            await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.BadRequest))).ConfigureAwait(false);
 
             policyHandled.Should().BeFalse();
         }
@@ -139,57 +139,57 @@ namespace Cortside.RestSharpClient.Tests {
         }
 
         [Fact]
-        public void OrTransientHttpError_onGenericPolicyBuilder_should_handle_HttpRequestException() {
+        public async Task OrTransientHttpError_onGenericPolicyBuilder_should_handle_HttpRequestExceptionAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = Policy<RestResponse>.Handle<CustomException>().OrTransientHttpError()
-                .FallbackAsync(token => {
+                .FallbackAsync(_ => {
                     policyHandled = true;
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => throw new HttpRequestException());
+            await policy.ExecuteAsync(() => throw new HttpRequestException()).ConfigureAwait(false);
 
             policyHandled.Should().BeTrue();
         }
 
         [Fact]
-        public void OrTransientHttpError_onGenericPolicyBuilder_should_handle_HttpStatusCode_RequestTimeout() {
+        public async Task OrTransientHttpError_onGenericPolicyBuilder_should_handle_HttpStatusCode_RequestTimeoutAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = Policy<RestResponse>.Handle<CustomException>().OrTransientHttpError()
-                .FallbackAsync(token => {
+                .FallbackAsync(_ => {
                     policyHandled = true;
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.RequestTimeout)));
+            await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.RequestTimeout))).ConfigureAwait(false);
 
             policyHandled.Should().BeTrue();
         }
 
         [Fact]
-        public void OrTransientHttpError_onGenericPolicyBuilder_should_handle_HttpStatusCode_InternalServerError() {
+        public async Task OrTransientHttpError_onGenericPolicyBuilder_should_handle_HttpStatusCode_InternalServerErrorAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = Policy<RestResponse>.Handle<CustomException>().OrTransientHttpError()
-                .FallbackAsync(token => {
+                .FallbackAsync(_ => {
                     policyHandled = true;
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.InternalServerError)));
+            await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.InternalServerError))).ConfigureAwait(false);
 
             policyHandled.Should().BeTrue();
         }
 
         [Fact]
-        public void OrTransientHttpError_onGenericPolicyBuilder_should_not_handle_HttpStatusCode_BadRequest() {
+        public async Task OrTransientHttpError_onGenericPolicyBuilder_should_not_handle_HttpStatusCode_BadRequestAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = Policy<RestResponse>.Handle<CustomException>().OrTransientHttpError()
-                .FallbackAsync(token => {
+                .FallbackAsync(_ => {
                     policyHandled = true;
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.BadRequest)));
+            await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.BadRequest))).ConfigureAwait(false);
 
             policyHandled.Should().BeFalse();
         }
@@ -207,57 +207,57 @@ namespace Cortside.RestSharpClient.Tests {
         }
 
         [Fact]
-        public void OrTransientHttpStatusCode_should_not_handle_HttpRequestException() {
+        public async Task OrTransientHttpStatusCode_should_not_handle_HttpRequestExceptionAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = Policy.Handle<CustomException>().OrTransientHttpStatusCode()
-                .FallbackAsync(token => {
+                .FallbackAsync(_ => {
                     policyHandled = true;
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => throw new HttpRequestException());
+            await policy.ExecuteAsync(() => throw new HttpRequestException()).ConfigureAwait(false);
 
             policyHandled.Should().BeFalse();
         }
 
         [Fact]
-        public void OrTransientHttpStatusCode_should_handle_HttpStatusCode_RequestTimeout() {
+        public async Task OrTransientHttpStatusCode_should_handle_HttpStatusCode_RequestTimeoutAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = Policy.Handle<CustomException>().OrTransientHttpStatusCode()
-                .FallbackAsync(token => {
+                .FallbackAsync(_ => {
                     policyHandled = true;
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.RequestTimeout)));
+            await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.RequestTimeout))).ConfigureAwait(false);
 
             policyHandled.Should().BeTrue();
         }
 
         [Fact]
-        public void OrTransientHttpStatusCode_should_handle_HttpStatusCode_InternalServerError() {
+        public async Task OrTransientHttpStatusCode_should_handle_HttpStatusCode_InternalServerErrorAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = Policy.Handle<CustomException>().OrTransientHttpStatusCode()
-                .FallbackAsync(token => {
+                .FallbackAsync(_ => {
                     policyHandled = true;
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.InternalServerError)));
+            await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.InternalServerError))).ConfigureAwait(false);
 
             policyHandled.Should().BeTrue();
         }
 
         [Fact]
-        public void OrTransientHttpStatusCode_should_not_handle_HttpStatusCode_BadRequest() {
+        public async Task OrTransientHttpStatusCode_should_not_handle_HttpStatusCode_BadRequestAsync() {
             var policyHandled = false;
             IAsyncPolicy<RestResponse> policy = Policy.Handle<CustomException>().OrTransientHttpStatusCode()
-                .FallbackAsync(token => {
+                .FallbackAsync(_ => {
                     policyHandled = true;
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.BadRequest)));
+            await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.BadRequest))).ConfigureAwait(false);
 
             policyHandled.Should().BeFalse();
         }

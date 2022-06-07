@@ -1,3 +1,5 @@
+#pragma warning disable _MissingAsync // TAP methods must end with Async.
+
 using System.Threading.Tasks;
 using Cortside.Common.Correlation;
 using Microsoft.Extensions.Logging;
@@ -37,7 +39,7 @@ namespace Cortside.RestSharpClient.Authenticators.OpenIDConnect {
         }
 
         protected override async ValueTask<Parameter> GetAuthenticationParameter(string accessToken) {
-            var token = string.IsNullOrEmpty(Token) ? await GetTokenAsync() : Token;
+            var token = string.IsNullOrEmpty(Token) ? await GetTokenAsync().ConfigureAwait(false) : Token;
             return new HeaderParameter(KnownHeaders.Authorization, token);
         }
 

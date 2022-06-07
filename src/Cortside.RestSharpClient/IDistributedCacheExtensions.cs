@@ -18,7 +18,7 @@ namespace Cortside.RestSharpClient {
                 return result;
             }
 
-            result = await factory();
+            result = await factory().ConfigureAwait(false);
 
             await cache.SetValueAsync(key, result, serializer, options).ConfigureAwait(false);
 

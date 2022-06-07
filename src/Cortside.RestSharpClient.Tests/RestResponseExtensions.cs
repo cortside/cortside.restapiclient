@@ -1,3 +1,5 @@
+#pragma warning disable RCS1224 // Make method an extension method.
+
 using System.Net;
 using System.Reflection;
 using RestSharp;

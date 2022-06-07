@@ -13,7 +13,7 @@ namespace Cortside.RestSharpClient {
     public class RestApiClient : IDisposable, IRestApiClient {
         private readonly ILogger logger;
         private readonly RestClient client;
-        private RestApiClientOptions options;
+        private readonly RestApiClientOptions options;
 
         public RestApiClient(string baseUrl, ILogger logger) {
             this.logger = logger;
@@ -186,8 +186,12 @@ namespace Cortside.RestSharpClient {
         }
 
         public void Dispose() {
-            client?.Dispose();
+            Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing) {
+            client?.Dispose();
         }
     }
 }

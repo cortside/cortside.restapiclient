@@ -1,3 +1,5 @@
+#pragma warning disable RCS1224 // Make method an extension method.
+
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -24,7 +26,7 @@ namespace Cortside.RestSharpClient {
         }
 
         /// <summary>
-        /// Builds a <see cref="PolicyBuilder{RestResponse}"/> to configure a <see cref="Policy{RestResponse}"/> which will handle <see cref="RestClient"/> requests that fail with conditions indicating a transient failure. 
+        /// Builds a <see cref="PolicyBuilder{RestResponse}"/> to configure a <see cref="Policy{RestResponse}"/> which will handle <see cref="RestClient"/> requests that fail with conditions indicating a transient failure.
         /// <para>The conditions configured to be handled are:
         /// <list type="bullet">
         /// <item><description>Network failures (as <see cref="HttpRequestException"/>)</description></item>
@@ -39,7 +41,7 @@ namespace Cortside.RestSharpClient {
         }
 
         /// <summary>
-        /// Configures the <see cref="PolicyBuilder{RestResponse}"/> to handle <see cref="RestClient"/> requests that fail with <see cref="HttpStatusCode"/>s indicating a transient failure. 
+        /// Configures the <see cref="PolicyBuilder{RestResponse}"/> to handle <see cref="RestClient"/> requests that fail with <see cref="HttpStatusCode"/>s indicating a transient failure.
         /// <para>The <see cref="HttpStatusCode"/>s configured to be handled are:
         /// <list type="bullet">
         /// <item><description>HTTP 5XX status codes (server errors)</description></item>
@@ -57,7 +59,7 @@ namespace Cortside.RestSharpClient {
         }
 
         /// <summary>
-        /// Configures the <see cref="PolicyBuilder{RestResponse}"/> to handle <see cref="RestClient"/> requests that fail with <see cref="HttpStatusCode"/>s indicating a transient failure. 
+        /// Configures the <see cref="PolicyBuilder{RestResponse}"/> to handle <see cref="RestClient"/> requests that fail with <see cref="HttpStatusCode"/>s indicating a transient failure.
         /// <para>The <see cref="HttpStatusCode"/>s configured to be handled are:
         /// <list type="bullet">
         /// <item><description>HTTP 5XX status codes (server errors)</description></item>
@@ -75,7 +77,7 @@ namespace Cortside.RestSharpClient {
         }
 
         /// <summary>
-        /// Configures the <see cref="PolicyBuilder{RestResponse}"/> to handle <see cref="RestClient"/> requests that fail with conditions indicating a transient failure. 
+        /// Configures the <see cref="PolicyBuilder{RestResponse}"/> to handle <see cref="RestClient"/> requests that fail with conditions indicating a transient failure.
         /// <para>The conditions configured to be handled are:
         /// <list type="bullet">
         /// <item><description>Network failures (as <see cref="HttpRequestException"/>)</description></item>
@@ -94,7 +96,7 @@ namespace Cortside.RestSharpClient {
         }
 
         /// <summary>
-        /// Configures the <see cref="PolicyBuilder{RestResponse}"/> to handle <see cref="RestClient"/> requests that fail with conditions indicating a transient failure. 
+        /// Configures the <see cref="PolicyBuilder{RestResponse}"/> to handle <see cref="RestClient"/> requests that fail with conditions indicating a transient failure.
         /// <para>The conditions configured to be handled are:
         /// <list type="bullet">
         /// <item><description>Network failures (as <see cref="HttpRequestException"/>)</description></item>

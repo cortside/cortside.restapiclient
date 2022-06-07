@@ -1,3 +1,6 @@
+#pragma warning disable RCS1085 // Use auto-implemented property.
+#pragma warning disable IDE0032 // Use auto-implemented property.
+
 using System;
 using System.Net;
 using System.Net.Http;
@@ -37,7 +40,7 @@ namespace Cortside.RestSharpClient {
 
         public RestApiClientOptions(string baseUrl) : this(new Uri(baseUrl)) { }
 
-        public RestApiClientOptions(RestClientOptions rcoptions) {
+        private RestApiClientOptions(RestClientOptions rcoptions) {
             rcOptions = rcoptions;
         }
 
@@ -57,7 +60,6 @@ namespace Cortside.RestSharpClient {
         public IDistributedCache Cache { get; set; }
 
         public IAsyncPolicy<RestResponse> Policy { get; set; }
-
 
         /// <summary>
         /// Explicit Host header value to use in requests independent from the request URI.
@@ -91,7 +93,7 @@ namespace Cortside.RestSharpClient {
         }
 
         /// <summary>
-        /// Set to true if you need the Content-Type not to have the charset 
+        /// Set to true if you need the Content-Type not to have the charset
         /// </summary>
         public bool DisableCharset {
             get { return rcOptions.DisableCharset; }
@@ -161,7 +163,7 @@ namespace Cortside.RestSharpClient {
 
         /// <summary>
         /// Modifies the default behavior of RestSharp to swallow exceptions.
-        /// When set to <code>true</code>, a <see cref="DeserializationException"/> will be thrown
+        /// When set to <c>true</c>, a <see cref="DeserializationException"/> will be thrown
         /// in case RestSharp fails to deserialize the response.
         /// </summary>
         public bool ThrowOnDeserializationError {
@@ -171,7 +173,7 @@ namespace Cortside.RestSharpClient {
 
         /// <summary>
         /// Modifies the default behavior of RestSharp to swallow exceptions.
-        /// When set to <code>true</code>, RestSharp will consider the request as unsuccessful
+        /// When set to <c>true</c>, RestSharp will consider the request as unsuccessful
         /// in case it fails to deserialize the response.
         /// </summary>
         public bool FailOnDeserializationError {
@@ -181,7 +183,7 @@ namespace Cortside.RestSharpClient {
 
         /// <summary>
         /// Modifies the default behavior of RestSharp to swallow exceptions.
-        /// When set to <code>true</code>, exceptions will be re-thrown.
+        /// When set to <c>true</c>, exceptions will be re-thrown.
         /// </summary>
         public bool ThrowOnAnyError {
             get => rcOptions.ThrowOnAnyError;

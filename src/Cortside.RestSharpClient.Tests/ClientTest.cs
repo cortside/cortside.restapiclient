@@ -13,7 +13,6 @@ namespace Cortside.RestSharpClient.Tests {
             // arrange
             var cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
             using (var client = new GitHubClient(new NullLogger<GitHubClient>(), cache)) {
-
                 // act
                 var repos = await client.GetReposAsync().ConfigureAwait(false);
 

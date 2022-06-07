@@ -1,3 +1,6 @@
+#pragma warning disable RCS1085 // Use auto-implemented property.
+#pragma warning disable IDE0032 // Use auto-implemented property.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,7 +30,6 @@ namespace Cortside.RestSharpClient {
         }
 
         public IAsyncPolicy<RestResponse> Policy { get; set; }
-
 
         public Func<HttpResponseMessage, RestResponse> AdvancedResponseWriter {
             get => request.AdvancedResponseWriter;

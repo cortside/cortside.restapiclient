@@ -20,6 +20,5 @@ namespace Cortside.RestSharpClient {
         Task<RestResponse<T>> GetAsync<T>(RestApiRequest request) where T : new();
         Task<T> GetWithCacheAsync<T>(RestApiRequest request, TimeSpan? duration = null) where T : class, new();
         Task<T> GetWithCacheAsync<T>(RestApiRequest request, string cacheKey, TimeSpan? duration = null) where T : class, new();
-        //RestApiClient UsePolicy(IAsyncPolicy<RestResponse> policy);
     }
 }

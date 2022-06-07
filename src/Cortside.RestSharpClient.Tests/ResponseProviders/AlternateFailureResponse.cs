@@ -33,5 +33,4 @@ namespace Cortside.RestSharpClient.Tests.ResponseProviders {
             };
         }
     }
-
 }

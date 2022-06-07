@@ -24,8 +24,6 @@ namespace Cortside.RestSharpClient {
         Func<Stream, Stream> ResponseWriter { get; set; }
         string RootElement { get; set; }
         int Timeout { get; set; }
-
-        //RestRequest AddParameter(Parameter parameter);
         void RemoveParameter(Parameter parameter);
     }
 }

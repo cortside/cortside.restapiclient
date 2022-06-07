@@ -12,10 +12,9 @@ namespace Cortside.RestSharpClient.Tests.Clients {
         private readonly RestApiClientOptions options;
 
         public GitHubClient(ILogger<GitHubClient> logger, IDistributedCache cache) {
-            var options = new RestApiClientOptions("https://api.github.com") {
+            options = new RestApiClientOptions("https://api.github.com") {
                 Cache = cache
             };
-            this.options = options;
 
             client = new RestApiClient(options, logger);
         }
@@ -28,8 +27,12 @@ namespace Cortside.RestSharpClient.Tests.Clients {
         }
 
         public void Dispose() {
-            client?.Dispose();
+            Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing) {
+            client?.Dispose();
         }
     }
 }
