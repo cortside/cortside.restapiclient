@@ -148,9 +148,9 @@ namespace Cortside.RestSharpClient {
             set => rcOptions.Encoding = value;
         }
 
-        public int Timeout {
-            get => rcOptions.Timeout;
-            set => rcOptions.Timeout = value;
+        public int MaxTimeout {
+            get => rcOptions.MaxTimeout;
+            set => rcOptions.MaxTimeout = value;
         }
 
         /// <summary>

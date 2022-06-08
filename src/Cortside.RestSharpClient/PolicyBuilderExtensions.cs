@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using Cortside.Common.Validation;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using RestSharp;
@@ -51,9 +52,7 @@ namespace Cortside.RestSharpClient {
         /// </summary>
         /// <returns>The <see cref="PolicyBuilder{RestResponse}"/> pre-configured to handle <see cref="RestClient"/> requests that fail with <see cref="HttpStatusCode"/>s indicating a transient failure. </returns>
         public static PolicyBuilder<RestResponse> OrTransientHttpStatusCode(this PolicyBuilder policyBuilder) {
-            if (policyBuilder == null) {
-                throw new ArgumentNullException(nameof(policyBuilder));
-            }
+            Guard.From.Null(policyBuilder, nameof(policyBuilder));
 
             return policyBuilder.OrResult(TransientHttpStatusCodePredicate);
         }
@@ -69,9 +68,7 @@ namespace Cortside.RestSharpClient {
         /// </summary>
         /// <returns>The <see cref="PolicyBuilder{RestResponse}"/> pre-configured to handle <see cref="RestClient"/> requests that fail with <see cref="HttpStatusCode"/>s indicating a transient failure. </returns>
         public static PolicyBuilder<RestResponse> OrTransientHttpStatusCode(this PolicyBuilder<RestResponse> policyBuilder) {
-            if (policyBuilder == null) {
-                throw new ArgumentNullException(nameof(policyBuilder));
-            }
+            Guard.From.Null(policyBuilder, nameof(policyBuilder));
 
             return policyBuilder.OrResult(TransientHttpStatusCodePredicate);
         }
@@ -88,9 +85,7 @@ namespace Cortside.RestSharpClient {
         /// </summary>
         /// <returns>The <see cref="PolicyBuilder{RestResponse}"/> pre-configured to handle <see cref="RestClient"/> requests that fail with conditions indicating a transient failure. </returns>
         public static PolicyBuilder<RestResponse> OrTransientHttpError(this PolicyBuilder policyBuilder) {
-            if (policyBuilder == null) {
-                throw new ArgumentNullException(nameof(policyBuilder));
-            }
+            Guard.From.Null(policyBuilder, nameof(policyBuilder));
 
             return policyBuilder.Or<HttpRequestException>().OrTransientHttpStatusCode();
         }
@@ -107,9 +102,7 @@ namespace Cortside.RestSharpClient {
         /// </summary>
         /// <returns>The <see cref="PolicyBuilder{RestResponse}"/> pre-configured to handle <see cref="RestClient"/> requests that fail with conditions indicating a transient failure. </returns>
         public static PolicyBuilder<RestResponse> OrTransientHttpError(this PolicyBuilder<RestResponse> policyBuilder) {
-            if (policyBuilder == null) {
-                throw new ArgumentNullException(nameof(policyBuilder));
-            }
+            Guard.From.Null(policyBuilder, nameof(policyBuilder));
 
             return policyBuilder.Or<HttpRequestException>().OrTransientHttpStatusCode();
         }
