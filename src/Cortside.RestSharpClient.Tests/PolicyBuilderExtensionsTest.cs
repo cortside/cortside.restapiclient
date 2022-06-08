@@ -215,9 +215,9 @@ namespace Cortside.RestSharpClient.Tests {
                     return Task.FromResult<RestResponse>(null);
                 });
 
-            await policy.ExecuteAsync(() => throw new HttpRequestException()).ConfigureAwait(false);
+            await policy.ExecuteAsync(() => throw new CustomException()).ConfigureAwait(false);
 
-            policyHandled.Should().BeFalse();
+            policyHandled.Should().BeTrue();
         }
 
         [Fact]
