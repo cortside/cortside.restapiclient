@@ -42,6 +42,9 @@ namespace Cortside.RestSharpClient {
 
         private RestApiClientOptions(RestClientOptions rcoptions) {
             rcOptions = rcoptions;
+            Serializer = new JsonNetSerializer();
+            Policy = Polly.Policy.NoOpAsync<RestResponse>();
+            Cache = new NullDistributedCache();
         }
 
         public static RestApiClientOptions From(RestClientOptions rcoptions) {
