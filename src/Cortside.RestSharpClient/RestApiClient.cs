@@ -15,14 +15,14 @@ namespace Cortside.RestSharpClient {
         private readonly RestClient client;
         private readonly RestApiClientOptions options;
 
-        public RestApiClient(string baseUrl, ILogger logger) {
+        public RestApiClient(ILogger logger, string baseUrl) {
             this.logger = logger;
 
             options = new RestApiClientOptions(baseUrl);
             client = new RestClient(options.Options);
         }
 
-        public RestApiClient(RestApiClientOptions options, ILogger logger) {
+        public RestApiClient(ILogger logger, RestApiClientOptions options) {
             this.logger = logger;
             this.options = options;
 

@@ -9,16 +9,7 @@ namespace Cortside.RestSharpClient.Tests.Clients {
         readonly RestApiClient client;
 
         public HttpStatusClient(ILogger<HttpStatusClient> logger, string hostUrl) {
-            var options = new RestApiClientOptions(hostUrl) {
-                Serializer = new JsonNetSerializer(),
-                Policy = PolicyBuilderExtensions
-                            .HandleTransientHttpError()
-                            .Or<TimeoutException>()
-                            .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
-                            .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 5))
-            };
-
-            client = new RestApiClient(options, logger);
+            client = new RestApiClient(logger, hostUrl);
         }
 
         public async Task<string> Get200Async() {

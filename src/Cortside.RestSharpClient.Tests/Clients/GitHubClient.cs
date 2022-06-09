@@ -16,7 +16,7 @@ namespace Cortside.RestSharpClient.Tests.Clients {
                 Cache = cache
             };
 
-            client = new RestApiClient(options, logger);
+            client = new RestApiClient(logger, options);
         }
 
         public IDistributedCache Cache => options.Cache;
