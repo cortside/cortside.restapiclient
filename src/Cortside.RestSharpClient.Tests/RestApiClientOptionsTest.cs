@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -25,7 +26,7 @@ namespace Cortside.RestSharpClient.Tests {
         [Fact]
         public void ShouldSetupDefaultsWithUrl() {
             // arrange
-            var url = "https://api.github.com/";
+            const string url = "https://api.github.com/";
 
             // act
             RestApiClientOptions options = new RestApiClientOptions(url);
@@ -43,7 +44,7 @@ namespace Cortside.RestSharpClient.Tests {
         [Fact]
         public void ShouldSetupDefaultsWithUri() {
             // arrange
-            var url = "https://api.github.com/";
+            const string url = "https://api.github.com/";
 
             // act
             RestApiClientOptions options = new RestApiClientOptions(new Uri(url));
@@ -61,7 +62,7 @@ namespace Cortside.RestSharpClient.Tests {
         [Fact]
         public void ShouldCreateFromOptions() {
             // arrange
-            var url = "https://api.github.com/";
+            const string url = "https://api.github.com/";
 
             // act
             RestApiClientOptions options = RestApiClientOptions.From(new RestClientOptions(url));
@@ -79,7 +80,7 @@ namespace Cortside.RestSharpClient.Tests {
         [Fact]
         public void ShouldSetBaseUrl() {
             // arrange
-            var url = "https://api.github.com/";
+            const string url = "https://api.github.com/";
 
             // act
             var options = new RestApiClientOptions {
@@ -341,6 +342,20 @@ namespace Cortside.RestSharpClient.Tests {
             // assert
             Assert.Equal(o, options.Credentials);
             Assert.Equal(o, options.Options.Credentials);
+        }
+
+        [Fact]
+        public void ShouldSetConfigureMessageHandler() {
+            // arrange
+            RestApiClientOptions options = new RestApiClientOptions();
+            var o = new Mock<HttpMessageHandler>().Object;
+
+            // act
+            options.ConfigureMessageHandler = _ => o;
+
+            // assert
+            Assert.NotNull(options.ConfigureMessageHandler);
+            Assert.NotNull(options.Options.ConfigureMessageHandler);
         }
     }
 }

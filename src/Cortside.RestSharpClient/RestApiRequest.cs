@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Threading.Tasks;
 using Polly;
 using RestSharp;
 
@@ -31,10 +30,10 @@ namespace Cortside.RestSharpClient {
 
         public IAsyncPolicy<RestResponse> Policy { get; set; }
 
-        public Func<HttpResponseMessage, RestResponse> AdvancedResponseWriter {
-            get => request.AdvancedResponseWriter;
-            set => throw new NotImplementedException();
-        }
+        //public Func<HttpResponseMessage, RestResponse> AdvancedResponseWriter {
+        //    get => request.AdvancedResponseWriter;
+        //    //set => request.AdvancedResponseWriter = value;
+        //}
 
         public bool AlwaysMultipartFormData {
             get => request.AlwaysMultipartFormData;
@@ -44,41 +43,61 @@ namespace Cortside.RestSharpClient {
         public int Attempts => request.Attempts;
 
         public HttpCompletionOption CompletionOption {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => request.CompletionOption;
+            set => request.CompletionOption = value;
         }
 
         public IReadOnlyCollection<FileParameter> Files => request.Files;
 
-        public string FormBoundary { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string FormBoundary {
+            get => request.FormBoundary;
+            set => request.FormBoundary = value;
+        }
 
         public Method Method {
             get => request.Method;
             set => request.Method = value;
         }
 
-        public bool MultipartFormQuoteParameters { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Func<HttpResponseMessage, ValueTask> OnAfterRequest { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Action<RestResponse> OnBeforeDeserialization { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Func<HttpRequestMessage, ValueTask> OnBeforeRequest { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool MultipartFormQuoteParameters {
+            get => request.MultipartFormQuoteParameters;
+            set => request.MultipartFormQuoteParameters = value;
+        }
+
+        //public Func<HttpResponseMessage, ValueTask> OnAfterRequest {
+        //    get => throw new NotImplementedException();
+        //    set => throw new NotImplementedException();
+        //}
+
+        //public Action<RestResponse> OnBeforeDeserialization {
+        //    get => throw new NotImplementedException();
+        //    set => throw new NotImplementedException();
+        //}
+
+        //public Func<HttpRequestMessage, ValueTask> OnBeforeRequest {
+        //    get => throw new NotImplementedException();
+        //    set => throw new NotImplementedException();
+        //}
 
         public ParametersCollection Parameters => request.Parameters;
 
         public DataFormat RequestFormat {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => request.RequestFormat;
+            set => request.RequestFormat = value;
         }
         public string Resource {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => request.Resource;
+            set => request.Resource = value;
         }
-        public Func<Stream, Stream> ResponseWriter {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
-        }
+
+        //public Func<Stream, Stream> ResponseWriter {
+        //    get => request.ResponseWriter;
+        //    //init => request.ResponseWriter = value;
+        //}
+
         public string RootElement {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => request.RootElement;
+            set => request.RootElement = value;
         }
         public int Timeout {
             get => request.Timeout;
@@ -98,6 +117,21 @@ namespace Cortside.RestSharpClient {
 
         public RestApiRequest AddHeader(string name, string value) {
             return AddParameter(new HeaderParameter(name, value));
+        }
+
+        public RestApiRequest AddFile(string name, string path, string contentType = null) {
+            RestRequest.AddFile(name, path, contentType);
+            return this;
+        }
+
+        public RestApiRequest AddFile(string name, byte[] bytes, string filename, string contentType = null) {
+            RestRequest.AddFile(name, bytes, filename, contentType);
+            return this;
+        }
+
+        public RestApiRequest AddFile(string name, Func<Stream> getFile, string fileName, string contentType = null) {
+            RestRequest.AddFile(name, getFile, fileName, contentType);
+            return this;
         }
     }
 }

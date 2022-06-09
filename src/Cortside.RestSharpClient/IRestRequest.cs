@@ -1,13 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
-using System.Threading.Tasks;
 using RestSharp;
 
 namespace Cortside.RestSharpClient {
     public interface IRestRequest {
-        Func<HttpResponseMessage, RestResponse> AdvancedResponseWriter { get; set; }
+        //Func<HttpResponseMessage, RestResponse> AdvancedResponseWriter { get; /*set;*/ }
         bool AlwaysMultipartFormData { get; set; }
         int Attempts { get; }
         HttpCompletionOption CompletionOption { get; set; }
@@ -15,13 +12,13 @@ namespace Cortside.RestSharpClient {
         string FormBoundary { get; set; }
         Method Method { get; set; }
         bool MultipartFormQuoteParameters { get; set; }
-        Func<HttpResponseMessage, ValueTask> OnAfterRequest { get; set; }
-        Action<RestResponse> OnBeforeDeserialization { get; set; }
-        Func<HttpRequestMessage, ValueTask> OnBeforeRequest { get; set; }
+        //Func<HttpResponseMessage, ValueTask> OnAfterRequest { get; set; }
+        //Action<RestResponse> OnBeforeDeserialization { get; set; }
+        //Func<HttpRequestMessage, ValueTask> OnBeforeRequest { get; set; }
         ParametersCollection Parameters { get; }
         DataFormat RequestFormat { get; set; }
         string Resource { get; set; }
-        Func<Stream, Stream> ResponseWriter { get; set; }
+        //Func<Stream, Stream> ResponseWriter { get; /*set;*/ }
         string RootElement { get; set; }
         int Timeout { get; set; }
         void RemoveParameter(Parameter parameter);
