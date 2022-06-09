@@ -13,7 +13,6 @@ namespace Cortside.RestSharpClient {
         IAsyncPolicy<RestResponse> Policy { get; }
         IRestSerializer Serializer { get; }
         Uri BuildUri(RestApiRequest request);
-        Task<RestResponse<T>> ExecuteAndFollowAsync<T>(RestApiRequest request);
         Task<RestResponse> ExecuteAsync(RestApiRequest request);
         Task<RestResponse<T>> ExecuteAsync<T>(RestApiRequest request);
         Task<RestResponse> GetAsync(RestApiRequest request);
