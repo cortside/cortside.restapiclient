@@ -19,7 +19,7 @@ namespace Cortside.RestSharpClient {
     public class RestApiClientOptions {
         private readonly RestClientOptions rcOptions = new RestClientOptions() {
             AutomaticDecompression = DecompressionMethods.GZip,
-            FollowRedirects = true,
+            FollowRedirects = false,
             UserAgent = DefaultUserAgent,
             Encoding = Encoding.UTF8,
             FailOnDeserializationError = true
@@ -55,6 +55,8 @@ namespace Cortside.RestSharpClient {
 
         static readonly Version Version = new AssemblyName(typeof(RestApiClientOptions).Assembly.FullName!).Version!;
         static readonly string DefaultUserAgent = $"RestApiClient/{Version}";
+
+        public bool FollowRedirects { get; set; } = true;
 
         public IAuthenticator Authenticator { get; set; }
 
@@ -129,11 +131,6 @@ namespace Cortside.RestSharpClient {
         public CacheControlHeaderValue CachePolicy {
             get { return rcOptions.CachePolicy; }
             set { rcOptions.CachePolicy = value; }
-        }
-
-        public bool FollowRedirects {
-            get { return rcOptions.FollowRedirects; }
-            set { rcOptions.FollowRedirects = value; }
         }
 
         public CookieContainer CookieContainer {

@@ -12,15 +12,15 @@ namespace Cortside.RestSharpClient.Tests {
         public async Task ShouldGetRepositoriesDefaultCacheAsync() {
             // arrange
             var cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
-            using (var client = new GitHubClient(new NullLogger<GitHubClient>(), cache)) {
-                // act
-                var repos = await client.GetReposAsync().ConfigureAwait(false);
+            var client = new GitHubClient(new NullLogger<GitHubClient>(), cache);
 
-                // assert
-                Assert.NotEmpty(repos);
-                Assert.Contains(repos, x => x.Name == "cortside.restsharpclient");
-                Assert.NotNull(await client.Cache.GetAsync("RestRequest::https://api.github.com/users/cortside/repos::").ConfigureAwait(false));
-            }
+            // act
+            var repos = await client.GetReposAsync().ConfigureAwait(false);
+
+            // assert
+            Assert.NotEmpty(repos);
+            Assert.Contains(repos, x => x.Name == "cortside.restsharpclient");
+            Assert.NotNull(await client.Cache.GetAsync("RestRequest::https://api.github.com/users/cortside/repos::").ConfigureAwait(false));
         }
 
         [Fact]

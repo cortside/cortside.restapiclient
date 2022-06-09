@@ -6,5 +6,6 @@ namespace Cortside.RestSharpClient {
         IAsyncPolicy<RestResponse> Policy { get; set; }
 
         RestApiRequest AddParameter(Parameter parameter);
+        bool? FollowRedirects { get; set; }
     }
 }

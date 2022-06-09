@@ -133,5 +133,7 @@ namespace Cortside.RestSharpClient {
             RestRequest.AddFile(name, getFile, fileName, contentType);
             return this;
         }
+
+        public bool? FollowRedirects { get; set; }
     }
 }

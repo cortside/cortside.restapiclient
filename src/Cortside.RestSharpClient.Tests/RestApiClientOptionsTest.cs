@@ -233,6 +233,9 @@ namespace Cortside.RestSharpClient.Tests {
 
             // assert
             Assert.False(options.FollowRedirects);
+
+            // underlying restsharpoptions should be false as this is manually handled
+            options.FollowRedirects = true;
             Assert.False(options.Options.FollowRedirects);
         }
 

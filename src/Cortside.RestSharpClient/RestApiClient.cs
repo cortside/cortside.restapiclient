@@ -18,12 +18,8 @@ namespace Cortside.RestSharpClient {
         public RestApiClient(string baseUrl, ILogger logger) {
             this.logger = logger;
 
-            var rcoptions = new RestClientOptions {
-                BaseUrl = new Uri(baseUrl)
-            };
-
-            options = RestApiClientOptions.From(rcoptions);
-            client = new RestClient(rcoptions);
+            options = new RestApiClientOptions(baseUrl);
+            client = new RestClient(options.Options);
         }
 
         public RestApiClient(RestApiClientOptions options, ILogger logger) {
@@ -79,6 +75,16 @@ namespace Cortside.RestSharpClient {
             }).ConfigureAwait(false);
 
             logger.LogDebug("Response to {url} returned with status code {StatusCode} and content: {Content}", client.BuildUri(request.RestRequest), response.StatusCode, response.Content);
+
+            // TODO: should check status code -- what else?
+            if (request.FollowRedirects ?? options.FollowRedirects && response.Headers.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase))) {
+                var url = response.Headers.FirstOrDefault(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
+                logger.LogInformation($"Following redirect to {url}");
+                var redirectRequest = new RestApiRequest(url, Method.Get);
+                var redirectResponse = await InnerExecuteAsync(redirectRequest).ConfigureAwait(false);
+                return redirectResponse;
+            }
+
             return response;
         }
 
@@ -143,23 +149,6 @@ namespace Cortside.RestSharpClient {
             }
 
             return item;
-        }
-
-        /// <summary>
-        /// Follows expected redirect and includes the authentication header in the redirect, which RestSharp does not do.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public async Task<RestResponse<T>> ExecuteAndFollowAsync<T>(RestApiRequest request) {
-            // TODO: this was moved to RestClientOptions, but I don't see how to set it per request or on the client
-            //FollowRedirects = false;
-            var response = await InnerExecuteAsync(request).ConfigureAwait(false);
-            var url = response.Headers.FirstOrDefault(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
-            logger.LogInformation($"Following redirect to {url}");
-            var redirectRequest = new RestApiRequest(url, Method.Get);
-            var redirectResponse = await InnerExecuteAsync(redirectRequest).ConfigureAwait(false);
-            return client.Deserialize<T>(redirectResponse);
         }
 
         private void LogError(RestApiRequest request, RestResponse response) {
