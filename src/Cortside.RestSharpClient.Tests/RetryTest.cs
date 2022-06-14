@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Cortside.RestSharpClient.Tests.Clients;
+using Cortside.RestSharpClient.Tests.Clients.HttpStatusApi;
 using Cortside.RestSharpClient.Tests.ResponseProviders;
 using Microsoft.Extensions.Logging.Abstractions;
 using WireMock.RequestBuilders;
@@ -23,9 +23,5 @@ namespace Cortside.RestSharpClient.Tests {
             // assert
             Assert.NotEmpty(repos);
         }
-
-        // TODO: follow redirects
-
-        // TODO: non-200 get request, with and without cache
     }
 }

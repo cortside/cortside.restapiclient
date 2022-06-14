@@ -8,8 +8,8 @@ using Polly;
 using RestSharp;
 using Xunit;
 
-namespace Cortside.RestSharpClient.Tests {
-    public class AuthenticatorTest {
+namespace Cortside.RestSharpClient.Tests.Authenticators {
+    public class OpenIDConnectAuthenticatorTest {
         [Fact]
         public async Task ShouldAuthenticateWithTokenRequestAsync() {
             var tokenRequest = new TokenRequest {
