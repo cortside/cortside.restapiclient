@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cortside.RestApiClient", "Cortside.RestApiClient\Cortside.RestApiClient.csproj", "{DC5FADCA-39C4-4773-9FDF-939BF59C35AA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D120124E-F0D6-49DD-88F9-D93B4C6ED050}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		..\NOTES.md = ..\NOTES.md
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cortside.RestApiClient.Tests", "Cortside.RestApiClient.Tests\Cortside.RestApiClient.Tests.csproj", "{64B32973-B0B2-41F2-AA5C-BCDF4C13C278}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC5FADCA-39C4-4773-9FDF-939BF59C35AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC5FADCA-39C4-4773-9FDF-939BF59C35AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC5FADCA-39C4-4773-9FDF-939BF59C35AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC5FADCA-39C4-4773-9FDF-939BF59C35AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64B32973-B0B2-41F2-AA5C-BCDF4C13C278}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64B32973-B0B2-41F2-AA5C-BCDF4C13C278}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64B32973-B0B2-41F2-AA5C-BCDF4C13C278}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64B32973-B0B2-41F2-AA5C-BCDF4C13C278}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9910A244-CF65-49D3-8A85-C9EB0C922471}
+	EndGlobalSection
+EndGlobal
