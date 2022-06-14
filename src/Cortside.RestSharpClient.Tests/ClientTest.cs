@@ -18,7 +18,7 @@ namespace Cortside.RestSharpClient.Tests {
 
             // assert
             Assert.NotEmpty(repos);
-            Assert.Contains(repos, x => x.Name == "cortside.restsharpclient");
+            Assert.Contains(repos, x => x.Name == "cortside.restapiclient");
             Assert.NotNull(cache.Get("RestRequest::https://api.github.com/users/cortside/repos::"));
         }
     }
