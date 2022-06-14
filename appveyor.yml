@@ -54,6 +54,8 @@ build_script:
                 $target = "master";
             }
             $analysisArgs += " /d:sonar.newCode.referenceBranch=""$target""";
+        } else {
+            $analysisArgs += " /d:sonar.newCode.referenceBranch=""$branch""";
         }
     } else {
         $branch = $Env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH;
