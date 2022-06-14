@@ -15,7 +15,7 @@ environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   JAVA_HOME: C:\Program Files\Java\jdk15
   SONAR_TOKEN:
-    secure: Toi4ag+CoqHYJFVNtLWDD1W0ddSNk334ksP80NQh9RDkcbi9zIKGWY/yvDwE8GxB
+    secure: GxL28p8CqF+SNRHHtFk7/H/pGgV6WteJjCDej3brdJ6CByDcAA7HKYIaYOI8etEF
   SONAR_PROJECT: cortside_cortside.restapiclient
 
 init:
