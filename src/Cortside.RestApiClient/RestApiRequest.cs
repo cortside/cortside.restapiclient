@@ -7,6 +7,7 @@ using System.IO;
 using System.Net.Http;
 using Polly;
 using RestSharp;
+using RestSharp.Serializers;
 
 namespace Cortside.RestApiClient {
     public class RestApiRequest : IRestApiRequest {
@@ -81,11 +82,6 @@ namespace Cortside.RestApiClient {
 
         public RestRequest RestRequest => request;
 
-        public RestApiRequest AddParameter(Parameter parameter) {
-            request.AddParameter(parameter);
-            return this;
-        }
-
         public void RemoveParameter(Parameter parameter) {
             request.RemoveParameter(parameter);
         }
@@ -110,5 +106,64 @@ namespace Cortside.RestApiClient {
         }
 
         public bool? FollowRedirects { get; set; }
+
+        public RestApiRequest AddParameter(Parameter parameter) {
+            request.AddParameter(parameter);
+            return this;
+        }
+
+        public RestApiRequest AddParameter(string name, string value, bool encode = true) {
+            request.AddParameter(new GetOrPostParameter(name, value, encode));
+            return this;
+        }
+
+        public RestApiRequest AddParameter<T>(string name, T value, bool encode = true) where T : struct {
+            request.AddParameter(name, value.ToString(), encode);
+            return this;
+        }
+
+        public RestApiRequest AddParameter(string name, object value, ParameterType type, bool encode = true) {
+            if (type != ParameterType.RequestBody) {
+                request.AddParameter(Parameter.CreateParameter(name, value, type, encode));
+                return this;
+            }
+
+            request.AddBody(value);
+            return this;
+        }
+
+        public RestApiRequest AddStringBody(string body, DataFormat dataFormat) {
+            string contentType = ContentType.FromDataFormat[dataFormat];
+            request.RequestFormat = dataFormat;
+            request.AddParameter(new BodyParameter("", body, contentType));
+            return this;
+        }
+
+        public RestApiRequest AddStringBody(string body, string contentType) {
+            request.AddParameter(new BodyParameter("", body, contentType));
+            return this;
+        }
+
+        public RestApiRequest AddJsonBody<T>(T obj, string contentType = "application/json") where T : class {
+            request.RequestFormat = DataFormat.Json;
+            if (!(obj is string text)) {
+                request.AddParameter(new JsonParameter("", obj, contentType));
+                return this;
+            }
+
+            request.AddStringBody(text, DataFormat.Json);
+            return this;
+        }
+
+        public RestApiRequest AddXmlBody<T>(T obj, string contentType = "application/xml", string xmlNamespace = "") where T : class {
+            request.RequestFormat = DataFormat.Xml;
+            if (!(obj is string text)) {
+                request.AddParameter(new XmlParameter("", obj, xmlNamespace, contentType));
+                return this;
+            }
+
+            request.AddStringBody(text, DataFormat.Xml);
+            return this;
+        }
     }
 }

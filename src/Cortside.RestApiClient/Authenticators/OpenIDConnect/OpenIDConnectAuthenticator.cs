@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Polly;
 using RestSharp;
 using RestSharp.Authenticators;
+using RestSharp.Serializers.NewtonsoftJson;
 
 namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
     public class OpenIDConnectAuthenticator : AuthenticatorBase {
@@ -47,6 +48,8 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             var options = new RestClientOptions(tokenRequest.AuthorityUrl);
 
             using (var client = new RestClient(options)) {
+                client.UseNewtonsoftJson();
+
                 var request = new RestRequest("connect/token", Method.Post)
                     .AddParameter("grant_type", tokenRequest.GrantType)
                     .AddParameter("scope", tokenRequest.Scope)
