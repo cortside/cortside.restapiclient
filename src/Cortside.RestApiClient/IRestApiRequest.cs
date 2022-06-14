@@ -35,5 +35,7 @@ namespace Cortside.RestApiClient {
         RestApiRequest AddStringBody(string body, string contentType);
         RestApiRequest AddJsonBody<T>(T obj, string contentType = "application/json") where T : class;
         RestApiRequest AddXmlBody<T>(T obj, string contentType = "application/xml", string xmlNamespace = "") where T : class;
+        RestApiRequest AddQueryParameter(string name, string value, bool encode = true);
+        RestApiRequest AddQueryParameter<T>(string name, T value, bool encode = true) where T : struct;
     }
 }
