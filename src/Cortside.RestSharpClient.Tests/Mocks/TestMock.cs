@@ -1,5 +1,6 @@
 ﻿using System;
 using Cortside.MockServer;
+using Cortside.RestSharpClient.Tests.Clients.CatalogApi;
 using Newtonsoft.Json;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;

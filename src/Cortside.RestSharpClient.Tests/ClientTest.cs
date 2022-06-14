@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Cortside.RestSharpClient.Tests.Clients;
+using Cortside.RestSharpClient.Tests.Clients.GitHubApi;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;

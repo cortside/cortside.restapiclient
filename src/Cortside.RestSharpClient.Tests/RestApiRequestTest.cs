@@ -43,19 +43,6 @@ namespace Cortside.RestSharpClient.Tests {
             Assert.Equal(Method.Options, request.RestRequest.Method);
         }
 
-        //[Fact]
-        //public void ShouldSetAdvancedResponseWriter() {
-        //    // arrange
-        //    var rr = new RestRequest();
-
-        //    // act
-        //    var request = RestApiRequest.From(rr);
-
-        //    // assert
-        //    Assert.Null(request.AdvancedResponseWriter);
-        //    Assert.Null(request.RestRequest.AdvancedResponseWriter);
-        //}
-
         [Fact]
         public void ShouldSetAlwaysMultipartFormData() {
             // act
@@ -107,7 +94,7 @@ namespace Cortside.RestSharpClient.Tests {
         [Fact]
         public void ShouldSetTimeout() {
             // arrange
-            var value = 99;
+            const int value = 99;
 
             // act
             var request = new RestApiRequest() {
@@ -122,7 +109,7 @@ namespace Cortside.RestSharpClient.Tests {
         [Fact]
         public void ShouldSetRootElement() {
             // arrange
-            var value = "foo";
+            const string value = "foo";
 
             // act
             var request = new RestApiRequest() {
@@ -137,7 +124,7 @@ namespace Cortside.RestSharpClient.Tests {
         [Fact]
         public void ShouldSetResource() {
             // arrange
-            var value = "foo";
+            const string value = "foo";
 
             // act
             var request = new RestApiRequest() {
@@ -152,7 +139,7 @@ namespace Cortside.RestSharpClient.Tests {
         [Fact]
         public void ShouldSetRequestFormat() {
             // arrange
-            var value = DataFormat.Binary;
+            const DataFormat value = DataFormat.Binary;
 
             // act
             var request = new RestApiRequest() {
@@ -167,7 +154,7 @@ namespace Cortside.RestSharpClient.Tests {
         [Fact]
         public void ShouldSetFormBoundary() {
             // arrange
-            var value = "foo";
+            const string value = "foo";
 
             // act
             var request = new RestApiRequest() {
@@ -220,7 +207,6 @@ namespace Cortside.RestSharpClient.Tests {
 
             // act
             var file = Path.GetFileName(filename);
-            var path = filename.Replace(Path.GetFileName(filename), "");
             request.AddFile(file, () => File.OpenRead(filename), filename);
 
             // assert
@@ -241,7 +227,7 @@ namespace Cortside.RestSharpClient.Tests {
         [Fact]
         public void ShouldSetCompletionOption() {
             // arrange
-            var value = HttpCompletionOption.ResponseHeadersRead;
+            const HttpCompletionOption value = HttpCompletionOption.ResponseHeadersRead;
 
             // act
             var request = new RestApiRequest() {

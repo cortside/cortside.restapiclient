@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Cortside.RestSharpClient.Tests.Clients {
+namespace Cortside.RestSharpClient.Tests {
     [Serializable]
-    internal class RestApiException : Exception {
+    public class RestApiException : Exception {
         public RestApiException() {
         }
 

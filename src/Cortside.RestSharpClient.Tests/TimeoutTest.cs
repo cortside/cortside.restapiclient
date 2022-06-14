@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Cortside.MockServer;
 using Cortside.MockServer.AccessControl;
-using Cortside.RestSharpClient.Tests.Clients;
+using Cortside.RestSharpClient.Tests.Clients.HttpStatusApi;
 using Cortside.RestSharpClient.Tests.Mocks;
 using Microsoft.Extensions.Logging.Abstractions;
 using RestSharp;

@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Cortside.RestSharpClient.Tests.Models;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using RestSharp;
 
-namespace Cortside.RestSharpClient.Tests.Clients {
+namespace Cortside.RestSharpClient.Tests.Clients.GitHubApi {
     public class GitHubClient : IDisposable {
         private readonly RestApiClient client;
         private readonly RestApiClientOptions options;

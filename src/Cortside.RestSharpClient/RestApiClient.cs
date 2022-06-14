@@ -4,10 +4,7 @@ using System.Threading.Tasks;
 using Cortside.Common.Correlation;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using Polly;
 using RestSharp;
-using RestSharp.Authenticators;
-using RestSharp.Serializers;
 
 namespace Cortside.RestSharpClient {
     public class RestApiClient : IDisposable, IRestApiClient {
@@ -30,15 +27,12 @@ namespace Cortside.RestSharpClient {
             if (options.Authenticator != null) {
                 client.UseAuthenticator(options.Authenticator);
             }
-            client.UseSerializer(() => options.Serializer);
-        }
-
-        public IAuthenticator Authenticator {
-            get { return options.Authenticator; }
-        }
-
-        public IRestSerializer Serializer {
-            get { return options.Serializer; }
+            if (options.Serializer != null) {
+                client.UseSerializer(() => options.Serializer);
+            }
+            if (options.XmlSerializer) {
+                client.UseXml();
+            }
         }
 
         public IDistributedCache Cache {
@@ -61,10 +55,6 @@ namespace Cortside.RestSharpClient {
             }
         }
 
-        public IAsyncPolicy<RestResponse> Policy {
-            get { return options.Policy; }
-        }
-
         protected async Task<RestResponse> InnerExecuteAsync(RestApiRequest request) {
             var policy = request.Policy ?? options.Policy;
 
@@ -80,9 +70,8 @@ namespace Cortside.RestSharpClient {
                 var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
                 logger.LogInformation("Response {retry}: Status Code = {StatusCode} Data = {Content}", retry, response.StatusCode, response.Content);
                 TimeoutCheck(request, response);
-                var exception = response.ErrorException;
-                if (options.ThrowOnAnyError && exception != null) {
-                    throw exception;
+                if (options.ThrowOnAnyError && response.ErrorException != null) {
+                    throw response.ErrorException;
                 }
                 return response;
             }).ConfigureAwait(false);
@@ -94,8 +83,8 @@ namespace Cortside.RestSharpClient {
                 throw exception;
             }
 
-            // TODO: should check status code -- what else?
-            if (request.FollowRedirects ?? options.FollowRedirects && response.Headers != null && response.Headers.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase))) {
+            // TODO: should this check status code? anything else?
+            if ((request.FollowRedirects ?? options.FollowRedirects) && response.Headers?.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)) == true) {
                 var url = response.Headers.FirstOrDefault(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
                 logger.LogInformation($"Following redirect to {url}");
                 var redirectRequest = new RestApiRequest(url, Method.Get);
@@ -166,13 +155,11 @@ namespace Cortside.RestSharpClient {
 
             var item = await Cache.GetValueAsync<T>(cacheKey, options.Serializer).ConfigureAwait(false);
             if (item == null) {
-                var response = await GetAsync(request).ConfigureAwait(false);
-                //var response = await InnerExecuteAsync(request).ConfigureAwait(false);
+                var response = await GetAsync<T>(request).ConfigureAwait(false);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK) {
-                    var rr = client.Deserialize<T>(response);
-                    await Cache.SetValueAsync(cacheKey, rr.Data, options.Serializer, cacheOptions).ConfigureAwait(false);
-                    item = rr.Data;
+                    await Cache.SetValueAsync(cacheKey, response.Data, options.Serializer, cacheOptions).ConfigureAwait(false);
+                    item = response.Data;
                 } else {
                     LogError(request, response);
                     var ex = response.ErrorException;
@@ -192,7 +179,7 @@ namespace Cortside.RestSharpClient {
 
             //Set up the information message with the URL, 
             //the status code, and the parameters.
-            string info = $"Request to " + BuildUri(request) + " failed with response status " + response.ResponseStatus.ToString() + " status code "
+            string info = "Request to " + BuildUri(request) + " failed with response status " + response.ResponseStatus.ToString() + " status code "
                           + response.StatusCode + ", parameters: "
                           + parameters + ", and content: " + response.Content;
 
