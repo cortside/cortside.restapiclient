@@ -19,7 +19,7 @@ namespace Cortside.RestApiClient.Tests {
 
             // assert
             Assert.NotEmpty(repos);
-            Assert.Contains(repos, x => x.Name == "cortside.restsharpclient");
+            Assert.Contains(repos, x => x.Name == "cortside.restapiclient");
             Assert.NotNull(await client.Cache.GetAsync("RestRequest::https://api.github.com/users/cortside/repos::").ConfigureAwait(false));
         }
 
@@ -34,7 +34,7 @@ namespace Cortside.RestApiClient.Tests {
 
             // assert
             Assert.NotEmpty(repos);
-            Assert.Contains(repos, x => x.Name == "cortside.restsharpclient");
+            Assert.Contains(repos, x => x.Name == "cortside.restapiclient");
             Assert.NotNull(await cache.GetAsync("RestRequest::https://api.github.com/users/cortside/repos::").ConfigureAwait(false));
         }
     }
