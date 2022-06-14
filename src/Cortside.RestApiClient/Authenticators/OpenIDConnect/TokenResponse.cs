@@ -1,12 +1,12 @@
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
     public class TokenResponse {
-        [JsonPropertyName("access_token")]
+        [JsonProperty("access_token")]
         public string AccessToken { get; set; }
-        [JsonPropertyName("expires_in")]
+        [JsonProperty("expires_in")]
         public int ExpiresIn { get; set; }
-        [JsonPropertyName("token_type")]
+        [JsonProperty("token_type")]
         public string TokenType { get; set; }
     }
 }
