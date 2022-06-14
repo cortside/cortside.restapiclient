@@ -185,7 +185,7 @@ namespace Cortside.RestSharpClient.Tests {
 
             // assert
             Assert.True(options.ThrowOnDeserializationError);
-            Assert.True(options.Options.ThrowOnDeserializationError);
+            Assert.False(options.Options.ThrowOnDeserializationError);
         }
 
         [Fact]
@@ -209,7 +209,7 @@ namespace Cortside.RestSharpClient.Tests {
 
             // assert
             Assert.True(options.ThrowOnAnyError);
-            Assert.True(options.Options.ThrowOnAnyError);
+            Assert.False(options.Options.ThrowOnAnyError);
         }
 
         [Fact]

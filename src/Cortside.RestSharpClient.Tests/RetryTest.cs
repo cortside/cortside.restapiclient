@@ -24,11 +24,6 @@ namespace Cortside.RestSharpClient.Tests {
             Assert.NotEmpty(repos);
         }
 
-
-        // TODO: test for timeout
-
-        // TODO: test with authenticator
-
         // TODO: follow redirects
 
         // TODO: non-200 get request, with and without cache

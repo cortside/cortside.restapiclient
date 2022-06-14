@@ -48,8 +48,16 @@ namespace Cortside.RestSharpClient {
         public Uri BuildUri(RestApiRequest request) => client.BuildUri(request.RestRequest);
 
         private void TimeoutCheck(RestApiRequest request, RestResponse response) {
-            if (response.StatusCode == 0) {
+            if (response.ResponseStatus == ResponseStatus.TimedOut) {
+                response.ErrorMessage = null;
+                response.ErrorException = null;
                 LogError(request, response);
+
+                if (options.ThrowOnAnyError) {
+                    var timeouts = new int[] { request.Timeout, client.Options.MaxTimeout };
+                    var timeout = timeouts.Where(x => x > 0).Min();
+                    throw new TimeoutException($"Timeout of {timeout} exceeded");
+                }
             }
         }
 
@@ -66,18 +74,28 @@ namespace Cortside.RestSharpClient {
 
             int retry = 0;
             var response = await policy.ExecuteAsync(async () => {
+                // TODO: log the attempt # as property
                 logger.LogInformation($"Attempt {retry++}");
 
                 var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
                 logger.LogInformation("Response {retry}: Status Code = {StatusCode} Data = {Content}", retry, response.StatusCode, response.Content);
                 TimeoutCheck(request, response);
+                var exception = response.ErrorException;
+                if (options.ThrowOnAnyError && exception != null) {
+                    throw exception;
+                }
                 return response;
             }).ConfigureAwait(false);
 
             logger.LogDebug("Response to {url} returned with status code {StatusCode} and content: {Content}", client.BuildUri(request.RestRequest), response.StatusCode, response.Content);
+            TimeoutCheck(request, response);
+            var exception = response.ErrorException;
+            if (options.ThrowOnAnyError && exception != null) {
+                throw exception;
+            }
 
             // TODO: should check status code -- what else?
-            if (request.FollowRedirects ?? options.FollowRedirects && response.Headers.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase))) {
+            if (request.FollowRedirects ?? options.FollowRedirects && response.Headers != null && response.Headers.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase))) {
                 var url = response.Headers.FirstOrDefault(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
                 logger.LogInformation($"Following redirect to {url}");
                 var redirectRequest = new RestApiRequest(url, Method.Get);
@@ -101,17 +119,33 @@ namespace Cortside.RestSharpClient {
             request.Method = Method.Get;
             var response = await InnerExecuteAsync(request).ConfigureAwait(false);
 
+            if (response.ResponseStatus == ResponseStatus.TimedOut) {
+                var timeouts = new int[] { request.Timeout, client.Options.MaxTimeout };
+                var timeout = timeouts.Where(x => x > 0).Min();
+                throw new TimeoutException($"Timeout of {timeout} exceeded");
+            }
+
+            if (response.ErrorException != null) {
+                LogError(request, response);
+                // Request failed with status code Forbidden
+                throw new RestApiException(response.ErrorMessage ?? response.ErrorException.Message, response.ErrorException);
+            }
+
+            if (!response.IsSuccessful) {
+                LogError(request, response);
+                throw new RestApiException($"Request failed with status code {response.StatusCode}");
+            }
+
             if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                 return response;
             } else {
                 LogError(request, response);
-                return default;
+                throw new RestApiException("unsucessful request--need better message");
             }
         }
 
         public async Task<RestResponse<T>> GetAsync<T>(RestApiRequest request) where T : new() {
-            request.Method = Method.Get;
-            var response = await InnerExecuteAsync(request).ConfigureAwait(false);
+            var response = await GetAsync(request).ConfigureAwait(false);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                 return client.Deserialize<T>(response);
@@ -132,7 +166,8 @@ namespace Cortside.RestSharpClient {
 
             var item = await Cache.GetValueAsync<T>(cacheKey, options.Serializer).ConfigureAwait(false);
             if (item == null) {
-                var response = await InnerExecuteAsync(request).ConfigureAwait(false);
+                var response = await GetAsync(request).ConfigureAwait(false);
+                //var response = await InnerExecuteAsync(request).ConfigureAwait(false);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                     var rr = client.Deserialize<T>(response);
@@ -157,7 +192,7 @@ namespace Cortside.RestSharpClient {
 
             //Set up the information message with the URL, 
             //the status code, and the parameters.
-            string info = "Request to " + BuildUri(request) + " failed with status code "
+            string info = $"Request to " + BuildUri(request) + " failed with response status " + response.ResponseStatus.ToString() + " status code "
                           + response.StatusCode + ", parameters: "
                           + parameters + ", and content: " + response.Content;
 

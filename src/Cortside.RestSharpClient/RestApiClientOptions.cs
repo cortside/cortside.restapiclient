@@ -16,13 +16,15 @@ using RestSharp.Authenticators;
 using RestSharp.Serializers;
 
 namespace Cortside.RestSharpClient {
-    public class RestApiClientOptions {
+    public class RestApiClientOptions : IRestApiClientOptions {
         private readonly RestClientOptions rcOptions = new RestClientOptions() {
             AutomaticDecompression = DecompressionMethods.GZip,
             FollowRedirects = false,
             UserAgent = DefaultUserAgent,
             Encoding = Encoding.UTF8,
-            FailOnDeserializationError = true
+            FailOnDeserializationError = true,
+            ThrowOnAnyError = false,
+            ThrowOnDeserializationError = false
         };
 
         public RestApiClientOptions() {
@@ -166,29 +168,20 @@ namespace Cortside.RestSharpClient {
         /// When set to <c>true</c>, a <see cref="DeserializationException"/> will be thrown
         /// in case RestSharp fails to deserialize the response.
         /// </summary>
-        public bool ThrowOnDeserializationError {
-            get => rcOptions.ThrowOnDeserializationError;
-            set => rcOptions.ThrowOnDeserializationError = value;
-        }
+        public bool ThrowOnDeserializationError { get; set; } = false;
 
         /// <summary>
         /// Modifies the default behavior of RestSharp to swallow exceptions.
         /// When set to <c>true</c>, RestSharp will consider the request as unsuccessful
         /// in case it fails to deserialize the response.
         /// </summary>
-        public bool FailOnDeserializationError {
-            get => rcOptions.FailOnDeserializationError;
-            set => rcOptions.FailOnDeserializationError = value;
-        }
+        public bool FailOnDeserializationError { get; set; } = true;
 
         /// <summary>
         /// Modifies the default behavior of RestSharp to swallow exceptions.
         /// When set to <c>true</c>, exceptions will be re-thrown.
         /// </summary>
-        public bool ThrowOnAnyError {
-            get => rcOptions.ThrowOnAnyError;
-            set => rcOptions.ThrowOnAnyError = value;
-        }
+        public bool ThrowOnAnyError { get; set; } = false;
 
         /// <summary>
         /// Callback function for handling the validation of remote certificates. Useful for certificate pinning and
