@@ -165,5 +165,15 @@ namespace Cortside.RestApiClient {
             request.AddStringBody(text, DataFormat.Xml);
             return this;
         }
+
+        public RestApiRequest AddQueryParameter(string name, string value, bool encode = true) {
+            request.AddParameter(new QueryParameter(name, value, encode));
+            return this;
+        }
+
+        public RestApiRequest AddQueryParameter<T>(string name, T value, bool encode = true) where T : struct {
+            request.AddQueryParameter(name, value.ToString(), encode);
+            return this;
+        }
     }
 }
