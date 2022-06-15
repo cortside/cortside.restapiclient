@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AsyncAnalyzers" Version="1.1.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Cortside.Common.Correlation" Version="1.1.226" />
+    <PackageReference Include="Cortside.Common.Json" Version="1.1.226" />
+    <PackageReference Include="Cortside.Common.Validation" Version="1.1.226" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.2.32">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Polly" Version="7.2.3" />
+    <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
+    <PackageReference Include="RestSharp" Version="108.0.1" />
+    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="108.0.1" />
+  </ItemGroup>
+
+</Project>
