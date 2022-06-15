@@ -15,3 +15,16 @@ scrutor
 https://andrewlock.net/adding-decorated-classes-to-the-asp.net-core-di-container-using-scrutor/#manually-creating-decorators-with-the-asp-net-core-di-container
 
 
+# mock apis
+https://mockbin.org
+https://geekflare.com/mock-rest-api/
+
+
+https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/implement-http-call-retries-exponential-backoff-polly
+https://github.com/App-vNext/Polly.Extensions.Http
+
+https://josef.codes/httpclient-error-handling-a-test-driven-approach/
+https://github.com/joseftw/JOS.HttpClient
+
+# xml test api
+https://www.appsloveworld.com/free-online-sample-xml-api-for-testing-purpose/
