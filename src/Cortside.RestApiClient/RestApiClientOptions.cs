@@ -58,7 +58,7 @@ namespace Cortside.RestApiClient {
         static readonly Version Version = new AssemblyName(typeof(RestApiClientOptions).Assembly.FullName!).Version!;
         static readonly string DefaultUserAgent = $"RestApiClient/{Version}";
 
-        public bool FollowRedirects { get; set; } = true;
+        public bool FollowRedirects { get; set; } = false;
 
         public IAuthenticator Authenticator { get; set; }
 
