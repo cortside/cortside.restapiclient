@@ -73,6 +73,10 @@ after_build:
     if($branch -ne 'master') {
         $fileVersion = "${fileVersion}-${branch}"; 
     }   
+    
+    $fileVersion = $fileVersion.replace("release/", "");
+    $fileVersion = $fileVersion.replace("feature/", "");
+    $fileVersion = $fileVersion.replace("bugfix/", "");
     dotnet pack src --include-symbols -p:SymbolPackageFormat=snupkg --configuration $env:configuration -o ((get-location).Path + '\artifacts') /property:Version=$fileVersion 
     
 artifacts:

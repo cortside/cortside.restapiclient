@@ -11,7 +11,7 @@ Function Invoke-Cleanup {
         Write-Host "Invoke-Cleanup"
         Write-Host "---------------------"
         # clean package, bin and obj folders
-        Get-ChildItem .\ -include .sonarqube,packages,bin,obj,node_modules -Recurse | Where-Object {$_.FullName -NotMatch "BuildScripts"} | foreach ($_) { Write-Host "Removing " + $_.fullname; remove-item $_.fullname -Force -Recurse }
+        Get-ChildItem .\ -include packages,bin,obj,node_modules -Recurse | Where-Object {$_.FullName -NotMatch "BuildScripts"} | foreach ($_) { Write-Host "Removing " + $_.fullname; remove-item $_.fullname -Force -Recurse }
 
         #Find nunit files
         Get-ChildItem -include *.nunit -Recurse |
