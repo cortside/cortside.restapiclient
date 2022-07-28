@@ -37,6 +37,14 @@ namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
             return response;
         }
 
+        public async Task<RestResponse> SearchItemsAsync(bool followRedirects) {
+            var request = new RestApiRequest("/api/v1/items/search", Method.Post) {
+                FollowRedirects = followRedirects,
+            };
+            var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+            return response;
+        }
+
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);

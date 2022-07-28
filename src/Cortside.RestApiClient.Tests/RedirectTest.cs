@@ -59,5 +59,41 @@ namespace Cortside.RestApiClient.Tests {
             // assert
             Assert.Equal("1234", item.Data.Sku);
         }
+
+        [Theory]
+        [InlineData(false, 303)]
+        [InlineData(true, 200)]
+        public async Task ShouldHandle303AsSuccessful(bool followRedirects, int statusCode) {
+            // arrange
+            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config);
+
+            // act
+            var item = await client.SearchItemsAsync(followRedirects).ConfigureAwait(false);
+
+            // assert
+            Assert.Equal(statusCode, (int)item.StatusCode);
+            Assert.Equal(followRedirects, item.Content.Length > 0);
+        }
+
+        [Theory]
+        [InlineData(false, 303)]
+        [InlineData(true, 200)]
+        public async Task RestSharpRedirect(bool followRedirects, int statusCode) {
+            // arrange
+            var options = new RestSharp.RestClientOptions(Server.Url) {
+                FollowRedirects = followRedirects,
+            };
+            var client = new RestSharp.RestClient(options);
+
+            Assert.False(options.ThrowOnAnyError);
+
+            // act
+            var request = new RestSharp.RestRequest("/api/v1/items/search", RestSharp.Method.Post);
+            var item = await client.ExecuteAsync(request).ConfigureAwait(false);
+
+            // assert
+            Assert.Equal(statusCode, (int)item.StatusCode);
+            Assert.Equal(followRedirects, item.Content.Length > 0);
+        }
     }
 }
