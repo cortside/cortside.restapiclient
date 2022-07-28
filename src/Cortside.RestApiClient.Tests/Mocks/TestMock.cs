@@ -13,15 +13,44 @@ namespace Cortside.RestApiClient.Tests.Mocks {
 
             server
                 .Given(
+                    Request.Create().WithPath("/api/v1/items/search")
+                        .UsingPost()
+                )
+                .RespondWith(
+                    Response.Create()
+                        .WithStatusCode(303)
+                        .WithHeader("Content-Type", "application/json")
+                        .WithHeader("Location", "/api/v1/items/search")
+                );
+
+            server
+                .Given(
+                    Request.Create().WithPath("/api/v1/items/search")
+                        .UsingGet()
+                )
+                .RespondWith(
+                    Response.Create()
+                        .WithStatusCode(200)
+                        .WithHeader("Content-Type", "application/json")
+                        .WithBody(r => JsonConvert.SerializeObject(new CatalogItem() {
+                            ItemId = Guid.NewGuid(),
+                            Name = $"Item {r.PathSegments[3]}",
+                            Sku = r.PathSegments[3],
+                            UnitPrice = new decimal(rnd.Next(10000) / 100.0)
+                        }))
+                );
+
+            server
+                .Given(
                     Request.Create().WithPath("/api/v1/items")
                         .UsingPost()
                 )
                 .RespondWith(
                     Response.Create()
-                        .WithStatusCode(201)
+                        .WithStatusCode(200)
                         .WithHeader("Content-Type", "application/json")
-                        .WithHeader("Location", "api/v1/items/1234")
-                        .WithBody(_ => JsonConvert.SerializeObject(new CatalogItem() {
+                        .WithHeader("Location", "/api/v1/items/1234")
+                        .WithBody(r => JsonConvert.SerializeObject(new CatalogItem() {
                             ItemId = Guid.NewGuid(),
                             Name = "Item 1234",
                             Sku = "1234",
