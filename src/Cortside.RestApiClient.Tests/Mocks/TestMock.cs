@@ -47,7 +47,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                 )
                 .RespondWith(
                     Response.Create()
-                        .WithStatusCode(200)
+                        .WithStatusCode(201)
                         .WithHeader("Content-Type", "application/json")
                         .WithHeader("Location", "/api/v1/items/1234")
                         .WithBody(r => JsonConvert.SerializeObject(new CatalogItem() {

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Cortside.Common.Correlation;
 using Microsoft.Extensions.Caching.Distributed;
@@ -69,6 +70,10 @@ namespace Cortside.RestApiClient {
 
                 var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
                 logger.LogInformation("Response {retry}: Status Code = {StatusCode} Data = {Content}", retry, response.StatusCode, response.Content);
+                if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod || response.StatusCode == HttpStatusCode.Redirect)) {
+                    response.IsSuccessful = true;
+                    response.ErrorException = null;
+                }
                 TimeoutCheck(request, response);
                 if (options.ThrowOnAnyError && response.ErrorException != null) {
                     throw response.ErrorException;
