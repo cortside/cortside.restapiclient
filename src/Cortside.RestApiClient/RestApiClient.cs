@@ -6,6 +6,7 @@ using Cortside.Common.Correlation;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using RestSharp;
+using Serilog.Context;
 
 namespace Cortside.RestApiClient {
     public class RestApiClient : IDisposable, IRestApiClient {
@@ -63,38 +64,41 @@ namespace Cortside.RestApiClient {
             request.AddHeader("Request-Id", correlationId);
             request.AddHeader("X-Correlation-Id", correlationId);
 
-            int retry = 0;
-            var response = await policy.ExecuteAsync(async () => {
-                // TODO: log the attempt # as property
-                logger.LogInformation($"Attempt {retry++}");
+            RestResponse response;
+            using (LogContext.PushProperty("RequestUrl", client.BuildUri(request.RestRequest))) {
+                int retry = 0;
+                response = await policy.ExecuteAsync(async () => {
+                    // TODO: log the attempt # as property
+                    logger.LogInformation($"Attempt {retry++}");
 
-                var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
-                logger.LogInformation("Response {retry}: Status Code = {StatusCode} Data = {Content}", retry, response.StatusCode, response.Content);
-                if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod || response.StatusCode == HttpStatusCode.Redirect)) {
-                    response.IsSuccessful = true;
-                    response.ErrorException = null;
-                }
+                    var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
+                    logger.LogInformation("Response {retry}: Status Code = {StatusCode} Data = {Content}", retry, response.StatusCode, response.Content);
+                    if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod || response.StatusCode == HttpStatusCode.Redirect)) {
+                        response.IsSuccessful = true;
+                        response.ErrorException = null;
+                    }
+                    TimeoutCheck(request, response);
+                    if (options.ThrowOnAnyError && response.ErrorException != null) {
+                        throw response.ErrorException;
+                    }
+                    return response;
+                }).ConfigureAwait(false);
+
+                logger.LogDebug("Response to {url} returned with status code {StatusCode} and content: {Content}", client.BuildUri(request.RestRequest), response.StatusCode, response.Content);
                 TimeoutCheck(request, response);
-                if (options.ThrowOnAnyError && response.ErrorException != null) {
-                    throw response.ErrorException;
+                var exception = response.ErrorException;
+                if (options.ThrowOnAnyError && exception != null) {
+                    throw exception;
                 }
-                return response;
-            }).ConfigureAwait(false);
 
-            logger.LogDebug("Response to {url} returned with status code {StatusCode} and content: {Content}", client.BuildUri(request.RestRequest), response.StatusCode, response.Content);
-            TimeoutCheck(request, response);
-            var exception = response.ErrorException;
-            if (options.ThrowOnAnyError && exception != null) {
-                throw exception;
-            }
-
-            // TODO: should this check status code? anything else?
-            if ((request.FollowRedirects ?? options.FollowRedirects) && response.Headers?.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)) == true) {
-                var url = response.Headers.FirstOrDefault(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
-                logger.LogInformation($"Following redirect to {url}");
-                var redirectRequest = new RestApiRequest(url, Method.Get);
-                var redirectResponse = await InnerExecuteAsync(redirectRequest).ConfigureAwait(false);
-                return redirectResponse;
+                // TODO: should this check status code? anything else?
+                if ((request.FollowRedirects ?? options.FollowRedirects) && response.Headers?.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)) == true) {
+                    var url = response.Headers.FirstOrDefault(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
+                    logger.LogInformation($"Following redirect to {url}");
+                    var redirectRequest = new RestApiRequest(url, Method.Get);
+                    var redirectResponse = await InnerExecuteAsync(redirectRequest).ConfigureAwait(false);
+                    return redirectResponse;
+                }
             }
 
             return response;
