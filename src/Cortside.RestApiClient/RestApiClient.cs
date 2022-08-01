@@ -75,7 +75,7 @@ namespace Cortside.RestApiClient {
                     logger.LogDebug("Request to {url}, attempt {attempt}, with body {body}", url, retry++, json);
 
                     var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
-                    logger.LogInformation("Response {retry}: Status Code = {StatusCode} Data = {Content}", retry, response.StatusCode, response.Content);
+                    logger.LogDebug("Response {retry}: Status Code = {StatusCode} Data = {Content}", retry, response.StatusCode, response.Content);
                     if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod || response.StatusCode == HttpStatusCode.Redirect)) {
                         response.IsSuccessful = true;
                         response.ErrorException = null;
@@ -87,7 +87,7 @@ namespace Cortside.RestApiClient {
                     return response;
                 }).ConfigureAwait(false);
 
-                logger.LogDebug("Response to {url} returned with status code {StatusCode} and content: {Content}", client.BuildUri(request.RestRequest), response.StatusCode, response.Content);
+                logger.LogInformation("Response from {url} returned with status code {StatusCode} and content: {Content}", client.BuildUri(request.RestRequest), response.StatusCode, response.Content);
                 TimeoutCheck(request, response);
                 var exception = response.ErrorException;
                 if (options.ThrowOnAnyError && exception != null) {
