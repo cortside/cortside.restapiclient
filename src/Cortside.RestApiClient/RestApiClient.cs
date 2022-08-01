@@ -68,8 +68,11 @@ namespace Cortside.RestApiClient {
             using (LogContext.PushProperty("RequestUrl", client.BuildUri(request.RestRequest))) {
                 int retry = 0;
                 response = await policy.ExecuteAsync(async () => {
-                    // TODO: log the attempt # as property
-                    logger.LogInformation($"Attempt {retry++}");
+                    var url = client.BuildUri(request.RestRequest);
+                    var body = request.Parameters.SingleOrDefault(x => x.Type == ParameterType.RequestBody);
+                    var serializer = options.Serializer ?? new JsonNetSerializer();
+                    var json = serializer.Serialize(body);
+                    logger.LogDebug("Request to {url}, attempt {attempt}, with body {body}", url, retry++, json);
 
                     var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
                     logger.LogInformation("Response {retry}: Status Code = {StatusCode} Data = {Content}", retry, response.StatusCode, response.Content);

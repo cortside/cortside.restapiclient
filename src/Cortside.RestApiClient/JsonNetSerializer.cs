@@ -27,7 +27,7 @@ namespace Cortside.RestApiClient {
 
         public string Serialize(object obj) => JsonConvert.SerializeObject(obj, settings);
 
-        public string Serialize(Parameter parameter) => Serialize(parameter.Value);
+        public string Serialize(Parameter parameter) => Serialize(parameter?.Value);
 
         public T Deserialize<T>(RestResponse response) => JsonConvert.DeserializeObject<T>(response.Content, settings);
 
