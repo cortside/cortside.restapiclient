@@ -10,7 +10,7 @@ using WireMock.Util;
 namespace Cortside.RestApiClient.Tests.ResponseProviders {
     public class AlternateFailureResponse : IResponseProvider {
         private static int _count = 0;
-        public Task<(IResponseMessage Message, IMapping Mapping)> ProvideResponseAsync(IRequestMessage requestMessage, WireMockServerSettings settings) {
+        public Task<(IResponseMessage Message, IMapping Mapping)> ProvideResponseAsync(IMapping mapping, IRequestMessage requestMessage, WireMockServerSettings settings) {
             ResponseMessage response;
             if (_count % 2 == 0) {
                 response = new ResponseMessage() { StatusCode = 500 };
@@ -20,7 +20,7 @@ namespace Cortside.RestApiClient.Tests.ResponseProviders {
                 SetBody(response, @"{ ""msg"": ""Hello from wiremock!"" }");
             }
             _count++;
-            (IResponseMessage, IMapping) tuple = (response, null);
+            (IResponseMessage, IMapping) tuple = (response, mapping);
             return Task.FromResult(tuple);
         }
 

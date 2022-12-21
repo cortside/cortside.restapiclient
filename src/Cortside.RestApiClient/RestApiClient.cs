@@ -77,7 +77,8 @@ namespace Cortside.RestApiClient {
                     var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
                     logger.LogDebug("Response {retry}: Status Code = {StatusCode} Data = {Content}", retry, response.StatusCode, response.Content);
                     if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod || response.StatusCode == HttpStatusCode.Redirect)) {
-                        response.IsSuccessful = true;
+                        response.IsSuccessStatusCode = true;
+                        response.ResponseStatus = ResponseStatus.Completed;
                         response.ErrorException = null;
                     }
                     TimeoutCheck(request, response);

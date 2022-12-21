@@ -100,7 +100,8 @@ namespace Cortside.RestApiClient.Tests {
 
             // this is what RestApiClient does now to alter the hanlding
             if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod || response.StatusCode == HttpStatusCode.Redirect)) {
-                response.IsSuccessful = true;
+                response.IsSuccessStatusCode = true;
+                response.ResponseStatus = ResponseStatus.Completed;
                 response.ErrorException = null;
             }
 
