@@ -43,7 +43,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             var token = string.IsNullOrEmpty(Token) ? await GetTokenAsync().ConfigureAwait(false) : Token;
             if (string.IsNullOrWhiteSpace(token)) {
                 logger.LogWarning("Authentication token is null or empty, authenticated requests will fail");
-                token = ""; //setting token to empty so the restsharp addheaders call won't throw object reference exception
+                token = string.Empty; //setting token to empty so the restsharp addheaders call won't throw object reference exception
             }
 
             return new HeaderParameter(KnownHeaders.Authorization, token);
