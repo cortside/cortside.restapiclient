@@ -86,7 +86,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
 
             // assert
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
-            Assert.Null(authorization);
+            Assert.Empty(authorization);
         }
     }
 }
