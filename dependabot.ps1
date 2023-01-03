@@ -1,6 +1,8 @@
-[cmdletBinding()]
-param(
-	[switch]$createpullrequest
+[CmdletBinding()]
+Param 
+(
+    [Parameter(Mandatory = $false)][string]$package = "",
+	[Parameter(Mandatory = $false)][switch]$createpullrequest
 )
 
 $ErrorActionPreference = "Stop"
@@ -45,42 +47,63 @@ git status
 Invoke-Exe git -args "checkout develop"
 Invoke-Exe git -args "pull"
 
-cp C:\work\cortside\cortside.templates\templates\api-editorconfig\src\.editorconfig .\src\.editorconfig
-cp C:\work\cortside\cortside.templates\templates\api-powershell\clean.ps1
-cp C:\work\cortside\cortside.templates\templates\api-powershell\update-nugetpackages.ps1
+echo "prepping"
 
-if (Test-Path -path "cleanup.ps1") {
-	rm cleanup.ps1
+.\clean.ps1 -quiet
+$result = check-result
+
+echo "about to restore"
+
+Invoke-Exe dotnet -args "restore src --verbosity quiet"
+$result = check-result
+
+echo "ready to update nuget packages"
+if ($package -eq "") { 
+	$body = (.\update-nugetpackages.ps1)
+} else {
+	$body = (Invoke-Exe dotnet -args "outdated src --include $package --pre-release Never --upgrade")
 }
- 
-.\update-nugetpackages.ps1
+echo $body
 $result = check-result
 
-.\clean.ps1
-$result = check-result
+echo "checking to see if anything changed"
 
-#dotnet build src
-#$result = check-result
+$files = (git status *.csproj | grep "modified:" | wc -l)
+if ($files -ne "0") {
+	dotnet test src
+	$result = check-result
 
-dotnet test src
-$result = check-result
+	git status
 
-git status
+	$bot = "BOT-{0:yyyyMMdd}" -f (Get-Date)
+	$branch = "feature/$bot"
+	if ($package -ne "") {
+		$branch = "feature/$bot-$package"
+	}
 
-$bot = "BOT-{0:yyyyMMdd}" -f (Get-Date)
-$branch = "feature/$bot"
+	git add *.csproj
+	git status
+	git checkout -b $branch
+	if ($package -eq "") { 
+		git commit -m "[$branch] updated nuget packages"
+	} else {
+		git commit -m "[$branch] update $package"
+	}
+	git push --set-upstream origin $branch
 
-git add *.csproj
-git add clea*.ps1 
-git add update-nugetpackages.ps1 
-git add dependabot.ps1
-git add ./src/.editorconfig
-git status
-git checkout -b $branch
-git commit -m "[$branch] updated nuget packages"
-git push --set-upstream origin $branch
+	$remote = (git remote -v)
+	if ($remote -like "*github.com*") {
+		gh repo set-default
+		gh pr create --title "$bot" --body "$body" --base develop
+	} else {
+		echo "should create the pr here -- everything passed - $branch"	
+		echo $body	
+	}
 
-.\clean.ps1
-git checkout develop
+	.\clean.ps1
+	git checkout develop
 
-echo "should create the pr here -- everything passed - $branch"
+	
+} else {
+	echo "no files changed"
+}
