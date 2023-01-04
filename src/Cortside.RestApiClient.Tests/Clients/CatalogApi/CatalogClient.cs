@@ -29,11 +29,19 @@ namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
             return response;
         }
 
-        internal async Task<RestResponse<CatalogItem>> CreateItemAsync() {
+        internal async Task<RestResponse<CatalogItem>> CreateItemAsync(bool followRedirects) {
             var request = new RestApiRequest("api/v1/items", Method.Post) {
-                FollowRedirects = true
+                FollowRedirects = followRedirects
             };
             var response = await client.ExecuteAsync<CatalogItem>(request).ConfigureAwait(false);
+            return response;
+        }
+
+        public async Task<RestResponse> SearchItemsAsync(bool followRedirects) {
+            var request = new RestApiRequest("/api/v1/items/search", Method.Post) {
+                FollowRedirects = followRedirects,
+            };
+            var response = await client.ExecuteAsync(request).ConfigureAwait(false);
             return response;
         }
 
