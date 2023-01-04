@@ -1,5 +1,31 @@
-# Release 1.0
+# Release 1.1
 
+|Commit|Date|Author|Message|
+|---|---|---|---|
+| 97d077f | <span style="white-space:nowrap;">2022-07-13</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [feature/BOT-20220713] updated nuget packages
+| 9fd9a43 | <span style="white-space:nowrap;">2022-07-13</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  handle git flow named branches
+| 9eb54cc | <span style="white-space:nowrap;">2022-07-13</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge pull request #7 from cortside/feature/BOT-20220713
+| 43c01d9 | <span style="white-space:nowrap;">2022-07-13</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [feature/BOT-20220713] updated nuget packages
+| 005f0dc | <span style="white-space:nowrap;">2022-07-28</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [querybypost] add tests to ensure that 303 can be handled successfully
+| e6e42b8 | <span style="white-space:nowrap;">2022-07-28</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [querybypost] override handling of 303 and 302 on POST
+| 43498c5 | <span style="white-space:nowrap;">2022-07-29</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge pull request #8 from cortside/querybypost
+| e481c40 | <span style="white-space:nowrap;">2022-07-29</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  add the url for request to logged properties to make searching for responses easier
+| 77faa7e | <span style="white-space:nowrap;">2022-08-01</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  add logging of request
+| 6838eef | <span style="white-space:nowrap;">2022-08-01</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  adjust logging
+| 0145d06 | <span style="white-space:nowrap;">2022-12-12</span> | <span style="white-space:nowrap;">Glen Kingston</span> |  [SVC-2031] Changed token to be empty instead of null when needed
+| bcbe694 | <span style="white-space:nowrap;">2022-12-20</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  reflect changes to RestSharp in determining response success
+| d14927e | <span style="white-space:nowrap;">2022-12-21</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  minor cleanup
+| c5c2667 | <span style="white-space:nowrap;">2022-12-21</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge branch 'develop' into feature/SVC-2031
+| 84ac55d | <span style="white-space:nowrap;">2022-12-21</span> | <span style="white-space:nowrap;">Glen Kingston</span> |  [SVC-2031] Fixed test to check for empty due to new changes
+| e8d6370 | <span style="white-space:nowrap;">2022-12-21</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [SVC-2031] use constant instead of literal
+| bd991de | <span style="white-space:nowrap;">2022-12-21</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge pull request #9 from cortside/feature/SVC-2031
+| 64c1cbe | <span style="white-space:nowrap;">2023-01-02</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [feature/BOT-20230102] updated nuget packages
+| 0952253 | <span style="white-space:nowrap;">2023-01-03</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (origin/feature/BOT-20230102, feature/BOT-20230102) update helper scripts; update nuget packages
+| fe878b8 | <span style="white-space:nowrap;">2023-01-03</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge pull request #10 from cortside/feature/BOT-20230102
+| 3790c57 | <span style="white-space:nowrap;">2023-01-03</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (HEAD -> release/1.1, origin/develop, origin/HEAD, develop) initial changelog
+****
+
+# Release 1.0
 |Commit|Date|Author|Message|
 |---|---|---|---|
 | 2c1d168 | <span style="white-space:nowrap;">2022-01-24</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  initial version
@@ -76,4 +102,3 @@
 | 0952253 | <span style="white-space:nowrap;">2023-01-03</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (origin/feature/BOT-20230102, feature/BOT-20230102) update helper scripts; update nuget packages
 | fe878b8 | <span style="white-space:nowrap;">2023-01-03</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (HEAD -> develop, origin/develop, origin/HEAD) Merge pull request #10 from cortside/feature/BOT-20230102
 ****
-
