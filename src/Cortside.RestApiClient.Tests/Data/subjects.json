@@ -1,68 +1,68 @@
 {
-  "subjects": [
-    {
-      "clientId": "foo",
-      "subjectId": "132953b2-f6a7-4c1d-8da1-2b3c3dafe1c5",
-      "claims": [
+    "subjects": [
         {
-          "type": "active",
-          "value": "true"
-        }
-      ],
-      "userType": "service",
-      "referenceToken": "107d225e3ea706bbbceb83593daf5c73c1347a89eaa89f253ca845beffb2e3f9",
-      "policies": [
-        {
-          "policyName": "ShoppingCart*",
-          "authorization": {
-            "roles": [
-              "Internal"
+            "clientId": "foo",
+            "subjectId": "132953b2-f6a7-4c1d-8da1-2b3c3dafe1c5",
+            "claims": [
+                {
+                    "type": "active",
+                    "value": "true"
+                }
             ],
-            "permissions": [
-              "GetOrders",
-              "GetOrder",
-              "CreateOrder",
-              "UpdateOrder",
-              "GetCustomers",
-              "GetCustomer",
-              "CreateCustomer",
-              "UpdateCustomer"
+            "userType": "service",
+            "referenceToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjY1QjBCQTk2MUI0NDMwQUJDNTNCRUI5NkVDMjBDNzQ5OTdGMDMwMzJSUzI1NiIsInR5cCI6IkpXVCIsIng1dCI6IlpiQzZsaHRFTUt2Rk8tdVc3Q0RIU1pmd01ESSJ9.eyJuYmYiOjE2NDI3OTE3ODMsImV4cCI6MTY0MjgwOTc4MywiaXNzIjoiaHR0cHM6Ly9pZGVudGl0eXNlcnZlci5rOHMuZW5lcmJhbmsuY29tIiwiYXVkIjpbInRlcm1zY2FsY3VsYXRvci1hcGkiLCJodHRwczovL2lkZW50aXR5c2VydmVyLms4cy5lbmVyYmFuay5jb20vcmVzb3VyY2VzIl0sImNsaWVudF9pZCI6ImF1dG9tYXRpb24uc3lzdGVtMSIsInN1YiI6IjQ1OWI5NGJhLTEwMTUtNDJhNC05YzRkLTVjNThiZmZhM2E5YSIsImdyb3VwcyI6ImVjYmRhM2Y3LWQ2MjgtNGU1YS04NzljLWNmNmNhYWQyM2JhMSIsInN1YmplY3RfdHlwZSI6ImNsaWVudCIsImlhdCI6MTY0Mjc5MTc4Mywic2NvcGUiOlsidGVybXNjYWxjdWxhdG9yLWFwaSJdfQ.siCAaMAp6O9ZiWGM7c7b_U3gRkx-lb4IqfxxFyI5LBLPGB9bSHy6fl5PHaIIjs_VO0TnuVv7gjafqUTkVEbpJbf3pbQOdvzNzfGKTWgEn44dbiz0ROuDy2_qpGqAUlo1r5nkYcuDUtyLP5FsrmxSjUP0DlanuWNWSiqx5YVdzenGeLSFD59cCszZnmS2Q9KPV5MOkaUEJnd2D44UJIcccoEdRhSDkY8a6Fs03Iodf2bzvcb2mZ6aiRHhjTo2XvqiG0azLIX2W735eiSX52qoUB6ae6bDzGpEXeE3z3bRw5fomgy40XXyct64IRnIW_Hfk0ZmNyw1L51ZJwlYSF7OPA",
+            "policies": [
+                {
+                    "policyName": "ShoppingCart*",
+                    "authorization": {
+                        "roles": [
+                            "Internal"
+                        ],
+                        "permissions": [
+                            "GetOrders",
+                            "GetOrder",
+                            "CreateOrder",
+                            "UpdateOrder",
+                            "GetCustomers",
+                            "GetCustomer",
+                            "CreateCustomer",
+                            "UpdateCustomer"
+                        ]
+                    }
+                }
             ]
-          }
-        }
-      ]
-    },
-    {
-      "clientId": "cort",
-      "subjectId": "15dc38a9-e9a0-4d44-8244-c7e28b20c558",
-      "claims": [
+        },
         {
-          "type": "active",
-          "value": "true"
-        }
-      ],
-      "userType": "service",
-      "referenceToken": "32335B921D74BC0C15951CBB60DC640284FBB6DA61BCE160AE621033CA9FA62D",
-      "policies": [
-        {
-          "policyName": "ShoppingCart*",
-          "authorization": {
-            "roles": [
-              "Internal"
+            "clientId": "cort",
+            "subjectId": "15dc38a9-e9a0-4d44-8244-c7e28b20c558",
+            "claims": [
+                {
+                    "type": "active",
+                    "value": "true"
+                }
             ],
-            "permissions": [
-              "GetOrders",
-              "GetOrder",
-              "CreateOrder",
-              "UpdateOrder",
-              "GetCustomers",
-              "GetCustomer",
-              "CreateCustomer",
-              "UpdateCustomer"
+            "userType": "service",
+            "referenceToken": "32335B921D74BC0C15951CBB60DC640284FBB6DA61BCE160AE621033CA9FA62D",
+            "policies": [
+                {
+                    "policyName": "ShoppingCart*",
+                    "authorization": {
+                        "roles": [
+                            "Internal"
+                        ],
+                        "permissions": [
+                            "GetOrders",
+                            "GetOrder",
+                            "CreateOrder",
+                            "UpdateOrder",
+                            "GetCustomers",
+                            "GetCustomer",
+                            "CreateCustomer",
+                            "UpdateCustomer"
+                        ]
+                    }
+                }
             ]
-          }
         }
-      ]
-    }
-  ]
+    ]
 }

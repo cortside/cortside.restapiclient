@@ -23,6 +23,7 @@
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
     <PackageReference Include="RestSharp" Version="108.0.3" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="108.0.3" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.12.2" />
   </ItemGroup>
 
 </Project>

@@ -16,7 +16,7 @@ namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
             var options = new RestApiClientOptions {
                 BaseUrl = new Uri(userClientConfiguration.ServiceUrl),
                 FollowRedirects = true,
-                Authenticator = new OpenIDConnectAuthenticator(userClientConfiguration.Authentication),
+                Authenticator = new OpenIDConnectAuthenticator(null, userClientConfiguration.Authentication),
                 Serializer = new JsonNetSerializer(),
                 Cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()))
             };

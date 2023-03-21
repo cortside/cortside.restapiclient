@@ -21,7 +21,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             };
 
             // arrange
-            var authenticator = new OpenIDConnectAuthenticator(tokenRequest)
+            var authenticator = new OpenIDConnectAuthenticator(null, tokenRequest)
                 .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
                     .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
                     .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
@@ -43,7 +43,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
         [Fact]
         public async Task ShouldAddAuthorizationHeaderAsync() {
             // arrange
-            var authenticator = new OpenIDConnectAuthenticator("https://demo.duendesoftware.com", "client_credentials", "m2m", "secret", "api")
+            var authenticator = new OpenIDConnectAuthenticator(null, "https://demo.duendesoftware.com", "client_credentials", "m2m", "secret", "api")
                 .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
                     .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
                     .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
@@ -72,7 +72,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             };
 
             // arrange
-            var authenticator = new OpenIDConnectAuthenticator(tokenRequest)
+            var authenticator = new OpenIDConnectAuthenticator(null, tokenRequest)
                 .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
                     .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
                     .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
