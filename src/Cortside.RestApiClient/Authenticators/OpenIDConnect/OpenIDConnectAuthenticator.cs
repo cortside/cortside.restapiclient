@@ -96,11 +96,8 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                     .AddParameter("grant_type", grantType)
                     .AddParameter("scope", scope)
                     .AddParameter("client_id", clientId)
-                    .AddParameter("client_secret", clientSecret);
-
-                if (token != null) {
-                    request.AddParameter("token", token);
-                }
+                    .AddParameter("client_secret", clientSecret)
+                    .AddParameter("token", token ?? string.Empty);
 
                 var correlationId = CorrelationContext.GetCorrelationId();
                 request.AddHeader("Request-Id", correlationId);
@@ -118,11 +115,9 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                     // https://github.com/restsharp/RestSharp/blob/5830af48cf85b8eaadf89d83fbc3bf46106f5873/src/RestSharp/Serializers/DeseralizationException.cs
                     var rr = client.Deserialize<TokenResponse>(response);
                     logger.LogDebug("Authentication successful");
-                    //return $"{rr!.Data.TokenType} {rr!.Data.AccessToken}";
                     return rr;
                 } else {
                     logger.LogError(response.ErrorException, $"Identity Server response code: {response.StatusCode} with error {response.ErrorMessage}");
-                    //return null;
                     return RestResponse<TokenResponse>.FromResponse(response);
                 }
             }

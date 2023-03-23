@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Cortside.RestApiClient.Authenticators.OpenIDConnect;
 using Cortside.RestApiClient.Tests.Clients.HttpStatusApi;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -12,11 +13,11 @@ namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
     public class CatalogClient : IDisposable {
         readonly RestApiClient client;
 
-        public CatalogClient(ILogger<HttpStatusClient> logger, CatalogClientConfiguration userClientConfiguration) {
+        public CatalogClient(ILogger<HttpStatusClient> logger, CatalogClientConfiguration userClientConfiguration, IHttpContextAccessor context) {
             var options = new RestApiClientOptions {
                 BaseUrl = new Uri(userClientConfiguration.ServiceUrl),
                 FollowRedirects = true,
-                Authenticator = new OpenIDConnectAuthenticator(null, userClientConfiguration.Authentication),
+                Authenticator = new OpenIDConnectAuthenticator(context, userClientConfiguration.Authentication),
                 Serializer = new JsonNetSerializer(),
                 Cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()))
             };

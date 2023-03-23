@@ -6,6 +6,7 @@ using Cortside.MockServer.AccessControl;
 using Cortside.RestApiClient.Tests.Clients.CatalogApi;
 using Cortside.RestApiClient.Tests.Clients.HttpStatusApi;
 using Cortside.RestApiClient.Tests.Mocks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using RestSharp;
 using Xunit;
@@ -41,7 +42,7 @@ namespace Cortside.RestApiClient.Tests {
         [Fact]
         public async Task ShouldGetItemAsync() {
             // arrange
-            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config);
+            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor());
 
             // act
             var item = await client.GetItemAsync("1234").ConfigureAwait(false);
@@ -55,7 +56,7 @@ namespace Cortside.RestApiClient.Tests {
         [InlineData(true, 200)]
         public async Task ShouldFollowRedirectAsync(bool followRedirects, int statusCode) {
             // arrange
-            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config);
+            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor());
 
             // act
             var item = await client.CreateItemAsync(followRedirects).ConfigureAwait(false);
@@ -71,7 +72,7 @@ namespace Cortside.RestApiClient.Tests {
         [InlineData(true, 200)]
         public async Task ShouldHandle303AsSuccessful(bool followRedirects, int statusCode) {
             // arrange
-            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config);
+            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor());
 
             // act
             var item = await client.SearchItemsAsync(followRedirects).ConfigureAwait(false);
