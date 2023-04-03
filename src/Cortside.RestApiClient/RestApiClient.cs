@@ -95,8 +95,7 @@ namespace Cortside.RestApiClient {
                     throw exception;
                 }
 
-                // TODO: should this check status code? anything else?
-                if ((request.FollowRedirects ?? options.FollowRedirects) && response.Headers?.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)) == true) {
+                if (response.StatusCode == HttpStatusCode.SeeOther && (request.FollowRedirects ?? options.FollowRedirects) && response.Headers?.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)) == true) {
                     var url = response.Headers.FirstOrDefault(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
                     logger.LogInformation($"Following redirect to {url}");
                     var redirectRequest = new RestApiRequest(url, Method.Get);

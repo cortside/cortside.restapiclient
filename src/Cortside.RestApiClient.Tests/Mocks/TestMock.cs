@@ -87,6 +87,18 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                         .WithBody(@"{ ""msg"": ""Hello I'm a little bit slow!"" }")
                         .WithDelay(TimeSpan.FromSeconds(10))
                 );
+
+            server
+                .Given(
+                    Request.Create().WithPath("/api/v1/302")
+                        .UsingGet()
+                )
+                .RespondWith(
+                    Response.Create()
+                        .WithStatusCode(302)
+                        .WithHeader("Content-Type", "application/json")
+                        .WithHeader("Location", "/api/v1/temp302")
+                );
         }
     }
 }

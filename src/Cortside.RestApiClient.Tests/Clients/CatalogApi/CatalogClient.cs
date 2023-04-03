@@ -11,15 +11,23 @@ using RestSharp;
 
 namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
     public class CatalogClient : IDisposable {
-        readonly RestApiClient client;
+        private readonly RestApiClient client;
 
-        public CatalogClient(ILogger<HttpStatusClient> logger, CatalogClientConfiguration userClientConfiguration, IHttpContextAccessor context) {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="userClientConfiguration"></param>
+        /// <param name="context"></param>
+        /// <param name="throwOnAnyError">added this to make variable testing easier</param>
+        public CatalogClient(ILogger<HttpStatusClient> logger, CatalogClientConfiguration userClientConfiguration, IHttpContextAccessor context, bool throwOnAnyError = false) {
             var options = new RestApiClientOptions {
                 BaseUrl = new Uri(userClientConfiguration.ServiceUrl),
                 FollowRedirects = true,
                 Authenticator = new OpenIDConnectAuthenticator(context, userClientConfiguration.Authentication),
                 Serializer = new JsonNetSerializer(),
-                Cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()))
+                Cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions())),
+                ThrowOnAnyError = throwOnAnyError
             };
             client = new RestApiClient(logger, options);
         }
@@ -41,6 +49,14 @@ namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
         public async Task<RestResponse> SearchItemsAsync(bool followRedirects) {
             var request = new RestApiRequest("/api/v1/items/search", Method.Post) {
                 FollowRedirects = followRedirects,
+            };
+            var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+            return response;
+        }
+
+        public async Task<RestResponse> TemporaryRedirect() {
+            var request = new RestApiRequest("/api/v1/302", Method.Get) {
+                FollowRedirects = true,
             };
             var response = await client.ExecuteAsync(request).ConfigureAwait(false);
             return response;
