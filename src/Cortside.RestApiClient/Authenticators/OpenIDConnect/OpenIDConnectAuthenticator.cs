@@ -59,7 +59,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             return new HeaderParameter(KnownHeaders.Authorization, token);
         }
 
-        private async Task<string> GetTokenAsync() {
+        public async Task<string> GetTokenAsync() {
             var response = await GetTokenAsync(tokenRequest.AuthorityUrl, tokenRequest.GrantType, tokenRequest.ClientId, tokenRequest.ClientSecret, tokenRequest.Scope).ConfigureAwait(false);
 
             if (!response.IsSuccessful) {
@@ -67,8 +67,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             }
 
             var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(response!.Data.AccessToken);
-            allowsDelegation = token.Claims.Any(x => x.Type == "grant_type" && x.Value == "delegation");
+            allowsDelegation = AllowsDelegation(handler, response?.Data?.AccessToken);
 
             if (allowsDelegation && context?.HttpContext != null) {
                 var authorization = context.HttpContext.Request.Headers["Authorization"].ToString();
@@ -84,6 +83,19 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             }
 
             return $"{response!.Data.TokenType} {response!.Data.AccessToken}";
+        }
+
+        private static bool AllowsDelegation(JwtSecurityTokenHandler handler, string token) {
+            if (string.IsNullOrWhiteSpace(token)) {
+                return false;
+            }
+
+            try {
+                var jwtToken = handler.ReadJwtToken(token);
+                return jwtToken.Claims.Any(x => x.Type == "grant_type" && x.Value == "delegation");
+            } catch (Exception ex) {
+                return false;
+            }
         }
 
         private async Task<RestResponse<TokenResponse>> GetTokenAsync(string url, string grantType, string clientId, string clientSecret, string scope, string token = null) {
