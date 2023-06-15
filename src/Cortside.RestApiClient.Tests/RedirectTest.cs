@@ -6,6 +6,7 @@ using Cortside.MockServer.AccessControl;
 using Cortside.RestApiClient.Tests.Clients.CatalogApi;
 using Cortside.RestApiClient.Tests.Clients.HttpStatusApi;
 using Cortside.RestApiClient.Tests.Mocks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using RestSharp;
 using Xunit;
@@ -41,7 +42,7 @@ namespace Cortside.RestApiClient.Tests {
         [Fact]
         public async Task ShouldGetItemAsync() {
             // arrange
-            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config);
+            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor());
 
             // act
             var item = await client.GetItemAsync("1234").ConfigureAwait(false);
@@ -52,10 +53,10 @@ namespace Cortside.RestApiClient.Tests {
 
         [Theory]
         [InlineData(false, 201)]
-        [InlineData(true, 200)]
+        [InlineData(true, 201)]
         public async Task ShouldFollowRedirectAsync(bool followRedirects, int statusCode) {
             // arrange
-            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config);
+            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor());
 
             // act
             var item = await client.CreateItemAsync(followRedirects).ConfigureAwait(false);
@@ -67,11 +68,12 @@ namespace Cortside.RestApiClient.Tests {
         }
 
         [Theory]
-        [InlineData(false, 303)]
-        [InlineData(true, 200)]
-        public async Task ShouldHandle303AsSuccessful(bool followRedirects, int statusCode) {
+        [InlineData(false, false, 303)]
+        [InlineData(true, false, 200)]
+        [InlineData(true, true, 200)]
+        public async Task ShouldHandle303AsSuccessful(bool followRedirects, bool throwOnAnyError, int statusCode) {
             // arrange
-            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config);
+            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor(), throwOnAnyError);
 
             // act
             var item = await client.SearchItemsAsync(followRedirects).ConfigureAwait(false);
@@ -82,23 +84,38 @@ namespace Cortside.RestApiClient.Tests {
             Assert.Equal(followRedirects, item.Content.Length > 0);
         }
 
+        [Fact]
+        public async Task ShouldNotFollow302() {
+            // arrange
+            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor());
+
+            // act
+            var item = await client.TemporaryRedirect().ConfigureAwait(false);
+
+            // assert
+            Assert.Equal(302, (int)item.StatusCode);
+            Assert.False(item.IsSuccessful);
+        }
+
         [Theory]
-        [InlineData(false, 303)]
-        [InlineData(true, 200)]
-        public async Task RestSharpRedirect(bool followRedirects, int statusCode) {
+        [InlineData(false, false, 303)]
+        [InlineData(true, false, 200)]
+        [InlineData(true, true, 200)]
+        public async Task RestSharpRedirect(bool followRedirects, bool throwOnAnyError, int statusCode) {
             // arrange
             var options = new RestSharp.RestClientOptions(Server.Url) {
                 FollowRedirects = followRedirects,
+                ThrowOnAnyError = throwOnAnyError
             };
             var client = new RestSharp.RestClient(options);
 
-            Assert.False(options.ThrowOnAnyError);
+            Assert.Equal(throwOnAnyError, options.ThrowOnAnyError);
 
             // act
             var request = new RestSharp.RestRequest("/api/v1/items/search", RestSharp.Method.Post);
             var response = await client.ExecuteAsync(request).ConfigureAwait(false);
 
-            // this is what RestApiClient does now to alter the hanlding
+            // this is what RestApiClient does now to alter the handling
             if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod || response.StatusCode == HttpStatusCode.Redirect)) {
                 response.IsSuccessStatusCode = true;
                 response.ResponseStatus = ResponseStatus.Completed;
@@ -108,7 +125,7 @@ namespace Cortside.RestApiClient.Tests {
             // assert
             Assert.Equal(statusCode, (int)response.StatusCode);
             Assert.True(response.IsSuccessful);
-            Assert.Equal(followRedirects, response.Content.Length > 0);
+            Assert.Equal(followRedirects, response.Content!.Length > 0);
         }
     }
 }

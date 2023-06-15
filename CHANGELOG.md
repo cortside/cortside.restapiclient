@@ -1,3 +1,18 @@
+# Release 1.2
+
+|Commit|Date|Author|Message|
+|---|---|---|---|
+| 3d33f42 | <span style="white-space:nowrap;">2023-01-03</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update version
+| ef6ff2c | <span style="white-space:nowrap;">2023-01-04</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge branch 'master' into develop
+| 30759d7 | <span style="white-space:nowrap;">2023-03-21</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [ARC-105] add delegation handling to OpenIdConnectAuthenticator
+| c4f309a | <span style="white-space:nowrap;">2023-03-22</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (origin/ARC-105, ARC-105) [ARC-105] add additional tests to validate delegation workflow in oidc authentication
+| bf74a89 | <span style="white-space:nowrap;">2023-03-23</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge pull request #12 from cortside/ARC-105
+| bedb3a5 | <span style="white-space:nowrap;">2023-04-03</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (origin/ARC-116, ARC-116) [ARC-116] check the status code for following redirects
+| e42db2e | <span style="white-space:nowrap;">2023-04-03</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge pull request #13 from cortside/ARC-116
+| e885581 | <span style="white-space:nowrap;">2023-06-15</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update powershell scripts
+| 882b530 | <span style="white-space:nowrap;">2023-06-15</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (HEAD -> release/1.2, origin/develop, origin/HEAD, develop) update to latest cortside libraries
+****
+
 # Release 1.1
 
 |Commit|Date|Author|Message|
