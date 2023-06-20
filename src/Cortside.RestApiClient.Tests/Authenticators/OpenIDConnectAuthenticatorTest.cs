@@ -127,7 +127,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
         [Fact]
         public async Task ShouldAddAuthorizationHeaderAsync() {
             // arrange
-            var authenticator = new OpenIDConnectAuthenticator(null, "https://demo.duendesoftware.com", "client_credentials", "m2m", "secret", "api")
+            var authenticator = new OpenIDConnectAuthenticator(new HttpContextAccessor(), "https://demo.duendesoftware.com", "client_credentials", "m2m", "secret", "api")
                 .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
                     .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
                     .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
@@ -156,7 +156,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             };
 
             // arrange
-            var authenticator = new OpenIDConnectAuthenticator(null, tokenRequest)
+            var authenticator = new OpenIDConnectAuthenticator(new HttpContextAccessor(), tokenRequest)
                 .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
                     .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
                     .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
@@ -171,6 +171,37 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             // assert
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
             Assert.Empty(authorization);
+        }
+
+        [Fact]
+        public async Task ShouldHandleNonJwtToken() {
+            var tokenRequest = new TokenRequest {
+                AuthorityUrl = Server.Url,
+                GrantType = "client_credentials",
+                Scope = "delegation",
+                ClientId = "foo",
+                ClientSecret = "secret"
+            };
+
+            // arrange
+            var header = new KeyValuePair<string, StringValues>("Authorization", new StringValues("some-token"));
+            var context = GetHttpContext("host", "/path", header);
+
+            var authenticator = new OpenIDConnectAuthenticator(context, tokenRequest)
+                .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
+                    .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
+                    .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
+                )
+                .UseLogger(new NullLogger<OpenIDConnectAuthenticator>());
+
+            var client = new RestClient(Server.Url);
+            var request = new RestRequest("/api/v1/items/1234", Method.Get);
+
+            // act
+            var token = await authenticator.GetTokenAsync();
+
+            // assert
+            Assert.Equal("Bearer delegation-token", token);
         }
     }
 }
