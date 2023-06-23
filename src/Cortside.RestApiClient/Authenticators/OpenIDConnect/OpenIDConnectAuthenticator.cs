@@ -101,9 +101,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
         private async Task<RestResponse<TokenResponse>> GetTokenAsync(string url, string grantType, string clientId, string clientSecret, string scope, string token = null) {
             var options = new RestClientOptions(url);
 
-            using (var client = new RestClient(options)) {
-                client.UseNewtonsoftJson();
-
+            using (var client = new RestClient(options, configureSerialization: s => s.UseNewtonsoftJson())) {
                 var request = new RestRequest("connect/token", Method.Post)
                     .AddParameter("grant_type", grantType)
                     .AddParameter("scope", scope)

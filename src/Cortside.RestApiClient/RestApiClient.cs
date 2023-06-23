@@ -6,6 +6,7 @@ using Cortside.Common.Correlation;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using RestSharp;
+using RestSharp.Serializers.Xml;
 using Serilog.Context;
 
 namespace Cortside.RestApiClient {
@@ -25,15 +26,11 @@ namespace Cortside.RestApiClient {
             this.logger = logger;
             this.options = options;
 
-            client = new RestClient(options.Options);
-            if (options.Authenticator != null) {
-                client.UseAuthenticator(options.Authenticator);
-            }
             if (options.Serializer != null) {
-                client.UseSerializer(() => options.Serializer);
+                client = new RestClient(options.Options, configureSerialization: s => s.UseSerializer(() => options.Serializer));
             }
             if (options.XmlSerializer) {
-                client.UseXml();
+                client = new RestClient(options.Options, configureSerialization: s => s.UseXmlSerializer());
             }
         }
 
