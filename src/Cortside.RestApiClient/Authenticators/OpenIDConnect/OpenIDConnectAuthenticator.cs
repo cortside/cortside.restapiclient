@@ -93,7 +93,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                 var jwtToken = handler.ReadJwtToken(token);
                 return jwtToken.Claims.Any(x => x.Type == "grant_type" && x.Value == "delegation");
             } catch (Exception ex) {
-                logger.LogDebug(ex, "");
+                logger.LogDebug(ex, "Unable to read token as JWT token to figure out if token has grant_type claim for delegation");
                 return false;
             }
         }
