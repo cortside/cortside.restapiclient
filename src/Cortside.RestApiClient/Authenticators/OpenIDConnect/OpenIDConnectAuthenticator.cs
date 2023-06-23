@@ -18,8 +18,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
         private readonly TokenRequest tokenRequest;
         private IAsyncPolicy<RestResponse> policy = Policy.NoOpAsync<RestResponse>();
         private ILogger<OpenIDConnectAuthenticator> logger = new NullLogger<OpenIDConnectAuthenticator>();
-        private bool allowsDelegation = false;
-        private DateTime tokenExpiration = DateTime.UtcNow;
+        private readonly DateTime tokenExpiration = DateTime.UtcNow;
         private readonly IHttpContextAccessor context;
 
         public OpenIDConnectAuthenticator(IHttpContextAccessor context, TokenRequest tokenRequest) : base("") {
@@ -67,7 +66,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             }
 
             var handler = new JwtSecurityTokenHandler();
-            allowsDelegation = AllowsDelegation(handler, response?.Data?.AccessToken);
+            var allowsDelegation = AllowsDelegation(handler, response?.Data?.AccessToken);
 
             if (allowsDelegation && context?.HttpContext != null) {
                 var authorization = context.HttpContext.Request.Headers["Authorization"].ToString();
@@ -85,7 +84,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             return $"{response!.Data.TokenType} {response!.Data.AccessToken}";
         }
 
-        private static bool AllowsDelegation(JwtSecurityTokenHandler handler, string token) {
+        private bool AllowsDelegation(JwtSecurityTokenHandler handler, string token) {
             if (string.IsNullOrWhiteSpace(token)) {
                 return false;
             }
@@ -94,6 +93,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                 var jwtToken = handler.ReadJwtToken(token);
                 return jwtToken.Claims.Any(x => x.Type == "grant_type" && x.Value == "delegation");
             } catch (Exception ex) {
+                logger.LogDebug(ex, "");
                 return false;
             }
         }
