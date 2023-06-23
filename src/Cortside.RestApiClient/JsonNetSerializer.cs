@@ -31,7 +31,7 @@ namespace Cortside.RestApiClient {
 
         public T Deserialize<T>(RestResponse response) => JsonConvert.DeserializeObject<T>(response.Content, settings);
 
-        public string ContentType { get; set; } = "application/json";
+        public ContentType ContentType { get; set; } = "application/json";
 
         public DataFormat DataFormat { get; } = DataFormat.Json;
 
@@ -39,10 +39,10 @@ namespace Cortside.RestApiClient {
 
         public IDeserializer Deserializer => this;
 
-        public string[] SupportedContentTypes => RestSharp.Serializers.ContentType.JsonAccept;
+        public string[] SupportedContentTypes => ContentType.JsonAccept;
 
-        public string[] AcceptedContentTypes => RestSharp.Serializers.ContentType.JsonAccept;
+        public string[] AcceptedContentTypes => ContentType.JsonAccept;
 
-        public SupportsContentType SupportsContentType => contentType => contentType.EndsWith("json", StringComparison.InvariantCultureIgnoreCase);
+        public SupportsContentType SupportsContentType => contentType => contentType.Value.EndsWith("json", StringComparison.InvariantCultureIgnoreCase);
     }
 }

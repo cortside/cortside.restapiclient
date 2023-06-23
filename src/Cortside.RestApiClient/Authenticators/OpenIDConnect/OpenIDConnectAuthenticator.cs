@@ -18,8 +18,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
         private readonly TokenRequest tokenRequest;
         private IAsyncPolicy<RestResponse> policy = Policy.NoOpAsync<RestResponse>();
         private ILogger<OpenIDConnectAuthenticator> logger = new NullLogger<OpenIDConnectAuthenticator>();
-        private bool allowsDelegation = false;
-        private DateTime tokenExpiration = DateTime.UtcNow;
+        private readonly DateTime tokenExpiration = DateTime.UtcNow;
         private readonly IHttpContextAccessor context;
 
         public OpenIDConnectAuthenticator(IHttpContextAccessor context, TokenRequest tokenRequest) : base("") {
@@ -67,7 +66,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             }
 
             var handler = new JwtSecurityTokenHandler();
-            allowsDelegation = AllowsDelegation(handler, response?.Data?.AccessToken);
+            var allowsDelegation = AllowsDelegation(handler, response?.Data?.AccessToken);
 
             if (allowsDelegation && context?.HttpContext != null) {
                 var authorization = context.HttpContext.Request.Headers["Authorization"].ToString();
@@ -85,7 +84,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             return $"{response!.Data.TokenType} {response!.Data.AccessToken}";
         }
 
-        private static bool AllowsDelegation(JwtSecurityTokenHandler handler, string token) {
+        private bool AllowsDelegation(JwtSecurityTokenHandler handler, string token) {
             if (string.IsNullOrWhiteSpace(token)) {
                 return false;
             }
@@ -94,6 +93,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                 var jwtToken = handler.ReadJwtToken(token);
                 return jwtToken.Claims.Any(x => x.Type == "grant_type" && x.Value == "delegation");
             } catch (Exception ex) {
+                logger.LogDebug(ex, "Unable to read token as JWT token to figure out if token has grant_type claim for delegation");
                 return false;
             }
         }
@@ -101,9 +101,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
         private async Task<RestResponse<TokenResponse>> GetTokenAsync(string url, string grantType, string clientId, string clientSecret, string scope, string token = null) {
             var options = new RestClientOptions(url);
 
-            using (var client = new RestClient(options)) {
-                client.UseNewtonsoftJson();
-
+            using (var client = new RestClient(options, configureSerialization: s => s.UseNewtonsoftJson())) {
                 var request = new RestRequest("connect/token", Method.Post)
                     .AddParameter("grant_type", grantType)
                     .AddParameter("scope", scope)
