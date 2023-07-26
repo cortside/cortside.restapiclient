@@ -29,7 +29,7 @@ namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
                 Cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions())),
                 ThrowOnAnyError = throwOnAnyError
             };
-            client = new RestApiClient(logger, options);
+            client = new RestApiClient(logger, context, options);
         }
 
         internal async Task<RestResponse<CatalogItem>> GetItemAsync(string sku) {
