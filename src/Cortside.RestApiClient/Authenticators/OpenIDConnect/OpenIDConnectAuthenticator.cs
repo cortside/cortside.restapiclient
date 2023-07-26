@@ -17,7 +17,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
     public class OpenIDConnectAuthenticator : AuthenticatorBase {
         private readonly TokenRequest tokenRequest;
         private IAsyncPolicy<RestResponse> policy = Policy.NoOpAsync<RestResponse>();
-        private ILogger<OpenIDConnectAuthenticator> logger = new NullLogger<OpenIDConnectAuthenticator>();
+        private ILogger logger = new NullLogger<OpenIDConnectAuthenticator>();
         private readonly DateTime tokenExpiration = DateTime.UtcNow;
         private readonly IHttpContextAccessor context;
 
@@ -42,7 +42,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             return this;
         }
 
-        public OpenIDConnectAuthenticator UseLogger(ILogger<OpenIDConnectAuthenticator> logger) {
+        public OpenIDConnectAuthenticator UseLogger(ILogger logger) {
             this.logger = logger;
             return this;
         }
