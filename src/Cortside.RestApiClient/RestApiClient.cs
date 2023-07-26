@@ -117,6 +117,10 @@ namespace Cortside.RestApiClient {
             }
 
             var ip = HttpContextUtility.GetRequestIpAddress(contextAccessor.HttpContext);
+            if (string.IsNullOrWhiteSpace(ip)) {
+                return;
+            }
+
             request.AddHeader("X-Forwarded-For", ip);
             request.AddHeader("Forwarded", $"for={ip}");
         }
