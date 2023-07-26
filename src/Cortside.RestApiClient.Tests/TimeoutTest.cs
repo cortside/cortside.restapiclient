@@ -4,6 +4,7 @@ using Cortside.MockServer;
 using Cortside.MockServer.AccessControl;
 using Cortside.RestApiClient.Tests.Clients.HttpStatusApi;
 using Cortside.RestApiClient.Tests.Mocks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using RestSharp;
 using Xunit;
@@ -29,7 +30,7 @@ namespace Cortside.RestApiClient.Tests {
                 BaseUrl = new Uri(Server.Url),
                 ThrowOnAnyError = true
             };
-            var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), options);
+            var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), new HttpContextAccessor(), options);
 
             // act
             return Assert.ThrowsAsync<TimeoutException>(() => client.GetTimeoutAsync());
@@ -42,7 +43,7 @@ namespace Cortside.RestApiClient.Tests {
                 BaseUrl = new Uri(Server.Url),
                 ThrowOnAnyError = false
             };
-            var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), options);
+            var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), new HttpContextAccessor(), options);
 
             // act
             return Assert.ThrowsAsync<TimeoutException>(() => client.GetTimeoutAsync());
@@ -55,7 +56,7 @@ namespace Cortside.RestApiClient.Tests {
                 BaseUrl = new Uri(Server.Url),
                 ThrowOnAnyError = true
             };
-            var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), options);
+            var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), new HttpContextAccessor(), options);
 
             // act
             RestResponse response = null;
@@ -70,7 +71,7 @@ namespace Cortside.RestApiClient.Tests {
                 BaseUrl = new Uri(Server.Url),
                 ThrowOnAnyError = false
             };
-            var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), options);
+            var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), new HttpContextAccessor(), options);
 
             // act
             RestResponse response = await client.ExecuteTimeoutAsync();

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using RestSharp;
@@ -10,12 +11,12 @@ namespace Cortside.RestApiClient.Tests.Clients.GitHubApi {
         private readonly RestApiClient client;
         private readonly RestApiClientOptions options;
 
-        public GitHubClient(ILogger<GitHubClient> logger, IDistributedCache cache) {
+        public GitHubClient(ILogger<GitHubClient> logger, IDistributedCache cache, IHttpContextAccessor contextAccessor) {
             options = new RestApiClientOptions("https://api.github.com") {
                 Cache = cache
             };
 
-            client = new RestApiClient(logger, options);
+            client = new RestApiClient(logger, contextAccessor, options);
         }
 
         public IDistributedCache Cache => options.Cache;

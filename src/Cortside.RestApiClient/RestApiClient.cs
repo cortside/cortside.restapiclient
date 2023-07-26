@@ -17,13 +17,14 @@ namespace Cortside.RestApiClient {
         private readonly RestApiClientOptions options;
         private readonly IHttpContextAccessor contextAccessor;
 
-        public RestApiClient(ILogger logger, string baseUrl) {
-            this.logger = logger;
-
-            options = new RestApiClientOptions(baseUrl);
-            client = new RestClient(options.Options);
+        [Obsolete("Use overload that takes IHttpContextAccessor")]
+        public RestApiClient(ILogger logger, string baseUrl) : this(logger, new HttpContextAccessor(), baseUrl) {
         }
 
+        public RestApiClient(ILogger logger, IHttpContextAccessor contextAccessor, string baseUrl) : this(logger, contextAccessor, new RestApiClientOptions(baseUrl)) {
+        }
+
+        [Obsolete("Use overload that takes IHttpContextAccessor")]
         public RestApiClient(ILogger logger, RestApiClientOptions options) : this(logger, new HttpContextAccessor(), options) {
         }
 
