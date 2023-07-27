@@ -91,7 +91,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             // assert
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
             Assert.NotNull(authorization);
-            Assert.Contains("delegation-token", authorization);
+            Assert.Contains("foo-client_credentials-token", authorization);
         }
 
         [Fact]
@@ -201,7 +201,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var token = await authenticator.GetTokenAsync();
 
             // assert
-            Assert.Equal("Bearer delegation-token", token);
+            Assert.Equal("Bearer foo-client_credentials-token", token);
         }
     }
 }
