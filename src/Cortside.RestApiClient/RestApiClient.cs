@@ -132,7 +132,15 @@ namespace Cortside.RestApiClient {
 
         public async Task<RestResponse<T>> ExecuteAsync<T>(IRestApiRequest request) {
             var response = await InnerExecuteAsync(request).ConfigureAwait(false);
-            return client.Deserialize<T>(response);
+            var result = client.Deserialize<T>(response);
+
+            var ex = result.ErrorException;
+            if ((options.ThrowOnDeserializationError || options.ThrowOnAnyError) && ex != null) {
+                LogError(request, result);
+                throw ex;
+            }
+
+            return result;
         }
 
         public async Task<RestResponse> GetAsync(IRestApiRequest request) {
@@ -160,7 +168,7 @@ namespace Cortside.RestApiClient {
                 return response;
             } else {
                 LogError(request, response);
-                throw new RestApiException("unsucessful request--need better message");
+                throw new RestApiException("unsuccessful request--need better message");
             }
         }
 
