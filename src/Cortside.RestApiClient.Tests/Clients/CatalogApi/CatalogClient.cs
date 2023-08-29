@@ -62,6 +62,14 @@ namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
             return response;
         }
 
+        public async Task<RestResponse> ModelMismatchAsync() {
+            var request = new RestApiRequest("/api/v1/jsonmodelmismatch", Method.Get) {
+                FollowRedirects = true,
+            };
+            var response = await client.ExecuteAsync<CatalogItem>(request).ConfigureAwait(false);
+            return response;
+        }
+
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
