@@ -9,11 +9,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 namespace Cortside.RestApiClient.Tests {
-    public class SerilizationTest {
+    public class SerializationTest {
         private readonly CatalogClientConfiguration config;
         public static MockHttpServer Server { get; set; }
 
-        public SerilizationTest() {
+        public SerializationTest() {
             var name = Guid.NewGuid().ToString();
             Server = new MockHttpServer(name)
                 .ConfigureBuilder(new IdentityServerMock("./Data/discovery.json", "./Data/jwks.json"))
@@ -36,16 +36,16 @@ namespace Cortside.RestApiClient.Tests {
         }
 
         [Fact]
-        public async Task ShouldThrowExceptionOnSerilizationErrorAsync() {
+        public Task ShouldThrowExceptionOnSerializationErrorAsync() {
             // arrange
             var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor(), true);
 
             // act
-            await Assert.ThrowsAnyAsync<Exception>(async () => await client.ModelMismatchAsync().ConfigureAwait(false)).ConfigureAwait(false);
+            return Assert.ThrowsAnyAsync<Exception>(async () => await client.ModelMismatchAsync().ConfigureAwait(false));
         }
 
         [Fact]
-        public async Task ShouldFailOnSerilizationErrorAsync() {
+        public async Task ShouldFailOnSerializationErrorAsync() {
             // arrange
             var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor(), false);
 
