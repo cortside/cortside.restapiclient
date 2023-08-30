@@ -29,7 +29,7 @@ namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
                 Cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions())),
                 ThrowOnAnyError = throwOnAnyError
             };
-            client = new RestApiClient(logger, options);
+            client = new RestApiClient(logger, context, options);
         }
 
         internal async Task<RestResponse<CatalogItem>> GetItemAsync(string sku) {
@@ -59,6 +59,14 @@ namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
                 FollowRedirects = true,
             };
             var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+            return response;
+        }
+
+        public async Task<RestResponse> ModelMismatchAsync() {
+            var request = new RestApiRequest("/api/v1/jsonmodelmismatch", Method.Get) {
+                FollowRedirects = true,
+            };
+            var response = await client.ExecuteAsync<CatalogItem>(request).ConfigureAwait(false);
             return response;
         }
 

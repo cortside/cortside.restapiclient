@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Cortside.RestApiClient.Tests.Clients.GitHubApi;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -7,12 +8,12 @@ using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Cortside.RestApiClient.Tests {
-    public class ClientTest {
+    public class GitHubClientTest {
         [Fact]
         public async Task ShouldGetRepositoriesDefaultCacheAsync() {
             // arrange
             var cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
-            var client = new GitHubClient(new NullLogger<GitHubClient>(), cache);
+            var client = new GitHubClient(new NullLogger<GitHubClient>(), cache, new HttpContextAccessor());
 
             // act
             var repos = await client.GetReposAsync().ConfigureAwait(false);
@@ -27,7 +28,7 @@ namespace Cortside.RestApiClient.Tests {
         public async Task ShouldGetRepositoriesAsync() {
             // arrange
             var cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
-            var client = new GitHubClient(new NullLogger<GitHubClient>(), cache);
+            var client = new GitHubClient(new NullLogger<GitHubClient>(), cache, new HttpContextAccessor());
 
             // act
             var repos = await client.GetReposAsync().ConfigureAwait(false);

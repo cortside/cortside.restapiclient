@@ -7,7 +7,6 @@ using System.IO;
 using System.Net.Http;
 using Polly;
 using RestSharp;
-using RestSharp.Serializers;
 
 namespace Cortside.RestApiClient {
     public class RestApiRequest : IRestApiRequest {
@@ -133,7 +132,7 @@ namespace Cortside.RestApiClient {
         }
 
         public RestApiRequest AddStringBody(string body, DataFormat dataFormat) {
-            string contentType = ContentType.FromDataFormat[dataFormat];
+            ContentType contentType = ContentType.FromDataFormat(dataFormat);
             request.RequestFormat = dataFormat;
             request.AddParameter(new BodyParameter("", body, contentType));
             return this;
@@ -146,7 +145,7 @@ namespace Cortside.RestApiClient {
 
         public RestApiRequest AddJsonBody<T>(T obj, string contentType = "application/json") where T : class {
             request.RequestFormat = DataFormat.Json;
-            if (!(obj is string text)) {
+            if (obj is not string text) {
                 request.AddParameter(new JsonParameter("", obj, contentType));
                 return this;
             }
@@ -157,7 +156,7 @@ namespace Cortside.RestApiClient {
 
         public RestApiRequest AddXmlBody<T>(T obj, string contentType = "application/xml", string xmlNamespace = "") where T : class {
             request.RequestFormat = DataFormat.Xml;
-            if (!(obj is string text)) {
+            if (obj is not string text) {
                 request.AddParameter(new XmlParameter("", obj, xmlNamespace, contentType));
                 return this;
             }

@@ -17,9 +17,8 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
     public class OpenIDConnectAuthenticator : AuthenticatorBase {
         private readonly TokenRequest tokenRequest;
         private IAsyncPolicy<RestResponse> policy = Policy.NoOpAsync<RestResponse>();
-        private ILogger<OpenIDConnectAuthenticator> logger = new NullLogger<OpenIDConnectAuthenticator>();
-        private bool allowsDelegation = false;
-        private DateTime tokenExpiration = DateTime.UtcNow;
+        private ILogger logger = new NullLogger<OpenIDConnectAuthenticator>();
+        private readonly DateTime tokenExpiration = DateTime.UtcNow;
         private readonly IHttpContextAccessor context;
 
         public OpenIDConnectAuthenticator(IHttpContextAccessor context, TokenRequest tokenRequest) : base("") {
@@ -43,7 +42,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             return this;
         }
 
-        public OpenIDConnectAuthenticator UseLogger(ILogger<OpenIDConnectAuthenticator> logger) {
+        public OpenIDConnectAuthenticator UseLogger(ILogger logger) {
             this.logger = logger;
             return this;
         }
@@ -61,17 +60,17 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
 
         public async Task<string> GetTokenAsync() {
             var response = await GetTokenAsync(tokenRequest.AuthorityUrl, tokenRequest.GrantType, tokenRequest.ClientId, tokenRequest.ClientSecret, tokenRequest.Scope).ConfigureAwait(false);
-
             if (!response.IsSuccessful) {
                 return null;
             }
 
-            var handler = new JwtSecurityTokenHandler();
-            allowsDelegation = AllowsDelegation(handler, response?.Data?.AccessToken);
+            var result = $"{response!.Data.TokenType} {response!.Data.AccessToken}";
 
+            var allowsDelegation = AllowsDelegation(response?.Data?.AccessToken);
             if (allowsDelegation && context?.HttpContext != null) {
                 var authorization = context.HttpContext.Request.Headers["Authorization"].ToString();
-                if (authorization != null) {
+
+                if (!string.IsNullOrWhiteSpace(authorization)) {
                     authorization = authorization.Replace("Bearer ", "");
                     response = await GetTokenAsync(tokenRequest.AuthorityUrl, "delegation", tokenRequest.ClientId, tokenRequest.ClientSecret, tokenRequest.Scope, authorization).ConfigureAwait(false);
                     if (response.IsSuccessful) {
@@ -82,18 +81,25 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                 }
             }
 
-            return $"{response!.Data.TokenType} {response!.Data.AccessToken}";
+            return result;
         }
 
-        private static bool AllowsDelegation(JwtSecurityTokenHandler handler, string token) {
+        private bool AllowsDelegation(string token) {
             if (string.IsNullOrWhiteSpace(token)) {
                 return false;
             }
 
             try {
+                var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
-                return jwtToken.Claims.Any(x => x.Type == "grant_type" && x.Value == "delegation");
+                var delegation = jwtToken.Claims.Any(x => x.Type == "grant_type" && x.Value == "delegation");
+                // check to see if token is for the client to be used for 
+                //var self = jwtToken.Claims.Any(x => x.Type == "client_id" && x.Value == tokenRequest.ClientId);
+
+                //return delegation && !self;
+                return delegation;
             } catch (Exception ex) {
+                logger.LogDebug(ex, "Unable to read token as JWT token to figure out if token has grant_type claim for delegation");
                 return false;
             }
         }
@@ -101,9 +107,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
         private async Task<RestResponse<TokenResponse>> GetTokenAsync(string url, string grantType, string clientId, string clientSecret, string scope, string token = null) {
             var options = new RestClientOptions(url);
 
-            using (var client = new RestClient(options)) {
-                client.UseNewtonsoftJson();
-
+            using (var client = new RestClient(options, configureSerialization: s => s.UseNewtonsoftJson())) {
                 var request = new RestRequest("connect/token", Method.Post)
                     .AddParameter("grant_type", grantType)
                     .AddParameter("scope", scope)
@@ -114,6 +118,8 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                 var correlationId = CorrelationContext.GetCorrelationId();
                 request.AddHeader("Request-Id", correlationId);
                 request.AddHeader("X-Correlation-Id", correlationId);
+
+                // TODO: add ip??
 
                 logger.LogInformation($"Getting {grantType} token for client_id {clientId} with scopes [{scope}]");
                 var response = await policy.ExecuteAsync(async () => {
@@ -126,10 +132,11 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                     // TODO: handling of deserialization exception?
                     // https://github.com/restsharp/RestSharp/blob/5830af48cf85b8eaadf89d83fbc3bf46106f5873/src/RestSharp/Serializers/DeseralizationException.cs
                     var rr = client.Deserialize<TokenResponse>(response);
-                    logger.LogDebug("Authentication successful");
+                    logger.LogDebug($"Successfully obtained {grantType} token for client_id {clientId} with scopes [{scope}]");
+
                     return rr;
                 } else {
-                    logger.LogError(response.ErrorException, $"Identity Server response code: {response.StatusCode} with error {response.ErrorMessage}");
+                    logger.LogError(response.ErrorException, $"Failed to obtain {grantType} token for client_id {clientId} with scopes [{scope}], Identity Server responded with status: {response.StatusCode} and error {response.ErrorMessage}");
                     return RestResponse<TokenResponse>.FromResponse(response);
                 }
             }

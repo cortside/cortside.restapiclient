@@ -1,3 +1,35 @@
+# Release 6.0
+
+* Update version number to match framework version (6.x)
+* Update projects to be net6.0
+* Update nuget dependencies to latest stable versions
+* Update to latest RestSharp and handle breaking changes
+* Set X-Forwarded-For header on client requests that originated from httprequest to capture original client ip
+* Improved authenticator logging
+* Handle deserialization exception when throw is true
+
+|Commit|Date|Author|Message|
+|---|---|---|---|
+| 6fb4e8b | <span style="white-space:nowrap;">2023-06-15</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update version
+| c28b6e9 | <span style="white-space:nowrap;">2023-06-20</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge branch 'master' into develop
+| 1400841 | <span style="white-space:nowrap;">2023-06-23</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [net6] update to net6
+| bb7b232 | <span style="white-space:nowrap;">2023-06-23</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [net6] update to latest restsharp library
+| d9744b8 | <span style="white-space:nowrap;">2023-06-23</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [net6] use vs2022 builder image
+| 5e0f21b | <span style="white-space:nowrap;">2023-06-23</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (origin/net6, net6) [net6] add useful message to when token parsing is not successful
+| 4c336fd | <span style="white-space:nowrap;">2023-06-23</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge pull request #15 from cortside/net6
+| 541bc53 | <span style="white-space:nowrap;">2023-07-17</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update version to 6.x to be in line with dotnet and net6 version numbers
+| 65ac8c9 | <span style="white-space:nowrap;">2023-07-17</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update version to 6.x to be in line with dotnet and net6 version numbers
+| 85bbf9c | <span style="white-space:nowrap;">2023-07-25</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  set X-Forwarded-For header on client requests that originated from httprequest to capture original client ip
+| 7a47485 | <span style="white-space:nowrap;">2023-07-26</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  set X-Forwarded-For header on client requests that originated from httprequest to capture original client ip
+| 35d06d0 | <span style="white-space:nowrap;">2023-07-26</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  set X-Forwarded-For header on client requests that originated from httprequest to capture original client ip
+| d96fafe | <span style="white-space:nowrap;">2023-07-26</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  allow for any ILogger in authenticator
+| d66d8a4 | <span style="white-space:nowrap;">2023-07-27</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  add more tests for delegation and better validation if there is reason to attempt to delegate
+| 346d497 | <span style="white-space:nowrap;">2023-08-15</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [OR-2315] handle deserialization exception when throw is true
+| 82eaaea | <span style="white-space:nowrap;">2023-08-15</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (origin/OR-2315, OR-2315) nudge for build
+| 5a21159 | <span style="white-space:nowrap;">2023-08-29</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge pull request #16 from cortside/OR-2315
+| ecbcdd4 | <span style="white-space:nowrap;">2023-08-30</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (HEAD -> release/6.0, origin/develop, origin/HEAD, develop) update to latest nuget packages
+****
+
 # Release 1.2
 
 |Commit|Date|Author|Message|

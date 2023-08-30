@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Polly;
 using RestSharp;
@@ -8,12 +9,12 @@ namespace Cortside.RestApiClient.Tests.Clients.HttpStatusApi {
     public class HttpStatusClient : IDisposable {
         readonly RestApiClient client;
 
-        public HttpStatusClient(ILogger<HttpStatusClient> logger, string hostUrl) {
-            client = new RestApiClient(logger, hostUrl);
+        public HttpStatusClient(ILogger<HttpStatusClient> logger, string hostUrl, IHttpContextAccessor contextAccessor) {
+            client = new RestApiClient(logger, contextAccessor, hostUrl);
         }
 
-        public HttpStatusClient(ILogger<HttpStatusClient> logger, RestApiClientOptions options) {
-            client = new RestApiClient(logger, options);
+        public HttpStatusClient(ILogger<HttpStatusClient> logger, IHttpContextAccessor contextAccessor, RestApiClientOptions options) {
+            client = new RestApiClient(logger, contextAccessor, options);
         }
 
         public async Task<string> Get200Async() {

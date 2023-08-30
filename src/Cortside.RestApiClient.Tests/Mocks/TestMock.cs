@@ -2,6 +2,7 @@
 using Cortside.MockServer;
 using Cortside.RestApiClient.Tests.Clients.CatalogApi;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
@@ -98,6 +99,20 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                         .WithStatusCode(302)
                         .WithHeader("Content-Type", "application/json")
                         .WithHeader("Location", "/api/v1/temp302")
+                );
+
+            server
+                .Given(
+                    Request.Create().WithPath("/api/v1/jsonmodelmismatch")
+                        .UsingGet()
+                )
+                .RespondWith(
+                    Response.Create()
+                        .WithStatusCode(200)
+                        .WithHeader("Content-Type", "application/json")
+                        .WithBody(r => JsonConvert.SerializeObject(new JObject {
+                            ["ItemId"] = null
+                        }))
                 );
         }
     }

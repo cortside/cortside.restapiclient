@@ -4,6 +4,7 @@ using Cortside.MockServer;
 using Cortside.RestApiClient.Tests.Clients.HttpStatusApi;
 using Cortside.RestApiClient.Tests.Clients.LexisNexisApi;
 using Cortside.RestApiClient.Tests.Mocks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
@@ -30,7 +31,7 @@ namespace Cortside.RestApiClient.Tests {
         [Fact]
         public async Task ShouldGetItemAsync() {
             // arrange
-            var client = new LexisNexisClient(new NullLogger<HttpStatusClient>(), config);
+            var client = new LexisNexisClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor());
 
             // act
             var item = await client.InstantIdAsync().ConfigureAwait(false);

@@ -60,7 +60,10 @@ namespace Cortside.RestApiClient {
 
         public bool FollowRedirects { get; set; } = false;
 
-        public IAuthenticator Authenticator { get; set; }
+        public IAuthenticator Authenticator {
+            get { return rcOptions.Authenticator; }
+            set { rcOptions.Authenticator = value; }
+        }
 
         public IRestSerializer Serializer { get; set; }
 

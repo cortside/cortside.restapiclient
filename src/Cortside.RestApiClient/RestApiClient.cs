@@ -3,9 +3,11 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Cortside.Common.Correlation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using RestSharp;
+using RestSharp.Serializers.Xml;
 using Serilog.Context;
 
 namespace Cortside.RestApiClient {
@@ -13,27 +15,29 @@ namespace Cortside.RestApiClient {
         private readonly ILogger logger;
         private readonly RestClient client;
         private readonly RestApiClientOptions options;
+        private readonly IHttpContextAccessor contextAccessor;
 
-        public RestApiClient(ILogger logger, string baseUrl) {
-            this.logger = logger;
-
-            options = new RestApiClientOptions(baseUrl);
-            client = new RestClient(options.Options);
+        [Obsolete("Use overload that takes IHttpContextAccessor")]
+        public RestApiClient(ILogger logger, string baseUrl) : this(logger, new HttpContextAccessor(), baseUrl) {
         }
 
-        public RestApiClient(ILogger logger, RestApiClientOptions options) {
+        public RestApiClient(ILogger logger, IHttpContextAccessor contextAccessor, string baseUrl) : this(logger, contextAccessor, new RestApiClientOptions(baseUrl)) {
+        }
+
+        [Obsolete("Use overload that takes IHttpContextAccessor")]
+        public RestApiClient(ILogger logger, RestApiClientOptions options) : this(logger, new HttpContextAccessor(), options) {
+        }
+
+        public RestApiClient(ILogger logger, IHttpContextAccessor contextAccessor, RestApiClientOptions options) {
             this.logger = logger;
             this.options = options;
+            this.contextAccessor = contextAccessor;
 
-            client = new RestClient(options.Options);
-            if (options.Authenticator != null) {
-                client.UseAuthenticator(options.Authenticator);
-            }
             if (options.Serializer != null) {
-                client.UseSerializer(() => options.Serializer);
+                client = new RestClient(options.Options, configureSerialization: s => s.UseSerializer(() => options.Serializer));
             }
             if (options.XmlSerializer) {
-                client.UseXml();
+                client = new RestClient(options.Options, configureSerialization: s => s.UseXmlSerializer());
             }
         }
 
@@ -63,6 +67,7 @@ namespace Cortside.RestApiClient {
             var correlationId = CorrelationContext.GetCorrelationId();
             request.AddHeader("Request-Id", correlationId);
             request.AddHeader("X-Correlation-Id", correlationId);
+            SetForwardedHeader(request);
 
             RestResponse response;
             using (LogContext.PushProperty("RequestUrl", client.BuildUri(request.RestRequest))) {
@@ -107,13 +112,35 @@ namespace Cortside.RestApiClient {
             return response;
         }
 
+        private void SetForwardedHeader(IRestApiRequest request) {
+            if (contextAccessor?.HttpContext?.Request == null) {
+                return;
+            }
+
+            var ip = HttpContextUtility.GetRequestIpAddress(contextAccessor.HttpContext);
+            if (string.IsNullOrWhiteSpace(ip)) {
+                return;
+            }
+
+            request.AddHeader("X-Forwarded-For", ip);
+            request.AddHeader("Forwarded", $"for={ip}");
+        }
+
         public Task<RestResponse> ExecuteAsync(IRestApiRequest request) {
             return InnerExecuteAsync(request);
         }
 
         public async Task<RestResponse<T>> ExecuteAsync<T>(IRestApiRequest request) {
             var response = await InnerExecuteAsync(request).ConfigureAwait(false);
-            return client.Deserialize<T>(response);
+            var result = client.Deserialize<T>(response);
+
+            var ex = result.ErrorException;
+            if ((options.ThrowOnDeserializationError || options.ThrowOnAnyError) && ex != null) {
+                LogError(request, result);
+                throw ex;
+            }
+
+            return result;
         }
 
         public async Task<RestResponse> GetAsync(IRestApiRequest request) {
@@ -141,7 +168,7 @@ namespace Cortside.RestApiClient {
                 return response;
             } else {
                 LogError(request, response);
-                throw new RestApiException("unsucessful request--need better message");
+                throw new RestApiException("unsuccessful request--need better message");
             }
         }
 
