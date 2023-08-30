@@ -6,6 +6,7 @@
 * Update to latest RestSharp and handle breaking changes
 * Set X-Forwarded-For header on client requests that originated from httprequest to capture original client ip
 * Improved authenticator logging
+* Handle deserialization exception when throw is true
 
 |Commit|Date|Author|Message|
 |---|---|---|---|
