@@ -1,5 +1,13 @@
 # Release 6.0
 
+* Update version number to match framework version (6.x)
+* Update projects to be net6.0
+* Update nuget dependencies to latest stable versions
+* Update to latest RestSharp and handle breaking changes
+* Set X-Forwarded-For header on client requests that originated from httprequest to capture original client ip
+* Improved authenticator logging
+* Handle deserialization exception when throw is true
+
 |Commit|Date|Author|Message|
 |---|---|---|---|
 | 6fb4e8b | <span style="white-space:nowrap;">2023-06-15</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update version
