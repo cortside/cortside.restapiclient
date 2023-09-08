@@ -117,18 +117,34 @@ namespace Cortside.RestApiClient {
         }
 
         public RestApiRequest AddParameter<T>(string name, T value, bool encode = true) where T : struct {
-            request.AddParameter(name, value.ToString(), encode);
+            request.AddParameter(name, StringifyValue(value), encode);
             return this;
         }
 
         public RestApiRequest AddParameter(string name, object value, ParameterType type, bool encode = true) {
             if (type != ParameterType.RequestBody) {
-                request.AddParameter(Parameter.CreateParameter(name, value, type, encode));
+                request.AddParameter(Parameter.CreateParameter(name, StringifyValue(value), type, encode));
                 return this;
             }
 
-            request.AddBody(value);
+            request.AddBody(request.RequestFormat == DataFormat.None ? StringifyValue(value) : value);
             return this;
+        }
+
+        private string StringifyValue(object value) {
+            if (value is string sv) {
+                return sv;
+            }
+
+            // Use serializer to format values instead of blind ToString()
+            // TODO: use actual settings
+            var serializer = new JsonNetSerializer();
+            var s = serializer.Serialize(value);
+            if (s.StartsWith('"')) {
+                s = s.Substring(1, s.Length - 2);
+            }
+
+            return s;
         }
 
         public RestApiRequest AddStringBody(string body, DataFormat dataFormat) {

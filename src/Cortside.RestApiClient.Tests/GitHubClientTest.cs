@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Cortside.RestApiClient.Tests {
     public class GitHubClientTest {
-        [Fact]
+        [Fact(Skip = "setup mock instead of relying on github")]
         public async Task ShouldGetRepositoriesDefaultCacheAsync() {
             // arrange
             var cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
@@ -24,7 +24,7 @@ namespace Cortside.RestApiClient.Tests {
             Assert.NotNull(await client.Cache.GetAsync("RestRequest::https://api.github.com/users/cortside/repos::").ConfigureAwait(false));
         }
 
-        [Fact]
+        [Fact(Skip = "setup mock instead of relying on github")]
         public async Task ShouldGetRepositoriesAsync() {
             // arrange
             var cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
