@@ -9,10 +9,12 @@ namespace Cortside.RestApiClient.Tests {
     public class DateTimeHandlingTest {
         [Fact]
         public void test1() {
-            var serializer = new JsonNetSerializer();
-            var json = serializer.Serialize(new DateTime(2013, 1, 21, 1, 2, 3, DateTimeKind.Local));
-            json = json.Substring(1, json.Length - 2);
-            Assert.Equal("2013-01-21T08:02:03Z", json);
+            using (new ScopedLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time"))) {
+                var serializer = new JsonNetSerializer();
+                var json = serializer.Serialize(new DateTime(2013, 1, 21, 1, 2, 3, DateTimeKind.Local));
+                json = json.Substring(1, json.Length - 2);
+                Assert.Equal("2013-01-21T08:02:03Z", json);
+            }
         }
 
         [Fact]
