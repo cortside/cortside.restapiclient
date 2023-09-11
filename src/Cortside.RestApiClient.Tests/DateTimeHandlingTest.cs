@@ -27,18 +27,21 @@ namespace Cortside.RestApiClient.Tests {
 
         [Fact]
         public async Task DateTimeHandling() {
-            var options = new RestApiClientOptions("https://postman-echo.com");
-            var client = new RestApiClient(NullLogger.Instance, new HttpContextAccessor(), options);
+            using (new ScopedLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time"))) {
+                var options = new RestApiClientOptions("https://postman-echo.com");
+                var client = new RestApiClient(NullLogger.Instance, new HttpContextAccessor(), options);
 
-            var request = new RestApiRequest("get", Method.Get);
-            request.AddQueryParameter("foo1", "bar1");
-            request.AddQueryParameter("foo2", "bar2");
-            request.AddParameter("date", new DateTime(2013, 1, 21, 1, 2, 3, DateTimeKind.Local));
-            var response = await client.GetAsync(request);
+                var request = new RestApiRequest("get", Method.Get);
+                request.AddQueryParameter("foo1", "bar1");
+                request.AddQueryParameter("foo2", "bar2");
+                request.AddParameter("date", new DateTime(2013, 1, 21, 1, 2, 3, DateTimeKind.Local));
+                var response = await client.GetAsync(request);
 
-            Assert.NotNull(response);
-            Assert.Equal("2013-01-21T08:02:03Z", request.Parameters.TryFind("date").Value);
-            Assert.Equal("https://postman-echo.com/get?foo1=bar1&foo2=bar2&date=2013-01-21T08%3a02%3a03Z", client.BuildUri(request).ToString());
+                Assert.NotNull(response);
+                Assert.Equal("2013-01-21T08:02:03Z", request.Parameters.TryFind("date").Value);
+                Assert.Equal("https://postman-echo.com/get?foo1=bar1&foo2=bar2&date=2013-01-21T08%3a02%3a03Z",
+                    client.BuildUri(request).ToString());
+            }
         }
     }
 }
