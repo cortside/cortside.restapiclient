@@ -60,7 +60,7 @@ namespace Cortside.RestApiClient.Tests {
 
             // act
             RestResponse response = null;
-            await Assert.ThrowsAsync<TimeoutException>(async () => response = await client.ExecuteTimeoutAsync());
+            await Assert.ThrowsAsync<TimeoutException>(async () => response = await client.ExecuteTimeoutAsync().ConfigureAwait(false)).ConfigureAwait(false);
             Assert.Null(response);
         }
 
@@ -74,7 +74,7 @@ namespace Cortside.RestApiClient.Tests {
             var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), new HttpContextAccessor(), options);
 
             // act
-            RestResponse response = await client.ExecuteTimeoutAsync();
+            RestResponse response = await client.ExecuteTimeoutAsync().ConfigureAwait(false);
             Assert.False(response.IsSuccessful);
         }
     }

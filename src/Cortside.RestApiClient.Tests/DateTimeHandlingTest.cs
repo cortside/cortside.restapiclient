@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Cortside.Common.Testing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using RestSharp;
@@ -8,7 +9,7 @@ using Xunit;
 namespace Cortside.RestApiClient.Tests {
     public class DateTimeHandlingTest {
         [Fact]
-        public void test1() {
+        public void SerializeDateTime() {
             using (new ScopedLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time"))) {
                 var serializer = new JsonNetSerializer();
                 var json = serializer.Serialize(new DateTime(2013, 1, 21, 1, 2, 3, DateTimeKind.Local));
@@ -18,7 +19,7 @@ namespace Cortside.RestApiClient.Tests {
         }
 
         [Fact]
-        public void test2() {
+        public void SerializeInt() {
             var serializer = new JsonNetSerializer();
             var json = serializer.Serialize(1);
 
@@ -26,7 +27,7 @@ namespace Cortside.RestApiClient.Tests {
         }
 
         [Fact]
-        public async Task DateTimeHandling() {
+        public async Task ShouldSerializeDateTimeInQueryString() {
             using (new ScopedLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time"))) {
                 var options = new RestApiClientOptions("https://postman-echo.com");
                 var client = new RestApiClient(NullLogger.Instance, new HttpContextAccessor(), options);
@@ -35,7 +36,7 @@ namespace Cortside.RestApiClient.Tests {
                 request.AddQueryParameter("foo1", "bar1");
                 request.AddQueryParameter("foo2", "bar2");
                 request.AddParameter("date", new DateTime(2013, 1, 21, 1, 2, 3, DateTimeKind.Local));
-                var response = await client.GetAsync(request);
+                var response = await client.GetAsync(request).ConfigureAwait(false);
 
                 Assert.NotNull(response);
                 Assert.Equal("2013-01-21T08:02:03Z", request.Parameters.TryFind("date").Value);
