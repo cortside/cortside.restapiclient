@@ -19,6 +19,24 @@ namespace Cortside.RestApiClient.Tests {
         }
 
         [Fact]
+        public void DeserializeIso8601UtcDateTime() {
+            // act
+            var date = DateTime.Parse("2013-01-21T08:02:03Z");
+
+            // assert
+            Assert.Equal(new DateTime(2013, 1, 21, 1, 2, 3, DateTimeKind.Local), date);
+        }
+
+        [Fact]
+        public void DeserializeIso8601OffsetDateTime() {
+            // act
+            var date = DateTime.Parse("2013-01-21T08:02:03-07:00");
+
+            // assert
+            Assert.Equal(new DateTime(2013, 1, 21, 1, 2, 3, DateTimeKind.Local), date);
+        }
+
+        [Fact]
         public void SerializeInt() {
             var serializer = new JsonNetSerializer();
             var json = serializer.Serialize(1);
