@@ -89,17 +89,17 @@ namespace Cortside.RestApiClient {
             return AddParameter(new HeaderParameter(name, value));
         }
 
-        public RestApiRequest AddFile(string name, string path, string contentType = null) {
+        public RestApiRequest AddFile(string name, string path, ContentType contentType = null) {
             RestRequest.AddFile(name, path, contentType);
             return this;
         }
 
-        public RestApiRequest AddFile(string name, byte[] bytes, string filename, string contentType = null) {
+        public RestApiRequest AddFile(string name, byte[] bytes, string filename, ContentType contentType = null) {
             RestRequest.AddFile(name, bytes, filename, contentType);
             return this;
         }
 
-        public RestApiRequest AddFile(string name, Func<Stream> getFile, string fileName, string contentType = null) {
+        public RestApiRequest AddFile(string name, Func<Stream> getFile, string fileName, ContentType contentType = null) {
             RestRequest.AddFile(name, getFile, fileName, contentType);
             return this;
         }
