@@ -11,8 +11,8 @@ namespace Cortside.RestApiClient.Tests.Clients.GitHubApi {
         private readonly RestApiClient client;
         private readonly RestApiClientOptions options;
 
-        public GitHubClient(ILogger<GitHubClient> logger, IDistributedCache cache, IHttpContextAccessor contextAccessor) {
-            options = new RestApiClientOptions("https://api.github.com") {
+        public GitHubClient(ILogger<GitHubClient> logger, IDistributedCache cache, IHttpContextAccessor contextAccessor, string baseUrl) {
+            options = new RestApiClientOptions(baseUrl) {
                 Cache = cache
             };
 

@@ -89,17 +89,17 @@ namespace Cortside.RestApiClient {
             return AddParameter(new HeaderParameter(name, value));
         }
 
-        public RestApiRequest AddFile(string name, string path, string contentType = null) {
+        public RestApiRequest AddFile(string name, string path, ContentType contentType = null) {
             RestRequest.AddFile(name, path, contentType);
             return this;
         }
 
-        public RestApiRequest AddFile(string name, byte[] bytes, string filename, string contentType = null) {
+        public RestApiRequest AddFile(string name, byte[] bytes, string filename, ContentType contentType = null) {
             RestRequest.AddFile(name, bytes, filename, contentType);
             return this;
         }
 
-        public RestApiRequest AddFile(string name, Func<Stream> getFile, string fileName, string contentType = null) {
+        public RestApiRequest AddFile(string name, Func<Stream> getFile, string fileName, ContentType contentType = null) {
             RestRequest.AddFile(name, getFile, fileName, contentType);
             return this;
         }
@@ -117,18 +117,34 @@ namespace Cortside.RestApiClient {
         }
 
         public RestApiRequest AddParameter<T>(string name, T value, bool encode = true) where T : struct {
-            request.AddParameter(name, value.ToString(), encode);
+            request.AddParameter(name, StringifyValue(value), encode);
             return this;
         }
 
         public RestApiRequest AddParameter(string name, object value, ParameterType type, bool encode = true) {
             if (type != ParameterType.RequestBody) {
-                request.AddParameter(Parameter.CreateParameter(name, value, type, encode));
+                request.AddParameter(Parameter.CreateParameter(name, StringifyValue(value), type, encode));
                 return this;
             }
 
-            request.AddBody(value);
+            request.AddBody(request.RequestFormat == DataFormat.None ? StringifyValue(value) : value);
             return this;
+        }
+
+        private string StringifyValue(object value) {
+            if (value is string sv) {
+                return sv;
+            }
+
+            // Use serializer to format values instead of blind ToString()
+            // TODO: use actual settings
+            var serializer = new JsonNetSerializer();
+            var s = serializer.Serialize(value);
+            if (s.StartsWith('"')) {
+                s = s.Substring(1, s.Length - 2);
+            }
+
+            return s;
         }
 
         public RestApiRequest AddStringBody(string body, DataFormat dataFormat) {

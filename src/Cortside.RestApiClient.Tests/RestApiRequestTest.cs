@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using RestSharp;
@@ -172,14 +173,14 @@ namespace Cortside.RestApiClient.Tests {
             var request = new RestApiRequest();
 
             // act
-            request.AddFile("foo.txt", new byte[0], "foo.txt");
+            request.AddFile("foo.txt", Array.Empty<byte>(), "foo.txt");
 
             // assert
             Assert.NotEmpty(request.Files);
             Assert.NotEmpty(request.RestRequest.Files);
         }
 
-        [Fact(Skip = "says file does not exist for some reason")]
+        [Fact]
         public void ShouldAddFile2() {
             // arrange
             var request = new RestApiRequest();
@@ -189,8 +190,7 @@ namespace Cortside.RestApiClient.Tests {
 
             // act
             var file = Path.GetFileName(filename);
-            var path = filename.Replace(Path.GetFileName(filename), "");
-            request.AddFile(file, path);
+            request.AddFile(file, filename);
 
             // assert
             Assert.NotEmpty(request.Files);

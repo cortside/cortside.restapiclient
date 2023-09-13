@@ -198,7 +198,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("/api/v1/items/1234", Method.Get);
 
             // act
-            var token = await authenticator.GetTokenAsync();
+            var token = await authenticator.GetTokenAsync().ConfigureAwait(false);
 
             // assert
             Assert.Equal("Bearer foo-client_credentials-token", token);

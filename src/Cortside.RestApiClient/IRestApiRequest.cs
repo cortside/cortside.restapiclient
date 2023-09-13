@@ -22,9 +22,9 @@ namespace Cortside.RestApiClient {
         RestRequest RestRequest { get; }
         string RootElement { get; set; }
         int Timeout { get; set; }
-        RestApiRequest AddFile(string name, byte[] bytes, string filename, string contentType = null);
-        RestApiRequest AddFile(string name, Func<Stream> getFile, string fileName, string contentType = null);
-        RestApiRequest AddFile(string name, string path, string contentType = null);
+        RestApiRequest AddFile(string name, byte[] bytes, string filename, ContentType contentType = null);
+        RestApiRequest AddFile(string name, Func<Stream> getFile, string fileName, ContentType contentType = null);
+        RestApiRequest AddFile(string name, string path, ContentType contentType = null);
         RestApiRequest AddHeader(string name, string value);
         void RemoveParameter(Parameter parameter);
         RestApiRequest AddParameter(Parameter parameter);
