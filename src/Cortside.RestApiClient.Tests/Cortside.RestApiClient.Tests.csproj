@@ -6,6 +6,9 @@
     <LangVersion>11.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="AsyncAnalyzers" Version="1.1.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
