@@ -37,11 +37,26 @@ namespace Cortside.RestApiClient.Tests {
         }
 
         [Fact]
-        public Task ShouldThrowExceptionForGetClientMethodAsync() {
+        public async Task ShouldNotThrowExceptionForGetClientMethodAsync() {
             // arrange
             var options = new RestApiClientOptions {
                 BaseUrl = new Uri(Server.Url),
                 ThrowOnAnyError = false
+            };
+            var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), new HttpContextAccessor(), options);
+
+            // act
+            var response = await client.GetTimeoutAsync();
+
+            Assert.Null(response);
+        }
+
+        [Fact]
+        public Task ShouldThrowExceptionForGetClientMethodAsync() {
+            // arrange
+            var options = new RestApiClientOptions {
+                BaseUrl = new Uri(Server.Url),
+                ThrowOnAnyError = true
             };
             var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), new HttpContextAccessor(), options);
 

@@ -61,6 +61,18 @@ namespace Cortside.RestApiClient {
             }
         }
 
+        private RestResponse<T> DeserializeRestResponse<T>(IRestApiRequest request, RestResponse response) {
+            var result = client.Deserialize<T>(response);
+
+            var ex = result.ErrorException;
+            if ((options.ThrowOnDeserializationError || options.ThrowOnAnyError) && ex != null) {
+                LogError(request, result);
+                throw ex;
+            }
+
+            return result;
+        }
+
         protected async Task<RestResponse> InnerExecuteAsync(IRestApiRequest request) {
             var policy = request.Policy ?? options.Policy;
 
@@ -71,27 +83,8 @@ namespace Cortside.RestApiClient {
 
             RestResponse response;
             using (LogContext.PushProperty("RequestUrl", client.BuildUri(request.RestRequest))) {
-                int retry = 0;
-                response = await policy.ExecuteAsync(async () => {
-                    var url = client.BuildUri(request.RestRequest);
-                    var body = request.Parameters.SingleOrDefault(x => x.Type == ParameterType.RequestBody);
-                    var serializer = options.Serializer ?? new JsonNetSerializer();
-                    var json = serializer.Serialize(body);
-                    logger.LogDebug("Request to {url}, attempt {attempt}, with body {body}", url, retry++, json);
-
-                    var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
-                    logger.LogDebug("Response {retry}: Status Code = {StatusCode} Data = {Content}", retry, response.StatusCode, response.Content);
-                    if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod || response.StatusCode == HttpStatusCode.Redirect)) {
-                        response.IsSuccessStatusCode = true;
-                        response.ResponseStatus = ResponseStatus.Completed;
-                        response.ErrorException = null;
-                    }
-                    TimeoutCheck(request, response);
-                    if (options.ThrowOnAnyError && response.ErrorException != null) {
-                        throw response.ErrorException;
-                    }
-                    return response;
-                }).ConfigureAwait(false);
+                int attempt = 0;
+                response = await policy.ExecuteAsync(async () => await InnerExecuteAttemptAsync(request, attempt++)).ConfigureAwait(false);
 
                 logger.LogInformation("Response from {url} returned with status code {StatusCode} and content: {Content}", client.BuildUri(request.RestRequest), response.StatusCode, response.Content);
                 TimeoutCheck(request, response);
@@ -107,6 +100,38 @@ namespace Cortside.RestApiClient {
                     var redirectResponse = await InnerExecuteAsync(redirectRequest).ConfigureAwait(false);
                     return redirectResponse;
                 }
+            }
+
+            return response;
+        }
+
+        private async Task<RestResponse> InnerExecuteAttemptAsync(IRestApiRequest request, int attempt) {
+            var url = client.BuildUri(request.RestRequest);
+            var body = request.Parameters.SingleOrDefault(x => x.Type == ParameterType.RequestBody);
+            var serializer = options.Serializer ?? new JsonNetSerializer();
+            var json = serializer.Serialize(body);
+            logger.LogDebug("Request to {url}, attempt {attempt}, with body {body}", url, attempt, json);
+
+            var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
+            if (response.ErrorException != null || !string.IsNullOrWhiteSpace(response.ErrorMessage)) {
+                logger.LogError(response.ErrorException,
+                    "Response {attempt}: Status Code = {StatusCode} ErrorMessage = {ErrorMessage} Content = {Content}", attempt,
+                    response.StatusCode, response.ErrorMessage, response.Content);
+            } else {
+                logger.LogDebug("Response {attempt}: Status Code = {StatusCode} Content = {Content}", attempt, response.StatusCode,
+                    response.Content);
+            }
+
+            if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod ||
+                                                  response.StatusCode == HttpStatusCode.Redirect)) {
+                response.IsSuccessStatusCode = true;
+                response.ResponseStatus = ResponseStatus.Completed;
+                response.ErrorException = null;
+            }
+
+            TimeoutCheck(request, response);
+            if (options.ThrowOnAnyError && response.ErrorException != null) {
+                throw response.ErrorException;
             }
 
             return response;
@@ -132,13 +157,7 @@ namespace Cortside.RestApiClient {
 
         public async Task<RestResponse<T>> ExecuteAsync<T>(IRestApiRequest request) {
             var response = await InnerExecuteAsync(request).ConfigureAwait(false);
-            var result = client.Deserialize<T>(response);
-
-            var ex = result.ErrorException;
-            if ((options.ThrowOnDeserializationError || options.ThrowOnAnyError) && ex != null) {
-                LogError(request, result);
-                throw ex;
-            }
+            var result = DeserializeRestResponse<T>(request, response);
 
             return result;
         }
@@ -147,19 +166,20 @@ namespace Cortside.RestApiClient {
             request.Method = Method.Get;
             var response = await InnerExecuteAsync(request).ConfigureAwait(false);
 
-            if (response.ResponseStatus == ResponseStatus.TimedOut) {
+            // TODO: move to InnerExecuteAsync and add as ErrorException?
+            if (response.ResponseStatus == ResponseStatus.TimedOut && options.ThrowOnAnyError) {
                 var timeouts = new int[] { request.Timeout, client.Options.MaxTimeout };
                 var timeout = timeouts.Where(x => x > 0).Min();
                 throw new TimeoutException($"Timeout of {timeout} exceeded");
             }
 
-            if (response.ErrorException != null) {
+            if (response.ErrorException != null && options.ThrowOnAnyError) {
                 LogError(request, response);
                 // Request failed with status code Forbidden
                 throw new RestApiException(response.ErrorMessage ?? response.ErrorException.Message, response.ErrorException);
             }
 
-            if (!response.IsSuccessful) {
+            if (!response.IsSuccessful && options.ThrowOnAnyError) {
                 LogError(request, response);
                 throw new RestApiException($"Request failed with status code {response.StatusCode}");
             }
@@ -168,7 +188,11 @@ namespace Cortside.RestApiClient {
                 return response;
             } else {
                 LogError(request, response);
-                throw new RestApiException("unsuccessful request--need better message");
+                if (options.ThrowOnAnyError) {
+                    throw new RestApiException("unsuccessful request--need better message");
+                }
+
+                return response;
             }
         }
 
@@ -176,7 +200,8 @@ namespace Cortside.RestApiClient {
             var response = await GetAsync(request).ConfigureAwait(false);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK) {
-                return client.Deserialize<T>(response);
+                var result = DeserializeRestResponse<T>(request, response);
+                return result;
             } else {
                 LogError(request, response);
                 return default;
@@ -202,7 +227,7 @@ namespace Cortside.RestApiClient {
                 } else {
                     LogError(request, response);
                     var ex = response.ErrorException;
-                    if (ex != null) {
+                    if (ex != null && options.ThrowOnAnyError) {
                         throw ex;
                     }
                     return default;
