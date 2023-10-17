@@ -84,7 +84,17 @@ namespace Cortside.RestApiClient {
             RestResponse response;
             using (LogContext.PushProperty("RequestUrl", client.BuildUri(request.RestRequest))) {
                 int attempt = 0;
-                response = await policy.ExecuteAsync(async () => await InnerExecuteAttemptAsync(request, attempt++)).ConfigureAwait(false);
+                try {
+                    response = await policy.ExecuteAsync(async () => await InnerExecuteAttemptAsync(request, attempt++))
+                        .ConfigureAwait(false);
+                } catch (Exception ex) {
+                    response = new RestResponse() {
+                        ErrorException = ex,
+                        ErrorMessage = ex.Message,
+                        IsSuccessStatusCode = false,
+                        StatusCode = 0
+                    };
+                }
 
                 logger.LogInformation("Response from {url} returned with status code {StatusCode} and content: {Content}", client.BuildUri(request.RestRequest), response.StatusCode, response.Content);
                 TimeoutCheck(request, response);
