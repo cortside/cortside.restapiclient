@@ -84,7 +84,17 @@ namespace Cortside.RestApiClient {
             RestResponse response;
             using (LogContext.PushProperty("RequestUrl", client.BuildUri(request.RestRequest))) {
                 int attempt = 0;
-                response = await policy.ExecuteAsync(async () => await InnerExecuteAttemptAsync(request, attempt++)).ConfigureAwait(false);
+                try {
+                    response = await policy.ExecuteAsync(async () => await InnerExecuteAttemptAsync(request, attempt++))
+                        .ConfigureAwait(false);
+                } catch (Exception ex) {
+                    response = new RestResponse() {
+                        ErrorException = ex,
+                        ErrorMessage = ex.Message,
+                        IsSuccessStatusCode = false,
+                        StatusCode = 0
+                    };
+                }
 
                 logger.LogInformation("Response from {url} returned with status code {StatusCode} and content: {Content}", client.BuildUri(request.RestRequest), response.StatusCode, response.Content);
                 TimeoutCheck(request, response);
@@ -202,10 +212,10 @@ namespace Cortside.RestApiClient {
             if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                 var result = DeserializeRestResponse<T>(request, response);
                 return result;
-            } else {
-                LogError(request, response);
-                return default;
             }
+
+            LogError(request, response);
+            return RestResponse<T>.FromResponse(response);
         }
 
         public Task<T> GetWithCacheAsync<T>(IRestApiRequest request, TimeSpan? duration = null) where T : class, new() {

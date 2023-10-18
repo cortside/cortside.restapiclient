@@ -165,12 +165,69 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var client = new RestClient("http://api.github.com");
             var request = new RestRequest("foo", Method.Get);
 
+            // act && assert
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await authenticator.Authenticate(client, request));
+        }
+
+        [Fact]
+        public async Task ShouldFailToAuthenticateWithCallWithThrowAsync() {
+            var tokenRequest = new TokenRequest {
+                AuthorityUrl = "https://demo.duendesoftware.com",
+                GrantType = "client_credentials",
+                Scope = "api",
+                ClientId = "m2m",
+                ClientSecret = "xxx"
+            };
+
+            // arrange
+            var authenticator = new OpenIDConnectAuthenticator(new HttpContextAccessor(), tokenRequest)
+                .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
+                    .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
+                    .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
+                );
+
+            var options = new RestApiClientOptions() {
+                BaseUrl = new Uri("http://api.github.com"),
+                Authenticator = authenticator,
+                ThrowOnAnyError = true
+            };
+            var client = new RestApiClient(new NullLogger<RestApiClient>(), new HttpContextAccessor(), options);
+            var request = new RestApiRequest("foo", Method.Get);
+
+            // act && assert
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await client.GetAsync(request));
+        }
+
+        [Fact]
+        public async Task ShouldFailToAuthenticateWithCallWithNoThrowAsync() {
+            var tokenRequest = new TokenRequest {
+                AuthorityUrl = "https://demo.duendesoftware.com",
+                GrantType = "client_credentials",
+                Scope = "api",
+                ClientId = "m2m",
+                ClientSecret = "xxx"
+            };
+
+            // arrange
+            var authenticator = new OpenIDConnectAuthenticator(new HttpContextAccessor(), tokenRequest)
+                .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
+                    .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
+                    .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
+                );
+
+            var options = new RestApiClientOptions() {
+                BaseUrl = new Uri("http://api.github.com"),
+                Authenticator = authenticator,
+                ThrowOnAnyError = false
+            };
+            var client = new RestApiClient(new NullLogger<RestApiClient>(), new HttpContextAccessor(), options);
+            var request = new RestApiRequest("foo", Method.Get);
+
             // act
-            await authenticator.Authenticate(client, request).ConfigureAwait(false);
+            var response = await client.GetAsync(request);
 
             // assert
-            var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
-            Assert.Empty(authorization);
+            Assert.False(response.IsSuccessful);
         }
 
         [Fact]

@@ -47,15 +47,20 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             return this;
         }
 
+        public DateTime TokenExpiration { get; set; }
+
         protected override async ValueTask<Parameter> GetAuthenticationParameter(string accessToken) {
-            // TODO: check for expired token
-            var token = string.IsNullOrEmpty(Token) ? await GetTokenAsync().ConfigureAwait(false) : Token;
-            if (string.IsNullOrWhiteSpace(token)) {
-                logger.LogWarning("Authentication token is null or empty, authenticated requests will fail");
-                token = string.Empty; //setting token to empty so the restsharp addheaders call won't throw object reference exception
+            var token = string.IsNullOrEmpty(accessToken) ? await GetTokenAsync().ConfigureAwait(false) : accessToken;
+            if (TokenExpiration <= DateTime.UtcNow) {
+                Token = await GetTokenAsync().ConfigureAwait(false);
             }
 
-            return new HeaderParameter(KnownHeaders.Authorization, token);
+            if (!string.IsNullOrWhiteSpace(token)) {
+                return new HeaderParameter(KnownHeaders.Authorization, token);
+            }
+
+            logger.LogWarning("Authentication token is null or empty, requests will fail");
+            throw new ArgumentNullException(nameof(token));
         }
 
         public async Task<string> GetTokenAsync() {
@@ -65,6 +70,10 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             }
 
             var result = $"{response!.Data.TokenType} {response!.Data.AccessToken}";
+
+            // cache token for future calls
+            Token = response!.Data.AccessToken;
+            TokenExpiration = DateTime.UtcNow.AddSeconds(response!.Data.ExpiresIn);
 
             var allowsDelegation = AllowsDelegation(response?.Data?.AccessToken);
             if (allowsDelegation && context?.HttpContext != null) {
