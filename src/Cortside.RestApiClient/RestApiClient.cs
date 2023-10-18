@@ -212,10 +212,10 @@ namespace Cortside.RestApiClient {
             if (response.StatusCode == System.Net.HttpStatusCode.OK) {
                 var result = DeserializeRestResponse<T>(request, response);
                 return result;
-            } else {
-                LogError(request, response);
-                return default;
             }
+
+            LogError(request, response);
+            return RestResponse<T>.FromResponse(response);
         }
 
         public Task<T> GetWithCacheAsync<T>(IRestApiRequest request, TimeSpan? duration = null) where T : class, new() {
