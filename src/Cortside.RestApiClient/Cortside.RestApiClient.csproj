@@ -9,6 +9,7 @@
     </PackageReference>
     <PackageReference Include="Cortside.Common.Correlation" Version="6.1.377-develop" />
     <PackageReference Include="Cortside.Common.Json" Version="6.1.377-develop" />
+    <PackageReference Include="Cortside.Common.Messages" Version="6.0.376" />
     <PackageReference Include="Cortside.Common.Validation" Version="6.1.377-develop" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.4" />
