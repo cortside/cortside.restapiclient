@@ -50,12 +50,19 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
         public DateTime TokenExpiration { get; set; }
 
         protected override async ValueTask<Parameter> GetAuthenticationParameter(string accessToken) {
+            // will only show first 20 characters of header/token for security
+            logger.LogTrace("GetAuthenticationParameter called with token {accessToken}. Token has cached value of {token} with expiration of {expiration}", accessToken.Left(20), Token.Left(20), TokenExpiration);
+
             var token = string.IsNullOrEmpty(accessToken) ? await GetTokenAsync().ConfigureAwait(false) : accessToken;
             if (TokenExpiration <= DateTime.UtcNow) {
                 Token = await GetTokenAsync().ConfigureAwait(false);
             }
 
             if (!string.IsNullOrWhiteSpace(token)) {
+                if (!token.StartsWith("Bearer ")) {
+                    token = "Bearer " + token;
+                }
+                logger.LogTrace("Using Authorization header with value of {header}", token.Left(20));
                 return new HeaderParameter(KnownHeaders.Authorization, token);
             }
 

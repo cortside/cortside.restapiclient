@@ -125,6 +125,44 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
         }
 
         [Fact]
+        public async Task ShouldAuthenticateWithTokenRequestWithCachedTokenAsync() {
+            var tokenRequest = new TokenRequest {
+                AuthorityUrl = "https://demo.duendesoftware.com",
+                GrantType = "client_credentials",
+                Scope = "api",
+                ClientId = "m2m",
+                ClientSecret = "secret"
+            };
+
+            // arrange
+            var authenticator = new OpenIDConnectAuthenticator(null, tokenRequest)
+                .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
+                    .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
+                    .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
+                )
+                .UseLogger(new NullLogger<OpenIDConnectAuthenticator>());
+
+            var client = new RestClient("http://api.github.com");
+
+            for (var i = 0; i < 10; i++) {
+                var request = new RestRequest("foo", Method.Get);
+
+                // act
+                await authenticator.Authenticate(client, request).ConfigureAwait(false);
+
+                // assert
+                var authorization = request.Parameters
+                    .FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)
+                    ?.Value?.ToString();
+                Assert.NotNull(authorization);
+                Assert.True(authorization.Trim().Length > 1);
+                Assert.True(authorization.StartsWith("Bearer "));
+                var token = authorization.Right(authorization.Length - 7);
+                Assert.Equal(3, token.Split(".").Length);
+            }
+        }
+
+        [Fact]
         public async Task ShouldAddAuthorizationHeaderAsync() {
             // arrange
             var authenticator = new OpenIDConnectAuthenticator(new HttpContextAccessor(), "https://demo.duendesoftware.com", "client_credentials", "m2m", "secret", "api")

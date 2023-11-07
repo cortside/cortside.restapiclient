@@ -1,12 +1,13 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using Cortside.RestApiClient.Authenticators.OpenIDConnect;
-using Cortside.RestApiClient.Tests.Clients.HttpStatusApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Polly;
 using RestSharp;
 
 namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
@@ -17,14 +18,18 @@ namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
         /// 
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="userClientConfiguration"></param>
+        /// <param name="clientConfiguration"></param>
         /// <param name="context"></param>
         /// <param name="throwOnAnyError">added this to make variable testing easier</param>
-        public CatalogClient(ILogger<HttpStatusClient> logger, CatalogClientConfiguration userClientConfiguration, IHttpContextAccessor context, bool throwOnAnyError = false) {
+        public CatalogClient(ILogger<CatalogClient> logger, CatalogClientConfiguration clientConfiguration, IHttpContextAccessor context, bool throwOnAnyError = false) {
             var options = new RestApiClientOptions {
-                BaseUrl = new Uri(userClientConfiguration.ServiceUrl),
+                BaseUrl = new Uri(clientConfiguration.ServiceUrl),
                 FollowRedirects = true,
-                Authenticator = new OpenIDConnectAuthenticator(context, userClientConfiguration.Authentication),
+                Authenticator = new OpenIDConnectAuthenticator(context, clientConfiguration.Authentication).UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
+                        .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
+                        .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
+                    )
+                    .UseLogger(logger),
                 Serializer = new JsonNetSerializer(),
                 Cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions())),
                 ThrowOnAnyError = throwOnAnyError

@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Cortside.MockServer;
 using Cortside.MockServer.AccessControl;
 using Cortside.RestApiClient.Tests.Clients.CatalogApi;
-using Cortside.RestApiClient.Tests.Clients.HttpStatusApi;
 using Cortside.RestApiClient.Tests.Mocks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -38,7 +37,7 @@ namespace Cortside.RestApiClient.Tests {
         [Fact]
         public Task ShouldThrowExceptionOnSerializationErrorAsync() {
             // arrange
-            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor(), true);
+            var client = new CatalogClient(new NullLogger<CatalogClient>(), config, new HttpContextAccessor(), true);
 
             // act
             return Assert.ThrowsAnyAsync<Exception>(async () => await client.ModelMismatchAsync().ConfigureAwait(false));
@@ -47,7 +46,7 @@ namespace Cortside.RestApiClient.Tests {
         [Fact]
         public async Task ShouldFailOnSerializationErrorAsync() {
             // arrange
-            var client = new CatalogClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor(), false);
+            var client = new CatalogClient(new NullLogger<CatalogClient>(), config, new HttpContextAccessor(), false);
 
             // act
             var response = await client.ModelMismatchAsync().ConfigureAwait(false);
