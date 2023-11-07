@@ -11,7 +11,7 @@ using Polly;
 using RestSharp;
 
 namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
-    public class CatalogClient : IDisposable {
+    public class CatalogClient : IDisposable, ICatalogClient {
         private readonly RestApiClient client;
 
         /// <summary>
@@ -37,13 +37,13 @@ namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
             client = new RestApiClient(logger, context, options);
         }
 
-        internal async Task<RestResponse<CatalogItem>> GetItemAsync(string sku) {
+        public async Task<RestResponse<CatalogItem>> GetItemAsync(string sku) {
             var request = new RestApiRequest($"api/v1/items/{sku}", Method.Get);
             var response = await client.ExecuteAsync<CatalogItem>(request).ConfigureAwait(false);
             return response;
         }
 
-        internal async Task<RestResponse<CatalogItem>> CreateItemAsync(bool followRedirects) {
+        public async Task<RestResponse<CatalogItem>> CreateItemAsync(bool followRedirects) {
             var request = new RestApiRequest("api/v1/items", Method.Post) {
                 FollowRedirects = followRedirects
             };

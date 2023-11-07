@@ -40,7 +40,7 @@
     <ProjectReference Include="..\Cortside.RestApiClient\Cortside.RestApiClient.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="appsettings.integration.json">
+    <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\*.json">
