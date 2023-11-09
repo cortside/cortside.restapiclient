@@ -24,12 +24,12 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var name = Guid.NewGuid().ToString();
 
             // JWT tokens can be generated with defined values using this site: http://jwtbuilder.jamiekurtz.com/
-            Server = new MockHttpServer(name)
-                .ConfigureBuilder(new SubjectMock("./Data/subjects.json"))
-                .ConfigureBuilder<TestMock>()
-                .ConfigureBuilder<DelegationGrantMock>();
+            Server = MockHttpServer.CreateBuilder(name)
+                .AddMock(new SubjectMock("./Data/subjects.json"))
+                .AddMock<TestMock>()
+                .AddMock<DelegationGrantMock>()
+                .Build();
 
-            Server.WaitForStart();
             client = new RestClient(Server.Url);
         }
 
@@ -44,9 +44,9 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
 
             // arrange
             var header = new KeyValuePair<string, StringValues>("Authorization", new StringValues(token));
-            var context = GetHttpContext("host", "/path", header);
+            var accessor = new HttpContextAccessor().SetHttpContext("host", "/path", header);
 
-            var authenticator = new OpenIDConnectAuthenticator(context, tokenRequest)
+            var authenticator = new OpenIDConnectAuthenticator(accessor, tokenRequest)
                 .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
                     .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
                     .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
@@ -56,24 +56,6 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             return authenticator;
         }
 
-        public static IHttpContextAccessor GetHttpContext(string host, string requestPath, KeyValuePair<string, StringValues> header) {
-            var context = new DefaultHttpContext {
-                Request = {
-                    Path = requestPath,
-                    Host = new HostString(host),
-                    Headers = {  }
-                }
-            };
-
-            if (!string.IsNullOrWhiteSpace(header.Value)) {
-                context.Request.Headers.Add(header.Key, header.Value);
-            }
-
-            var obj = new HttpContextAccessor();
-            obj.HttpContext = context;
-            return obj;
-        }
-
         [Fact]
         public async Task ShouldNotDelegate_NoRequestToken() {
             // arrange
@@ -81,7 +63,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("/api/v1/items/1234", Method.Get);
 
             // act
-            await authenticator.Authenticate(client, request).ConfigureAwait(false);
+            await authenticator.Authenticate(client, request);
 
             // assert
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
@@ -96,7 +78,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("/api/v1/items/1234", Method.Get);
 
             // act
-            await authenticator.Authenticate(client, request).ConfigureAwait(false);
+            await authenticator.Authenticate(client, request);
 
             // assert
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
@@ -111,7 +93,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("/api/v1/items/1234", Method.Get);
 
             // act
-            await authenticator.Authenticate(client, request).ConfigureAwait(false);
+            await authenticator.Authenticate(client, request);
 
             // assert
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();

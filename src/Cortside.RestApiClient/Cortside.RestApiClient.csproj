@@ -3,14 +3,10 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AsyncAnalyzers" Version="1.1.7">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Cortside.Common.Correlation" Version="6.1.377-develop" />
-    <PackageReference Include="Cortside.Common.Json" Version="6.1.377-develop" />
-    <PackageReference Include="Cortside.Common.Messages" Version="6.0.376" />
-    <PackageReference Include="Cortside.Common.Validation" Version="6.1.377-develop" />
+    <PackageReference Include="Cortside.Common.Correlation" Version="6.1.390" />
+    <PackageReference Include="Cortside.Common.Json" Version="6.1.390" />
+    <PackageReference Include="Cortside.Common.Messages" Version="6.1.390" />
+    <PackageReference Include="Cortside.Common.Validation" Version="6.1.390" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.4" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.7.30">
@@ -23,6 +19,6 @@
     <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="110.2.0" />
     <PackageReference Include="RestSharp.Serializers.Xml" Version="110.2.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.2" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.33.0" />
   </ItemGroup>
 </Project>

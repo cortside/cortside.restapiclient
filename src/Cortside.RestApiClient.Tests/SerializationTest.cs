@@ -14,12 +14,11 @@ namespace Cortside.RestApiClient.Tests {
 
         public SerializationTest() {
             var name = Guid.NewGuid().ToString();
-            Server = new MockHttpServer(name)
-                .ConfigureBuilder(new IdentityServerMock("./Data/discovery.json", "./Data/jwks.json"))
-                .ConfigureBuilder(new SubjectMock("./Data/subjects.json"))
-                .ConfigureBuilder<TestMock>();
-
-            Server.WaitForStart();
+            Server = MockHttpServer.CreateBuilder(name)
+                .AddMock(new IdentityServerMock("./Data/discovery.json", "./Data/jwks.json"))
+                .AddMock(new SubjectMock("./Data/subjects.json"))
+                .AddMock<TestMock>()
+                .Build();
 
             config = new CatalogClientConfiguration() {
                 ServiceUrl = Server.Url,
@@ -40,7 +39,7 @@ namespace Cortside.RestApiClient.Tests {
             var client = new CatalogClient(new NullLogger<CatalogClient>(), config, new HttpContextAccessor(), true);
 
             // act
-            return Assert.ThrowsAnyAsync<Exception>(async () => await client.ModelMismatchAsync().ConfigureAwait(false));
+            return Assert.ThrowsAnyAsync<Exception>(async () => await client.ModelMismatchAsync());
         }
 
         [Fact]
@@ -49,7 +48,7 @@ namespace Cortside.RestApiClient.Tests {
             var client = new CatalogClient(new NullLogger<CatalogClient>(), config, new HttpContextAccessor(), false);
 
             // act
-            var response = await client.ModelMismatchAsync().ConfigureAwait(false);
+            var response = await client.ModelMismatchAsync();
             Assert.NotNull(response.ErrorException);
         }
     }

@@ -1,18 +1,18 @@
 ﻿using System;
 using Cortside.MockServer;
+using Cortside.MockServer.Builder;
 using Cortside.RestApiClient.Tests.Clients.CatalogApi;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
-using WireMock.Server;
 
 namespace Cortside.RestApiClient.Tests.Mocks {
-    public class TestMock : IMockHttpServerBuilder {
-        public void Configure(WireMockServer server) {
+    public class TestMock : IMockHttpMock {
+        public void Configure(MockHttpServer server) {
             var rnd = new Random();
 
-            server
+            server.WireMockServer
                 .Given(
                     Request.Create().WithPath("/api/v1/items/search")
                         .UsingPost()
@@ -24,7 +24,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                         .WithHeader("Location", "/api/v1/items/search")
                 );
 
-            server
+            server.WireMockServer
                 .Given(
                     Request.Create().WithPath("/api/v1/items/search")
                         .UsingGet()
@@ -41,7 +41,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                         }))
                 );
 
-            server
+            server.WireMockServer
                 .Given(
                     Request.Create().WithPath("/api/v1/items")
                         .UsingPost()
@@ -59,7 +59,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                         }))
                 );
 
-            server
+            server.WireMockServer
                 .Given(
                     Request.Create().WithPath("/api/v1/items/*")
                         .UsingGet()
@@ -76,7 +76,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                         }))
                 );
 
-            server
+            server.WireMockServer
                 .Given(
                     Request.Create().WithPath("/api/v1/timeout")
                         .UsingGet()
@@ -89,7 +89,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                         .WithDelay(TimeSpan.FromSeconds(10))
                 );
 
-            server
+            server.WireMockServer
                 .Given(
                     Request.Create().WithPath("/api/v1/302")
                         .UsingGet()
@@ -101,7 +101,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                         .WithHeader("Location", "/api/v1/temp302")
                 );
 
-            server
+            server.WireMockServer
                 .Given(
                     Request.Create().WithPath("/api/v1/jsonmodelmismatch")
                         .UsingGet()
@@ -115,7 +115,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                         }))
                 );
 
-            server
+            server.WireMockServer
                 .Given(
                     Request.Create().WithPath("/users/cortside/repos")
                         .UsingGet()

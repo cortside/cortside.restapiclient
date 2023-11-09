@@ -6,11 +6,15 @@ using Microsoft.Extensions.Logging.Abstractions;
 using RestSharp;
 using Xunit;
 
-namespace Cortside.RestApiClient.Tests {
-    public class DateTimeHandlingTest {
+namespace Cortside.RestApiClient.Tests
+{
+    public class DateTimeHandlingTest
+    {
         [Fact]
-        public void SerializeDateTime() {
-            using (new ScopedLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time"))) {
+        public void SerializeDateTime()
+        {
+            using (new ScopedLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time")))
+            {
                 var serializer = new JsonNetSerializer();
                 var json = serializer.Serialize(new DateTime(2013, 1, 21, 1, 2, 3, DateTimeKind.Local));
                 json = json.Substring(1, json.Length - 2);
@@ -19,8 +23,10 @@ namespace Cortside.RestApiClient.Tests {
         }
 
         [Fact]
-        public void DeserializeIso8601UtcDateTime() {
-            using (new ScopedLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time"))) {
+        public void DeserializeIso8601UtcDateTime()
+        {
+            using (new ScopedLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time")))
+            {
                 // act
                 var date = DateTime.Parse("2013-01-21T08:02:03Z");
 
@@ -30,8 +36,10 @@ namespace Cortside.RestApiClient.Tests {
         }
 
         [Fact]
-        public void DeserializeIso8601OffsetDateTime() {
-            using (new ScopedLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time"))) {
+        public void DeserializeIso8601OffsetDateTime()
+        {
+            using (new ScopedLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time")))
+            {
                 // act
                 var date = DateTime.Parse("2013-01-21T08:02:03-05:00");
 
@@ -41,7 +49,8 @@ namespace Cortside.RestApiClient.Tests {
         }
 
         [Fact]
-        public void SerializeInt() {
+        public void SerializeInt()
+        {
             var serializer = new JsonNetSerializer();
             var json = serializer.Serialize(1);
 
@@ -49,8 +58,10 @@ namespace Cortside.RestApiClient.Tests {
         }
 
         [Fact]
-        public async Task ShouldSerializeDateTimeInQueryString() {
-            using (new ScopedLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time"))) {
+        public async Task ShouldSerializeDateTimeInQueryString()
+        {
+            using (new ScopedLocalTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time")))
+            {
                 var options = new RestApiClientOptions("https://postman-echo.com");
                 var client = new RestApiClient(NullLogger.Instance, new HttpContextAccessor(), options);
 
@@ -58,7 +69,7 @@ namespace Cortside.RestApiClient.Tests {
                 request.AddQueryParameter("foo1", "bar1");
                 request.AddQueryParameter("foo2", "bar2");
                 request.AddParameter("date", new DateTime(2013, 1, 21, 1, 2, 3, DateTimeKind.Local));
-                var response = await client.GetAsync(request).ConfigureAwait(false);
+                var response = await client.GetAsync(request);
 
                 Assert.NotNull(response);
                 Assert.Equal("2013-01-21T08:02:03Z", request.Parameters.TryFind("date").Value);

@@ -17,22 +17,19 @@ using Xunit;
 
 namespace Cortside.RestApiClient.Tests.Authenticators {
     public class OpenIDConnectAuthenticatorTest {
-        private readonly CatalogClientConfiguration config;
-
         public static MockHttpServer Server { get; set; }
 
         public OpenIDConnectAuthenticatorTest() {
             var name = Guid.NewGuid().ToString();
 
             // JWT tokens can be generated with defined values using this site: http://jwtbuilder.jamiekurtz.com/
-            Server = new MockHttpServer(name)
-                .ConfigureBuilder(new SubjectMock("./Data/subjects.json"))
-                .ConfigureBuilder<TestMock>()
-                .ConfigureBuilder<DelegationGrantMock>();
+            Server = MockHttpServer.CreateBuilder(name)
+                .AddMock(new SubjectMock("./Data/subjects.json"))
+                .AddMock<TestMock>()
+                .AddMock<DelegationGrantMock>()
+                .Build();
 
-            Server.WaitForStart();
-
-            config = new CatalogClientConfiguration() {
+            var config = new CatalogClientConfiguration() {
                 ServiceUrl = Server.Url,
                 Authentication = new Cortside.RestApiClient.Authenticators.OpenIDConnect.TokenRequest() {
                     AuthorityUrl = Server.Url,
@@ -86,7 +83,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("/api/v1/items/1234", Method.Get);
 
             // act
-            await authenticator.Authenticate(client, request).ConfigureAwait(false);
+            await authenticator.Authenticate(client, request);
 
             // assert
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
@@ -116,7 +113,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("foo", Method.Get);
 
             // act
-            await authenticator.Authenticate(client, request).ConfigureAwait(false);
+            await authenticator.Authenticate(client, request);
 
             // assert
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
@@ -148,7 +145,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
                 var request = new RestRequest("foo", Method.Get);
 
                 // act
-                await authenticator.Authenticate(client, request).ConfigureAwait(false);
+                await authenticator.Authenticate(client, request);
 
                 // assert
                 var authorization = request.Parameters
@@ -175,7 +172,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("foo", Method.Get);
 
             // act
-            await authenticator.Authenticate(client, request).ConfigureAwait(false);
+            await authenticator.Authenticate(client, request);
 
             // assert
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
@@ -293,7 +290,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("/api/v1/items/1234", Method.Get);
 
             // act
-            var token = await authenticator.GetTokenAsync().ConfigureAwait(false);
+            var token = await authenticator.GetTokenAsync();
 
             // assert
             Assert.Equal("Bearer foo-client_credentials-token", token);

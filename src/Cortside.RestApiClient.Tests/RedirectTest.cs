@@ -18,12 +18,11 @@ namespace Cortside.RestApiClient.Tests {
 
         public RedirectTest() {
             var name = Guid.NewGuid().ToString();
-            Server = new MockHttpServer(name)
-                .ConfigureBuilder(new IdentityServerMock("./Data/discovery.json", "./Data/jwks.json"))
-                .ConfigureBuilder(new SubjectMock("./Data/subjects.json"))
-                .ConfigureBuilder<TestMock>();
-
-            Server.WaitForStart();
+            Server = MockHttpServer.CreateBuilder(name)
+                .AddMock(new IdentityServerMock("./Data/discovery.json", "./Data/jwks.json"))
+                .AddMock(new SubjectMock("./Data/subjects.json"))
+                .AddMock<TestMock>()
+                .Build();
 
             config = new CatalogClientConfiguration() {
                 ServiceUrl = Server.Url,
@@ -44,7 +43,7 @@ namespace Cortside.RestApiClient.Tests {
             var client = new CatalogClient(new NullLogger<CatalogClient>(), config, new HttpContextAccessor());
 
             // act
-            var item = await client.GetItemAsync("1234").ConfigureAwait(false);
+            var item = await client.GetItemAsync("1234");
 
             // assert
             Assert.Equal("1234", item.Data.Sku);
@@ -58,7 +57,7 @@ namespace Cortside.RestApiClient.Tests {
             var client = new CatalogClient(new NullLogger<CatalogClient>(), config, new HttpContextAccessor());
 
             // act
-            var item = await client.CreateItemAsync(followRedirects).ConfigureAwait(false);
+            var item = await client.CreateItemAsync(followRedirects);
 
             // assert
             Assert.True(item.IsSuccessful);
@@ -75,7 +74,7 @@ namespace Cortside.RestApiClient.Tests {
             var client = new CatalogClient(new NullLogger<CatalogClient>(), config, new HttpContextAccessor(), throwOnAnyError);
 
             // act
-            var item = await client.SearchItemsAsync(followRedirects).ConfigureAwait(false);
+            var item = await client.SearchItemsAsync(followRedirects);
 
             // assert
             Assert.Equal(statusCode, (int)item.StatusCode);
@@ -89,7 +88,7 @@ namespace Cortside.RestApiClient.Tests {
             var client = new CatalogClient(new NullLogger<CatalogClient>(), config, new HttpContextAccessor());
 
             // act
-            var item = await client.TemporaryRedirect().ConfigureAwait(false);
+            var item = await client.TemporaryRedirect();
 
             // assert
             Assert.Equal(302, (int)item.StatusCode);
@@ -112,7 +111,7 @@ namespace Cortside.RestApiClient.Tests {
 
             // act
             var request = new RestSharp.RestRequest("/api/v1/items/search", RestSharp.Method.Post);
-            var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+            var response = await client.ExecuteAsync(request);
 
             // this is what RestApiClient does now to alter the handling
             if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod || response.StatusCode == HttpStatusCode.Redirect)) {

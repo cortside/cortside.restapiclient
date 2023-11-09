@@ -1,14 +1,14 @@
 ﻿using Cortside.MockServer;
+using Cortside.MockServer.Builder;
 using Cortside.RestApiClient.Tests.ResponseProviders;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
-using WireMock.Server;
 
 namespace Cortside.RestApiClient.Tests.Mocks {
-    public class LexisNexisMock : IMockHttpServerBuilder {
-        public void Configure(WireMockServer server) {
+    public class LexisNexisMock : IMockHttpMock {
+        public void Configure(MockHttpServer server) {
             // generate response depending on what tester requests in street1 field
-            server
+            server.WireMockServer
                 .Given(
                 Request.Create().UsingPost()
                     .WithPath("/WsIdentity/InstantID")
