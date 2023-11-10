@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using Cortside.MockServer;
 using Cortside.MockServer.AccessControl;
@@ -201,7 +202,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("foo", Method.Get);
 
             // act && assert
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await authenticator.Authenticate(client, request));
+            await Assert.ThrowsAsync<AuthenticationException>(async () => await authenticator.Authenticate(client, request));
         }
 
         [Fact]
@@ -230,7 +231,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestApiRequest("foo", Method.Get);
 
             // act && assert
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await client.GetAsync(request));
+            await Assert.ThrowsAsync<AuthenticationException>(async () => await client.GetAsync(request));
         }
 
         [Fact]
@@ -290,10 +291,12 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("/api/v1/items/1234", Method.Get);
 
             // act
-            var token = await authenticator.GetTokenAsync();
+            await authenticator.Authenticate(client, request);
 
             // assert
-            Assert.Equal("Bearer foo-client_credentials-token", token);
+            var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
+            Assert.NotNull(authorization);
+            Assert.Equal("Bearer foo-client_credentials-token", authorization.ToString());
         }
     }
 }

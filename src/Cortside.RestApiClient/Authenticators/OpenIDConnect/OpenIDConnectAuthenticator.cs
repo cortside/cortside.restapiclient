@@ -3,6 +3,7 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using Cortside.Common.Correlation;
 using Microsoft.AspNetCore.Http;
@@ -18,8 +19,9 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
         private readonly TokenRequest tokenRequest;
         private IAsyncPolicy<RestResponse> policy = Policy.NoOpAsync<RestResponse>();
         private ILogger logger = new NullLogger<OpenIDConnectAuthenticator>();
-        private readonly DateTime tokenExpiration = DateTime.UtcNow;
+        private DateTime tokenExpiration = DateTime.UtcNow;
         private readonly IHttpContextAccessor context;
+        private bool clientAllowsDelegation = false;
 
         public OpenIDConnectAuthenticator(IHttpContextAccessor context, TokenRequest tokenRequest) : base("") {
             this.context = context;
@@ -47,57 +49,49 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             return this;
         }
 
-        public DateTime TokenExpiration { get; set; }
-
         protected override async ValueTask<Parameter> GetAuthenticationParameter(string accessToken) {
             // will only show first 20 characters of header/token for security
-            logger.LogTrace("GetAuthenticationParameter called with token {accessToken}. Token has cached value of {token} with expiration of {expiration}", accessToken.Left(20), Token.Left(20), TokenExpiration);
+            logger.LogTrace("GetAuthenticationParameter called with token {accessToken}. Token has cached value of {token} with expiration of {expiration}", accessToken.Left(20), Token.Left(20), tokenExpiration);
 
-            var token = string.IsNullOrEmpty(accessToken) ? await GetTokenAsync().ConfigureAwait(false) : accessToken;
-            if (TokenExpiration <= DateTime.UtcNow) {
-                Token = await GetTokenAsync().ConfigureAwait(false);
-            }
+            // save working token so that another thread does not set it from underneath us
+            var currentToken = Token;
 
-            if (!string.IsNullOrWhiteSpace(token)) {
-                if (!token.StartsWith("Bearer ")) {
-                    token = "Bearer " + token;
+            // get a new token if the cached one is not set OR it's expired
+            if (string.IsNullOrEmpty(Token) || tokenExpiration <= DateTime.UtcNow) {
+                var response = await GetTokenAsync(tokenRequest.AuthorityUrl, tokenRequest.GrantType, tokenRequest.ClientId, tokenRequest.ClientSecret, tokenRequest.Scope).ConfigureAwait(false);
+                if (!response.IsSuccessful || response.Data == null) {
+                    throw new AuthenticationException(response.ErrorMessage);
                 }
-                logger.LogTrace("Using Authorization header with value of {header}", token.Left(20));
-                return new HeaderParameter(KnownHeaders.Authorization, token);
+
+                // set both current working token and cached token with expiration date
+                currentToken = response.Data.Token;
+                Token = currentToken;
+                tokenExpiration = response.Data.ExpirationDate;
+                clientAllowsDelegation = AllowsDelegation(currentToken);
+
+                if (clientAllowsDelegation) {
+                    logger.LogInformation($"Token for client_id {tokenRequest.ClientId} allows delegation");
+                }
             }
 
-            logger.LogWarning("Authentication token is null or empty, requests will fail");
-            throw new ArgumentNullException(nameof(token));
-        }
-
-        public async Task<string> GetTokenAsync() {
-            var response = await GetTokenAsync(tokenRequest.AuthorityUrl, tokenRequest.GrantType, tokenRequest.ClientId, tokenRequest.ClientSecret, tokenRequest.Scope).ConfigureAwait(false);
-            if (!response.IsSuccessful) {
-                return null;
-            }
-
-            var result = $"{response!.Data.TokenType} {response!.Data.AccessToken}";
-
-            // cache token for future calls
-            Token = response!.Data.AccessToken;
-            TokenExpiration = DateTime.UtcNow.AddSeconds(response!.Data.ExpiresIn);
-
-            var allowsDelegation = AllowsDelegation(response?.Data?.AccessToken);
-            if (allowsDelegation && context?.HttpContext != null) {
-                var authorization = context.HttpContext.Request.Headers["Authorization"].ToString();
-
+            // check to see if delegation is allowed and if there is an Authorization header from HttpContext
+            if (clientAllowsDelegation) {
+                var authorization = context?.HttpContext?.Request.Headers["Authorization"].ToString();
                 if (!string.IsNullOrWhiteSpace(authorization)) {
+                    logger.LogInformation($"Delegation is allowed and Authorization header was found in HttpContext with value of {authorization.Left(20)}");
                     authorization = authorization.Replace("Bearer ", "");
-                    response = await GetTokenAsync(tokenRequest.AuthorityUrl, "delegation", tokenRequest.ClientId, tokenRequest.ClientSecret, tokenRequest.Scope, authorization).ConfigureAwait(false);
-                    if (response.IsSuccessful) {
-                        return $"{response!.Data.TokenType} {response!.Data.AccessToken}";
+                    var response = await GetTokenAsync(tokenRequest.AuthorityUrl, "delegation", tokenRequest.ClientId, tokenRequest.ClientSecret, tokenRequest.Scope, authorization).ConfigureAwait(false);
+                    if (!response.IsSuccessful || response.Data == null) {
+                        logger.LogWarning("Delegation token request failed, falling back to client token");
                     }
 
-                    return null;
+                    logger.LogInformation("Delegation token request was successful, using delegation token instead of client token");
+                    currentToken = $"{response!.Data!.TokenType} {response!.Data!.AccessToken}";
                 }
             }
 
-            return result;
+            logger.LogTrace("Using Authorization header with value of {header}", currentToken.Left(20));
+            return new HeaderParameter(KnownHeaders.Authorization, currentToken);
         }
 
         private bool AllowsDelegation(string token) {
@@ -107,7 +101,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
 
             try {
                 var handler = new JwtSecurityTokenHandler();
-                var jwtToken = handler.ReadJwtToken(token);
+                var jwtToken = handler.ReadJwtToken(token.Replace("Bearer ", ""));
                 var delegation = jwtToken.Claims.Any(x => x.Type == "grant_type" && x.Value == "delegation");
                 // check to see if token is for the client to be used for 
                 //var self = jwtToken.Claims.Any(x => x.Type == "client_id" && x.Value == tokenRequest.ClientId);
@@ -120,8 +114,8 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
             }
         }
 
-        private async Task<RestResponse<TokenResponse>> GetTokenAsync(string url, string grantType, string clientId, string clientSecret, string scope, string token = null) {
-            var options = new RestClientOptions(url);
+        private async Task<RestResponse<TokenResponse>> GetTokenAsync(string authorityUrl, string grantType, string clientId, string clientSecret, string scope, string token = null) {
+            var options = new RestClientOptions(authorityUrl);
 
             using (var client = new RestClient(options, configureSerialization: s => s.UseNewtonsoftJson())) {
                 var request = new RestRequest("connect/token", Method.Post)
@@ -134,8 +128,6 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                 var correlationId = CorrelationContext.GetCorrelationId();
                 request.AddHeader("Request-Id", correlationId);
                 request.AddHeader("X-Correlation-Id", correlationId);
-
-                // TODO: add ip??
 
                 logger.LogInformation($"Getting {grantType} token for client_id {clientId} with scopes [{scope}]");
                 var response = await policy.ExecuteAsync(async () => {
