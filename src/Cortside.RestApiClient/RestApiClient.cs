@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Cortside.Common.Correlation;
 using Microsoft.AspNetCore.Http;
@@ -28,16 +29,24 @@ namespace Cortside.RestApiClient {
         public RestApiClient(ILogger logger, RestApiClientOptions options) : this(logger, new HttpContextAccessor(), options) {
         }
 
-        public RestApiClient(ILogger logger, IHttpContextAccessor contextAccessor, RestApiClientOptions options) {
+        public RestApiClient(ILogger logger, IHttpContextAccessor contextAccessor, RestApiClientOptions options, HttpClient httpClient = null) {
             this.logger = logger;
             this.options = options;
             this.contextAccessor = contextAccessor;
 
             if (options.Serializer != null) {
-                client = new RestClient(options.Options, configureSerialization: s => s.UseSerializer(() => options.Serializer));
+                if (httpClient != null) {
+                    client = new RestClient(httpClient, options.Options, configureSerialization: s => s.UseSerializer(() => options.Serializer));
+                } else {
+                    client = new RestClient(options.Options, configureSerialization: s => s.UseSerializer(() => options.Serializer));
+                }
             }
             if (options.XmlSerializer) {
-                client = new RestClient(options.Options, configureSerialization: s => s.UseXmlSerializer());
+                if (httpClient != null) {
+                    client = new RestClient(httpClient, options.Options, configureSerialization: s => s.UseXmlSerializer());
+                } else {
+                    client = new RestClient(options.Options, configureSerialization: s => s.UseXmlSerializer());
+                }
             }
         }
 
