@@ -1,5 +1,33 @@
 # Release 6.1
 
+|Commit|Date|Author|Message|
+|---|---|---|---|
+| f3774da | <span style="white-space:nowrap;">2023-08-30</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update version
+| fcc1c4b | <span style="white-space:nowrap;">2023-09-04</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge branch 'master' into develop
+| a5ad76b | <span style="white-space:nowrap;">2023-09-07</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [ISSUE-18] use serializer instead of ToString() for parameter conversion
+| df4e215 | <span style="white-space:nowrap;">2023-09-11</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [ISSUE-18] use scoped timezone
+| 5532565 | <span style="white-space:nowrap;">2023-09-11</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [ISSUE-18] use scoped timezone to test case
+| 50a3e35 | <span style="white-space:nowrap;">2023-09-12</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [ISSUE-18] cleanup lint warnings; use new Cortside.Common.Testing library
+| 5649c0a | <span style="white-space:nowrap;">2023-09-12</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [ISSUE-18] cleanup lint warnings; unskip tests
+| 53bd98e | <span style="white-space:nowrap;">2023-09-12</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [ISSUE-18] cleanup lint warnings; unskip tests
+| 38aeb50 | <span style="white-space:nowrap;">2023-09-12</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (origin/ISSUE-18, ISSUE-18) [ISSUE-18] cleanup lint warnings; unskip tests
+| 37a702c | <span style="white-space:nowrap;">2023-09-12</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge pull request #19 from cortside/ISSUE-18
+| 69b9e16 | <span style="white-space:nowrap;">2023-09-26</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  add more error logging for things like cert errors and more consistent exception only when options are set to throw
+| 50b1fee | <span style="white-space:nowrap;">2023-10-17</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [ISSUE-20] fail request when authenticator fails
+| 8d0fdc5 | <span style="white-space:nowrap;">2023-10-18</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (origin/ISSUE-20, ISSUE-20) [ISSUE-20] GetAsync should return a response, even if the status is not 200 so that caller can interrogate for error
+| 4ab1b58 | <span style="white-space:nowrap;">2023-10-18</span> | <span style="white-space:nowrap;">gkingston-regions</span> |  Merge pull request #21 from cortside/ISSUE-20
+| d64421f | <span style="white-space:nowrap;">2023-10-18</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Add extension method for easier logging of response failures
+| 9de9478 | <span style="white-space:nowrap;">2023-11-07</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  resolve issue where returning of cached token did not return Bearer prefix
+| 1746178 | <span style="white-space:nowrap;">2023-11-07</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  move servicecollection extension methods to register client to this project
+| e4f960e | <span style="white-space:nowrap;">2023-11-09</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update to latest nuget packages with required changes
+| f588494 | <span style="white-space:nowrap;">2023-11-09</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  ignore ncrunch directories
+| 5626228 | <span style="white-space:nowrap;">2023-11-09</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  add support to use a byo-httpclient
+| ece68df | <span style="white-space:nowrap;">2023-11-10</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  refactor authenticator to make it easier to understand and to help ensure that it's more likely thread-safe
+| 0b4b461 | <span style="white-space:nowrap;">2023-11-14</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (HEAD -> release/6.1, origin/develop, origin/HEAD, develop) update changelog with release notes
+****
+
+# Release 6.1
+
 * Update nuget dependencies to latest stable versions
 * Change to use client serializer for request parameters, needed for proper date/time formatting if something other than default ToString() functionality is desired
 * Add ServiceCollection extension method to register a RestApiClient based implemenation client
