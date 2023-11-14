@@ -11,13 +11,27 @@ namespace Cortside.RestApiClient {
         private readonly JsonSerializerSettings settings;
 
         public JsonNetSerializer() {
+            // these values should match Cortside.AspNetCore JsonNetUtility
             settings = new JsonSerializerSettings {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                DateFormatHandling = DateFormatHandling.IsoDateFormat
+                MissingMemberHandling = MissingMemberHandling.Ignore,
+                NullValueHandling = NullValueHandling.Include,
+                DefaultValueHandling = DefaultValueHandling.Include,
+
+                // datetime specific handling
+                // always output ISO-8601 format
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+
+                // parse using DateTimeOffset so that ISO-8601 with timezone is used
+                DateParseHandling = DateParseHandling.DateTimeOffset,
+
+                // setting to control how DateTime and DateTimeOffset are serialized.
+                // always serialize to utc
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc
             };
+
             settings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy()));
-            settings.Converters.Add(new IsoDateTimeConverter { DateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'" });
             settings.Converters.Add(new IsoTimeSpanConverter());
         }
 

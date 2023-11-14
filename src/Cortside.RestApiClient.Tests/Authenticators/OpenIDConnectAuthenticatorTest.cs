@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using Cortside.MockServer;
 using Cortside.MockServer.AccessControl;
@@ -17,22 +18,19 @@ using Xunit;
 
 namespace Cortside.RestApiClient.Tests.Authenticators {
     public class OpenIDConnectAuthenticatorTest {
-        private readonly CatalogClientConfiguration config;
-
         public static MockHttpServer Server { get; set; }
 
         public OpenIDConnectAuthenticatorTest() {
             var name = Guid.NewGuid().ToString();
 
             // JWT tokens can be generated with defined values using this site: http://jwtbuilder.jamiekurtz.com/
-            Server = new MockHttpServer(name)
-                .ConfigureBuilder(new SubjectMock("./Data/subjects.json"))
-                .ConfigureBuilder<TestMock>()
-                .ConfigureBuilder<DelegationGrantMock>();
+            Server = MockHttpServer.CreateBuilder(name)
+                .AddMock(new SubjectMock("./Data/subjects.json"))
+                .AddMock<TestMock>()
+                .AddMock<DelegationGrantMock>()
+                .Build();
 
-            Server.WaitForStart();
-
-            config = new CatalogClientConfiguration() {
+            var config = new CatalogClientConfiguration() {
                 ServiceUrl = Server.Url,
                 Authentication = new Cortside.RestApiClient.Authenticators.OpenIDConnect.TokenRequest() {
                     AuthorityUrl = Server.Url,
@@ -86,7 +84,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("/api/v1/items/1234", Method.Get);
 
             // act
-            await authenticator.Authenticate(client, request).ConfigureAwait(false);
+            await authenticator.Authenticate(client, request);
 
             // assert
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
@@ -116,12 +114,50 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("foo", Method.Get);
 
             // act
-            await authenticator.Authenticate(client, request).ConfigureAwait(false);
+            await authenticator.Authenticate(client, request);
 
             // assert
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
             Assert.NotNull(authorization);
             Assert.True(authorization.Trim().Length > 1);
+        }
+
+        [Fact]
+        public async Task ShouldAuthenticateWithTokenRequestWithCachedTokenAsync() {
+            var tokenRequest = new TokenRequest {
+                AuthorityUrl = "https://demo.duendesoftware.com",
+                GrantType = "client_credentials",
+                Scope = "api",
+                ClientId = "m2m",
+                ClientSecret = "secret"
+            };
+
+            // arrange
+            var authenticator = new OpenIDConnectAuthenticator(null, tokenRequest)
+                .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
+                    .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
+                    .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
+                )
+                .UseLogger(new NullLogger<OpenIDConnectAuthenticator>());
+
+            var client = new RestClient("http://api.github.com");
+
+            for (var i = 0; i < 10; i++) {
+                var request = new RestRequest("foo", Method.Get);
+
+                // act
+                await authenticator.Authenticate(client, request);
+
+                // assert
+                var authorization = request.Parameters
+                    .FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)
+                    ?.Value?.ToString();
+                Assert.NotNull(authorization);
+                Assert.True(authorization.Trim().Length > 1);
+                Assert.True(authorization.StartsWith("Bearer "));
+                var token = authorization.Right(authorization.Length - 7);
+                Assert.Equal(3, token.Split(".").Length);
+            }
         }
 
         [Fact]
@@ -137,7 +173,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("foo", Method.Get);
 
             // act
-            await authenticator.Authenticate(client, request).ConfigureAwait(false);
+            await authenticator.Authenticate(client, request);
 
             // assert
             var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
@@ -165,12 +201,69 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var client = new RestClient("http://api.github.com");
             var request = new RestRequest("foo", Method.Get);
 
+            // act && assert
+            await Assert.ThrowsAsync<AuthenticationException>(async () => await authenticator.Authenticate(client, request));
+        }
+
+        [Fact]
+        public async Task ShouldFailToAuthenticateWithCallWithThrowAsync() {
+            var tokenRequest = new TokenRequest {
+                AuthorityUrl = "https://demo.duendesoftware.com",
+                GrantType = "client_credentials",
+                Scope = "api",
+                ClientId = "m2m",
+                ClientSecret = "xxx"
+            };
+
+            // arrange
+            var authenticator = new OpenIDConnectAuthenticator(new HttpContextAccessor(), tokenRequest)
+                .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
+                    .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
+                    .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
+                );
+
+            var options = new RestApiClientOptions() {
+                BaseUrl = new Uri("http://api.github.com"),
+                Authenticator = authenticator,
+                ThrowOnAnyError = true
+            };
+            var client = new RestApiClient(new NullLogger<RestApiClient>(), new HttpContextAccessor(), options);
+            var request = new RestApiRequest("foo", Method.Get);
+
+            // act && assert
+            await Assert.ThrowsAsync<AuthenticationException>(async () => await client.GetAsync(request));
+        }
+
+        [Fact]
+        public async Task ShouldFailToAuthenticateWithCallWithNoThrowAsync() {
+            var tokenRequest = new TokenRequest {
+                AuthorityUrl = "https://demo.duendesoftware.com",
+                GrantType = "client_credentials",
+                Scope = "api",
+                ClientId = "m2m",
+                ClientSecret = "xxx"
+            };
+
+            // arrange
+            var authenticator = new OpenIDConnectAuthenticator(new HttpContextAccessor(), tokenRequest)
+                .UsePolicy(PolicyBuilderExtensions.Handle<Exception>()
+                    .OrResult(r => r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == 0)
+                    .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 2))
+                );
+
+            var options = new RestApiClientOptions() {
+                BaseUrl = new Uri("http://api.github.com"),
+                Authenticator = authenticator,
+                ThrowOnAnyError = false
+            };
+            var client = new RestApiClient(new NullLogger<RestApiClient>(), new HttpContextAccessor(), options);
+            var request = new RestApiRequest("foo", Method.Get);
+
             // act
-            await authenticator.Authenticate(client, request).ConfigureAwait(false);
+            var response = await client.GetAsync(request);
 
             // assert
-            var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
-            Assert.Empty(authorization);
+            Assert.False(response.IsSuccessful);
         }
 
         [Fact]
@@ -198,10 +291,12 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("/api/v1/items/1234", Method.Get);
 
             // act
-            var token = await authenticator.GetTokenAsync();
+            await authenticator.Authenticate(client, request);
 
             // assert
-            Assert.Equal("Bearer foo-client_credentials-token", token);
+            var authorization = request.Parameters.FirstOrDefault(x => x.Type == ParameterType.HttpHeader && x.Name == KnownHeaders.Authorization)?.Value?.ToString();
+            Assert.NotNull(authorization);
+            Assert.Equal("Bearer foo-client_credentials-token", authorization.ToString());
         }
     }
 }

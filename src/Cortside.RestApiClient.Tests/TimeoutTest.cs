@@ -15,12 +15,11 @@ namespace Cortside.RestApiClient.Tests {
 
         public TimeoutTest() {
             var name = Guid.NewGuid().ToString();
-            Server = new MockHttpServer(name)
-                .ConfigureBuilder(new IdentityServerMock("./Data/discovery.json", "./Data/jwks.json"))
-                .ConfigureBuilder(new SubjectMock("./Data/subjects.json"))
-                .ConfigureBuilder<TestMock>();
-
-            Server.WaitForStart();
+            Server = MockHttpServer.CreateBuilder(name)
+                .AddMock(new IdentityServerMock("./Data/discovery.json", "./Data/jwks.json"))
+                .AddMock(new SubjectMock("./Data/subjects.json"))
+                .AddMock<TestMock>()
+                .Build();
         }
 
         [Fact]
@@ -37,11 +36,26 @@ namespace Cortside.RestApiClient.Tests {
         }
 
         [Fact]
-        public Task ShouldThrowExceptionForGetClientMethodAsync() {
+        public async Task ShouldNotThrowExceptionForGetClientMethodAsync() {
             // arrange
             var options = new RestApiClientOptions {
                 BaseUrl = new Uri(Server.Url),
                 ThrowOnAnyError = false
+            };
+            var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), new HttpContextAccessor(), options);
+
+            // act
+            var response = await client.GetTimeoutAsync();
+
+            Assert.Null(response);
+        }
+
+        [Fact]
+        public Task ShouldThrowExceptionForGetClientMethodAsync() {
+            // arrange
+            var options = new RestApiClientOptions {
+                BaseUrl = new Uri(Server.Url),
+                ThrowOnAnyError = true
             };
             var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), new HttpContextAccessor(), options);
 

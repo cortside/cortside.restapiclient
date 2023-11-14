@@ -19,7 +19,7 @@ namespace Cortside.RestApiClient.Tests {
             var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), url, new HttpContextAccessor());
 
             // act
-            var repos = await client.Get200Async().ConfigureAwait(false);
+            var repos = await client.Get200Async();
 
             // assert
             Assert.NotEmpty(repos);

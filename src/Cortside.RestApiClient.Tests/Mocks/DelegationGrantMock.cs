@@ -1,14 +1,14 @@
 ﻿using Cortside.MockServer;
 using Cortside.MockServer.AccessControl.Models;
+using Cortside.MockServer.Builder;
 using Newtonsoft.Json;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
-using WireMock.Server;
 
 namespace Cortside.RestApiClient.Tests.Mocks {
-    public class DelegationGrantMock : IMockHttpServerBuilder {
-        public void Configure(WireMockServer server) {
-            server
+    public class DelegationGrantMock : IMockHttpMock {
+        public void Configure(MockHttpServer server) {
+            server.WireMockServer
                 .Given(
                     Request.Create()
                         .WithPath("/connect/token")
@@ -26,7 +26,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                         }))
                 );
 
-            server
+            server.WireMockServer
                 .Given(
                     Request.Create()
                         .WithPath("/connect/token")
@@ -44,7 +44,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                         }))
                 );
 
-            server
+            server.WireMockServer
                 .Given(
                     Request.Create()
                         .WithPath("/connect/token")
@@ -62,7 +62,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                         }))
                 );
 
-            server
+            server.WireMockServer
                 .Given(
                     Request.Create()
                         .WithPath("/connect/token")

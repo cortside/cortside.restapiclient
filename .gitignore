@@ -247,6 +247,7 @@ coverage.json
 coverage.opencover.xml
 *.ncrunchsolution
 *.ncrunchproject
+.NCrunch_*
 
 *.zip
 .vscode/*

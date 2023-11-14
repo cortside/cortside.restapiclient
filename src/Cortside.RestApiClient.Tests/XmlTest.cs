@@ -16,10 +16,9 @@ namespace Cortside.RestApiClient.Tests {
 
         public XmlTest() {
             var name = Guid.NewGuid().ToString();
-            Server = new MockHttpServer(name)
-                .ConfigureBuilder<LexisNexisMock>();
-
-            Server.WaitForStart();
+            Server = MockHttpServer.CreateBuilder(name)
+                .AddMock<LexisNexisMock>()
+                .Build();
 
             config = new LexisNexisClientConfiguration() {
                 ServiceUrl = Server.Url,
@@ -34,7 +33,7 @@ namespace Cortside.RestApiClient.Tests {
             var client = new LexisNexisClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor());
 
             // act
-            var item = await client.InstantIdAsync().ConfigureAwait(false);
+            var item = await client.InstantIdAsync();
 
             // assert
             Assert.Equal("385133841", item.Data.Response.Result.UniqueId);
