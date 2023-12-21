@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Cortside.MockServer;
 using Cortside.RestApiClient.Tests.Clients.HttpStatusApi;
 using Cortside.RestApiClient.Tests.Clients.LexisNexisApi;
-using Cortside.RestApiClient.Tests.Mocks;
+using Cortside.RestApiClient.Tests.Mocks.LexisNexis;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
@@ -37,6 +37,18 @@ namespace Cortside.RestApiClient.Tests {
 
             // assert
             Assert.Equal("385133841", item.Data.Response.Result.UniqueId);
+        }
+
+        [Fact]
+        public async Task ShouldDeserializeAllXmlChildren() {
+            // arrange
+            var client = new LexisNexisClient(new NullLogger<HttpStatusClient>(), config, new HttpContextAccessor());
+
+            // act
+            var response = await client.VerificationOfOccupancyAsync();
+
+            // assert
+            Assert.Equal(17, response.Response.Result.AttributeGroup.Attributes.Attribute.Count);
         }
     }
 }

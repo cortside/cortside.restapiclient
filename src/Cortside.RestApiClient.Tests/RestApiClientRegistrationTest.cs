@@ -1,5 +1,4 @@
-﻿using Cortside.AspNetCore.AccessControl;
-using Cortside.RestApiClient.Tests.Clients.CatalogApi;
+﻿using Cortside.RestApiClient.Tests.Clients.CatalogApi;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

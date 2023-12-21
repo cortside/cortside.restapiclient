@@ -3,7 +3,7 @@
 using System;
 using Cortside.RestApiClient.Authenticators.OpenIDConnect;
 
-namespace Cortside.AspNetCore.AccessControl {
+namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
     public class IdentityServerConfiguration {
         public string Authority { get; set; }
         public bool RequireHttpsMetadata { get; set; }
