@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using RestSharp;
-using RestSharp.Serializers.Xml;
 using Serilog.Context;
 
 namespace Cortside.RestApiClient {
@@ -41,11 +40,12 @@ namespace Cortside.RestApiClient {
                     client = new RestClient(options.Options, configureSerialization: s => s.UseSerializer(() => options.Serializer));
                 }
             }
-            if (options.XmlSerializer) {
+
+            if (client == null) {
                 if (httpClient != null) {
-                    client = new RestClient(httpClient, options.Options, configureSerialization: s => s.UseXmlSerializer());
+                    client = new RestClient(httpClient, options.Options, configureSerialization: s => s.UseDefaultSerializers());
                 } else {
-                    client = new RestClient(options.Options, configureSerialization: s => s.UseXmlSerializer());
+                    client = new RestClient(options.Options, configureSerialization: s => s.UseDefaultSerializers());
                 }
             }
         }
@@ -126,10 +126,11 @@ namespace Cortside.RestApiClient {
 
         private async Task<RestResponse> InnerExecuteAttemptAsync(IRestApiRequest request, int attempt) {
             var url = client.BuildUri(request.RestRequest);
-            var body = request.Parameters.SingleOrDefault(x => x.Type == ParameterType.RequestBody);
+            var requestBody = request.Parameters.SingleOrDefault(x => x.Type == ParameterType.RequestBody);
             var serializer = options.Serializer ?? new JsonNetSerializer();
-            var json = serializer.Serialize(body);
-            logger.LogDebug("Request to {url}, attempt {attempt}, with body {body}", url, attempt, json);
+            var body = requestBody == null ? "NULL" : serializer.Serialize(requestBody);
+
+            logger.LogDebug("Request to {url}, attempt {attempt}, with body {body}", url, attempt, body);
 
             var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
             if (response.ErrorException != null || !string.IsNullOrWhiteSpace(response.ErrorMessage)) {
