@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Cortside.RestApiClient;
 using Cortside.RestApiClient.Authenticators.OpenIDConnect;
-using Cortside.RestApiClient.Tests.Clients.IdentityApi;
 using HttpTracer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
@@ -11,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RestSharp;
 
-namespace EnerBank.Application.IdentityServerClient {
+namespace Cortside.RestApiClient.Tests.Clients.IdentityApi {
     public class IdentityClient : IDisposable {
         private readonly RestApiClient apiClient;
         private readonly ILogger<IdentityClient> logger;
@@ -19,7 +18,7 @@ namespace EnerBank.Application.IdentityServerClient {
 
         public IdentityClient(ILogger<IdentityClient> logger, RecaptchaConfiguration config, IHttpContextAccessor contextAccessor) {
             this.logger = logger;
-            this.configuration = config;
+            configuration = config;
 
             var options = new RestApiClientOptions {
                 BaseUrl = new Uri(config.ServiceUrl),

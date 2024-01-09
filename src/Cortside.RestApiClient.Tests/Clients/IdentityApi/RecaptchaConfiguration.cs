@@ -1,6 +1,6 @@
 ﻿using Cortside.RestApiClient.Authenticators.OpenIDConnect;
 
-namespace EnerBank.Application.IdentityServerClient {
+namespace Cortside.RestApiClient.Tests.Clients.IdentityApi {
     public class RecaptchaConfiguration {
         public string ServiceUrl { get; set; }
         public string Secret { get; set; }
