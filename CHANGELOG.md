@@ -1,3 +1,18 @@
+# Release 6.2
+
+|Commit|Date|Author|Message|
+|---|---|---|---|
+| af8b000 | <span style="white-space:nowrap;">2023-11-14</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update version
+| 233523d | <span style="white-space:nowrap;">2023-11-14</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge branch 'release/6.1' into develop
+| 52b7125 | <span style="white-space:nowrap;">2023-11-14</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge branch 'master' into develop
+| 9e7ceeb | <span style="white-space:nowrap;">2023-12-21</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [ISSUE-23] change xml handling to be default or explicit by IRestSerializer implementation
+| cd7458a | <span style="white-space:nowrap;">2023-12-21</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (origin/ISSUE-23, ISSUE-23) update nuget api key
+| 34c6981 | <span style="white-space:nowrap;">2023-12-22</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge pull request #24 from cortside/ISSUE-23
+| 8210bb6 | <span style="white-space:nowrap;">2024-01-09</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  add some additional tests to help with validating a problem in a project that uses this library
+| ebca48b | <span style="white-space:nowrap;">2024-01-09</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update latest powershell scripts
+| 700fb59 | <span style="white-space:nowrap;">2024-01-09</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (HEAD -> release/6.2, origin/develop, origin/HEAD, develop) merge from develop
+****
+
 # Release 6.1
 
 * Update nuget dependencies to latest stable versions
