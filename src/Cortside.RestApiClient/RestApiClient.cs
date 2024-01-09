@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Cortside.Common.Correlation;
 using Microsoft.AspNetCore.Http;
@@ -126,10 +127,8 @@ namespace Cortside.RestApiClient {
 
         private async Task<RestResponse> InnerExecuteAttemptAsync(IRestApiRequest request, int attempt) {
             var url = client.BuildUri(request.RestRequest);
-            var body = request.Parameters.SingleOrDefault(x => x.Type == ParameterType.RequestBody);
-            var serializer = options.Serializer ?? new JsonNetSerializer();
-            var json = serializer.Serialize(body);
-            logger.LogDebug("Request to {url}, attempt {attempt}, with body {body}", url, attempt, json);
+            var body = BuildContent(request);
+            logger.LogDebug("Request to {url}, attempt {attempt}, with body {body}", url, attempt, body);
 
             var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
             if (response.ErrorException != null || !string.IsNullOrWhiteSpace(response.ErrorMessage)) {
@@ -277,6 +276,23 @@ namespace Cortside.RestApiClient {
 
             //Log the exception and info message
             logger.LogError(ex, info);
+        }
+
+        // TODO: use internal method from RestSharp that handles everything correctly
+        public string BuildContent(IRestApiRequest request) {
+            var body = request.Parameters.SingleOrDefault(x => x.Type == ParameterType.RequestBody);
+            if (body != null) {
+                var serializer = options.Serializer ?? new JsonNetSerializer();
+                return serializer.Serialize(body);
+            }
+
+            var postParameters = request.Method == Method.Post ? request.Parameters.GetParameters<GetOrPostParameter>() : Enumerable.Empty<GetOrPostParameter>();
+            var sb = new StringBuilder();
+            foreach (var postParameter in postParameters) {
+                sb.Append(postParameter.Name).Append("=").AppendLine(postParameter.Value?.ToString() ?? string.Empty);
+            }
+
+            return sb.ToString();
         }
 
         public void Dispose() {
