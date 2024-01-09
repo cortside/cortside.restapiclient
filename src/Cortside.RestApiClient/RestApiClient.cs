@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using RestSharp;
-using RestSharp.Serializers.Xml;
 using Serilog.Context;
 
 namespace Cortside.RestApiClient {
@@ -42,11 +41,12 @@ namespace Cortside.RestApiClient {
                     client = new RestClient(options.Options, configureSerialization: s => s.UseSerializer(() => options.Serializer));
                 }
             }
-            if (options.XmlSerializer) {
+
+            if (client == null) {
                 if (httpClient != null) {
-                    client = new RestClient(httpClient, options.Options, configureSerialization: s => s.UseXmlSerializer());
+                    client = new RestClient(httpClient, options.Options, configureSerialization: s => s.UseDefaultSerializers());
                 } else {
-                    client = new RestClient(options.Options, configureSerialization: s => s.UseXmlSerializer());
+                    client = new RestClient(options.Options, configureSerialization: s => s.UseDefaultSerializers());
                 }
             }
         }
