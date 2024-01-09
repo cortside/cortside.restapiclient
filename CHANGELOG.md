@@ -1,5 +1,9 @@
 # Release 6.2
 
+* Update nuget dependencies to latest stable versions
+* [ISSUE-23] change xml handling to be default or explicit by IRestSerializer implementation
+	* RestApiClientOptions.XmlSerializer was removed as no longer needed as the default serilizers now handle xml
+
 |Commit|Date|Author|Message|
 |---|---|---|---|
 | af8b000 | <span style="white-space:nowrap;">2023-11-14</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update version
