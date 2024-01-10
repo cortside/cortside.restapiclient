@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -9,7 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using RestSharp;
-using Serilog.Context;
 
 namespace Cortside.RestApiClient {
     public class RestApiClient : IDisposable, IRestApiClient {
@@ -92,7 +92,7 @@ namespace Cortside.RestApiClient {
             SetForwardedHeader(request);
 
             RestResponse response;
-            using (LogContext.PushProperty("RequestUrl", client.BuildUri(request.RestRequest))) {
+            using (logger.BeginScope(new Dictionary<string, object> { ["RequestUrl"] = client.BuildUri(request.RestRequest) })) {
                 int attempt = 0;
                 try {
                     response = await policy.ExecuteAsync(async () => await InnerExecuteAttemptAsync(request, attempt++))
