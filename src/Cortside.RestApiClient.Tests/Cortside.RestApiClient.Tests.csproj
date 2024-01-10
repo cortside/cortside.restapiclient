@@ -9,7 +9,7 @@
     <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Cortside.Common.Testing" Version="6.1.397" />
+    <PackageReference Include="Cortside.Common.Testing" Version="6.2.403" />
     <PackageReference Include="Cortside.MockServer.AccessControl" Version="6.1.62" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <PackageReference Include="HttpTracer" Version="2.1.1" />
