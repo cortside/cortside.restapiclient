@@ -213,6 +213,5 @@ namespace Cortside.RestApiClient {
             get => rcOptions.AllowMultipleDefaultParametersWithSameName;
             set => rcOptions.AllowMultipleDefaultParametersWithSameName = value;
         }
-        public bool XmlSerializer { get; set; }
     }
 }
