@@ -3,6 +3,7 @@
 * Update nuget dependencies to latest stable versions
 * [ISSUE-23] change xml handling to be default or explicit by IRestSerializer implementation
 	* RestApiClientOptions.XmlSerializer was removed as no longer needed as the default serilizers now handle xml
+* Remove any direct serilog references to break Serilog coupling, needed for making cortside libraries easier to multitarget net6.0 and net8.0
 
 |Commit|Date|Author|Message|
 |---|---|---|---|
