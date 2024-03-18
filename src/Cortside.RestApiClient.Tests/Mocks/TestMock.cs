@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using Cortside.Common.Testing;
 using Cortside.MockServer;
 using Cortside.MockServer.Builder;
 using Cortside.RestApiClient.Tests.Clients.CatalogApi;
@@ -14,15 +16,54 @@ namespace Cortside.RestApiClient.Tests.Mocks {
 
             server.WireMockServer
                 .Given(
-                    Request.Create().WithPath("/api/v1/items/search")
-                        .UsingPost()
+                    Request.Create().WithPath("/large/xml")
+                        .UsingGet()
                 )
                 .RespondWith(
                     Response.Create()
-                        .WithStatusCode(303)
-                        .WithHeader("Content-Type", "application/json")
-                        .WithHeader("Location", "/api/v1/items/search")
+                        .WithStatusCode(200)
+                        .WithHeader("Content-Type", "application/xml")
+                        //.WithBodyFromFile("Data/large-response.xml")
+                        .WithBody(_ => {
+                            var sb = new StringBuilder("<associates exportDate=\"2024-01-15\">");
+                            for (int i = 0; i < 88944; i++) {
+                                var associate =
+                                    @$"  <associate id=""ID{i.ToString().PadLeft(7)}"" firstName=""{RandomValues.FirstName}"" lastName=""{RandomValues.LastName}"" exeCode="""" status=""Active"" email=""{RandomValues.EmailAddress}"">
+    <hierarchy>
+      <company code=""C101"" />
+      <division code=""D123456789"" name=""{{RandomValues.CreateRandomString()}}"" />
+      <group code=""G123456789"" name=""{{RandomValues.CreateRandomString()}}"" />
+      <department code=""U123456789"" name=""{{RandomValues.CreateRandomString()}}"" />
+      <costCenter code=""CC123456789"" />
+      <job code=""{i}"" title=""{RandomValues.CreateRandomString()}"" />
+      <functional title=""No Functional Title"" />
+    </hierarchy>
+    <manager id=""ID999999"" firstName=""{RandomValues.FirstName}"" lastName=""{RandomValues.LastName}"" />
+    <limits>
+      <limit amount=""$1.00"" calculation=""None"" isDerived=""false"" source=""Standard"" category=""Wire"" type=""Commercial"" product=""N/A"" system=""System0"" authorityType=""Originate"" originiateType=""Non-repetitive"" />
+      <limit amount=""$5,000,000.00"" calculation=""None"" isDerived=""false"" source=""Standard"" category=""Wire"" type=""Commercial"" product=""N/A"" system=""System1"" authorityType=""Originate"" originiateType=""Repetitive"" />
+      <limit amount=""$300,000.00"" calculation=""None"" isDerived=""false"" source=""Standard"" category=""Settlement"" type=""Commercial"" product=""System3"" system=""CLO"" />
+    </limits>
+  </associate>";
+                                sb.AppendLine(associate);
+                            }
+                            sb.AppendLine("</associates>");
+
+                            return sb.ToString();
+                        })
                 );
+
+            server.WireMockServer
+                    .Given(
+                        Request.Create().WithPath("/api/v1/items/search")
+                            .UsingPost()
+                    )
+                    .RespondWith(
+                        Response.Create()
+                            .WithStatusCode(303)
+                            .WithHeader("Content-Type", "application/json")
+                            .WithHeader("Location", "/api/v1/items/search")
+                    );
 
             server.WireMockServer
                 .Given(
