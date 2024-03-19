@@ -15,7 +15,7 @@ using RestSharp.Authenticators;
 using RestSharp.Serializers.NewtonsoftJson;
 
 namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
-    public class OpenIDConnectAuthenticator : AuthenticatorBase {
+    public class OpenIDConnectAuthenticator : AuthenticatorBase, IRestApiAuthenticator {
         private readonly TokenRequest tokenRequest;
         private IAsyncPolicy<RestResponse> policy = Policy.NoOpAsync<RestResponse>();
         private ILogger logger = new NullLogger<OpenIDConnectAuthenticator>();
@@ -148,6 +148,11 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                     return RestResponse<TokenResponse>.FromResponse(response);
                 }
             }
+        }
+
+        public void ClearToken() {
+            this.Token = null;
+            this.tokenExpiration = DateTime.MinValue;
         }
     }
 }
