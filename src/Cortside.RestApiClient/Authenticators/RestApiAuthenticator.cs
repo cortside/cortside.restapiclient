@@ -1,8 +1,10 @@
 ﻿using System.Threading.Tasks;
 using RestSharp;
 
-namespace Cortside.RestApiClient.Authenticators {
-    public abstract class RestApiAuthenticator : IRestApiAuthenticator {
+namespace Cortside.RestApiClient.Authenticators
+{
+    public abstract class RestApiAuthenticator : IRestApiAuthenticator
+    {
         protected RestApiAuthenticator(string token) => Token = token;
 
         protected string Token { get; set; }
@@ -12,7 +14,8 @@ namespace Cortside.RestApiClient.Authenticators {
         public async ValueTask Authenticate(IRestClient client, RestRequest request)
             => request.AddOrUpdateParameter(await GetAuthenticationParameter(Token).ConfigureAwait(false));
 
-        public virtual void ClearToken() {
+        public virtual void ResetToken()
+        {
             Token = null;
         }
     }
