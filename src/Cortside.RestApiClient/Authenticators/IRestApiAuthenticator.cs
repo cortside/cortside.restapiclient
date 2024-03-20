@@ -7,6 +7,6 @@ namespace Cortside.RestApiClient.Authenticators {
         /// in the case of authorization failure (401) in cases like revoked tokens.
         /// Override this method to do something other than just set the internal token to null.
         /// </summary>
-        void ResetToken();
+        void HandleUnauthorizedClientRequest();
     }
 }
