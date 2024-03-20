@@ -17,7 +17,7 @@ namespace Cortside.RestApiClient.Tests.Clients.HttpStatusApi {
             client = new RestApiClient(logger, contextAccessor, options);
         }
 
-        public async Task<string> Get200Async() {
+        public async Task<string> Get200RetryAsync() {
             var request = new RestApiRequest("200retry", Method.Get) {
                 Timeout = 1000,
                 Policy = PolicyBuilderExtensions
@@ -29,6 +29,34 @@ namespace Cortside.RestApiClient.Tests.Clients.HttpStatusApi {
 
             var response = await client.GetAsync(request).ConfigureAwait(false);
             return response?.Content;
+        }
+
+        public async Task<RestResponse> Get200Async() {
+            var request = new RestApiRequest("200", Method.Get) {
+                Timeout = 1000,
+                Policy = PolicyBuilderExtensions
+                    .HandleTransientHttpError()
+                    .Or<TimeoutException>()
+                    .OrResult(x => x.StatusCode == 0 || x.StatusCode == System.Net.HttpStatusCode.Unauthorized || x.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                    .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 5))
+            };
+
+            var response = await client.GetAsync(request).ConfigureAwait(false);
+            return response;
+        }
+
+        public async Task<RestResponse> Get401Async() {
+            var request = new RestApiRequest("401", Method.Get) {
+                Timeout = 1000,
+                Policy = PolicyBuilderExtensions
+                    .HandleTransientHttpError()
+                    .Or<TimeoutException>()
+                    .OrResult(x => x.StatusCode == 0 || x.StatusCode == System.Net.HttpStatusCode.Unauthorized || x.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                    .WaitAndRetryAsync(PolicyBuilderExtensions.Jitter(1, 5))
+            };
+
+            var response = await client.GetAsync(request).ConfigureAwait(false);
+            return response;
         }
 
         public async Task<string> GetTimeoutAsync() {

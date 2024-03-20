@@ -62,12 +62,7 @@ namespace Cortside.RestApiClient {
 
         public IAuthenticator Authenticator {
             get { return rcOptions.Authenticator; }
-            set {
-                rcOptions.Authenticator = value;
-                if (rcOptions.Authenticator != null) {
-
-                }
-            }
+            set { rcOptions.Authenticator = value; }
         }
 
         public IRestSerializer Serializer { get; set; }

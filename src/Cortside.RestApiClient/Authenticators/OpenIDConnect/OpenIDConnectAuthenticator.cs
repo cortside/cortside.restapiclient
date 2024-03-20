@@ -1,5 +1,3 @@
-#pragma warning disable _MissingAsync // TAP methods must end with Async.
-
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -11,11 +9,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Polly;
 using RestSharp;
-using RestSharp.Authenticators;
 using RestSharp.Serializers.NewtonsoftJson;
 
 namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
-    public class OpenIDConnectAuthenticator : AuthenticatorBase {
+    public class OpenIDConnectAuthenticator : RestApiAuthenticator {
         private readonly TokenRequest tokenRequest;
         private IAsyncPolicy<RestResponse> policy = Policy.NoOpAsync<RestResponse>();
         private ILogger logger = new NullLogger<OpenIDConnectAuthenticator>();
@@ -148,6 +145,11 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                     return RestResponse<TokenResponse>.FromResponse(response);
                 }
             }
+        }
+
+        public override void HandleUnauthorizedClientRequest() {
+            Token = null;
+            tokenExpiration = DateTime.MinValue;
         }
     }
 }

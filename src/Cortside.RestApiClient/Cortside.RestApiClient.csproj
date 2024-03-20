@@ -3,18 +3,18 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Cortside.Common.Correlation" Version="6.2.403" />
-    <PackageReference Include="Cortside.Common.Json" Version="6.2.403" />
-    <PackageReference Include="Cortside.Common.Messages" Version="6.2.403" />
-    <PackageReference Include="Cortside.Common.Validation" Version="6.2.403" />
+    <PackageReference Include="Cortside.Common.Correlation" Version="6.2.408" />
+    <PackageReference Include="Cortside.Common.Json" Version="6.2.408" />
+    <PackageReference Include="Cortside.Common.Messages" Version="6.2.408" />
+    <PackageReference Include="Cortside.Common.Validation" Version="6.2.408" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.4" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.8.14">
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.9.28">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Polly" Version="7.2.4" />
+    <PackageReference Include="Polly" Version="8.3.1" />
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
     <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="110.2.0" />

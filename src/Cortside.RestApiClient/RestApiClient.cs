@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Cortside.Common.Correlation;
+using Cortside.RestApiClient.Authenticators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -138,6 +139,11 @@ namespace Cortside.RestApiClient {
             } else {
                 logger.LogDebug("Response {attempt}: Status Code = {StatusCode} Content = {Content}", attempt, response.StatusCode,
                     response.Content);
+            }
+
+            var authenticator = options.Authenticator as IRestApiAuthenticator;
+            if (authenticator != null && response.StatusCode == HttpStatusCode.Unauthorized) {
+                authenticator.HandleUnauthorizedClientRequest();
             }
 
             if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod ||
