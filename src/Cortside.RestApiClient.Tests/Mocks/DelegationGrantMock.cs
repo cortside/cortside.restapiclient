@@ -12,7 +12,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                 .Given(
                     Request.Create()
                         .WithPath("/connect/token")
-                        .WithBody(b => b?.Contains("grant_type=delegation") == true && b?.Contains("client_id=foo") == true)
+                        .WithBody(b => b?.Contains("grant_type=delegation") == true && b.Contains("client_id=foo") == true)
                         .UsingPost()
                 )
                 .RespondWith(
@@ -30,7 +30,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                 .Given(
                     Request.Create()
                         .WithPath("/connect/token")
-                        .WithBody(b => b?.Contains("grant_type=client_credentials") == true && b?.Contains("client_id=foo") == true)
+                        .WithBody(b => b?.Contains("grant_type=client_credentials") == true && b.Contains("client_id=foo") == true)
                         .UsingPost()
                 )
                 .RespondWith(
@@ -48,7 +48,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                 .Given(
                     Request.Create()
                         .WithPath("/connect/token")
-                        .WithBody(b => b?.Contains("grant_type=delegation") == true && b?.Contains("client_id=allow") == true)
+                        .WithBody(b => b?.Contains("grant_type=delegation") == true && b.Contains("client_id=allow"))
                         .UsingPost()
                 )
                 .RespondWith(
@@ -66,7 +66,7 @@ namespace Cortside.RestApiClient.Tests.Mocks {
                 .Given(
                     Request.Create()
                         .WithPath("/connect/token")
-                        .WithBody(b => b?.Contains("grant_type=client_credentials") == true && b?.Contains("client_id=allow") == true)
+                        .WithBody(b => b?.Contains("grant_type=client_credentials") == true && b.Contains("client_id=allow") == true)
                         .UsingPost()
                 )
                 .RespondWith(

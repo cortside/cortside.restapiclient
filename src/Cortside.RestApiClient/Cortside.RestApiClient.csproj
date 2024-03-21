@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Cortside.Common.Correlation" Version="6.2.408" />
     <PackageReference Include="Cortside.Common.Json" Version="6.2.408" />

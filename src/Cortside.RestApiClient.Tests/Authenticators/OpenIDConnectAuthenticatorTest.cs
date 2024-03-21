@@ -154,7 +154,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
                     ?.Value?.ToString();
                 Assert.NotNull(authorization);
                 Assert.True(authorization.Trim().Length > 1);
-                Assert.True(authorization.StartsWith("Bearer "));
+                Assert.StartsWith("Bearer ", authorization);
                 var token = authorization.Right(authorization.Length - 7);
                 Assert.Equal(3, token.Split(".").Length);
             }
@@ -182,7 +182,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
         }
 
         [Fact]
-        public async Task ShouldFailToAuthenticateAsync() {
+        public Task ShouldFailToAuthenticateAsync() {
             var tokenRequest = new TokenRequest {
                 AuthorityUrl = "https://demo.duendesoftware.com",
                 GrantType = "client_credentials",
@@ -202,11 +202,11 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestRequest("foo", Method.Get);
 
             // act && assert
-            await Assert.ThrowsAsync<AuthenticationException>(async () => await authenticator.Authenticate(client, request));
+            return Assert.ThrowsAsync<AuthenticationException>(async () => await authenticator.Authenticate(client, request));
         }
 
         [Fact]
-        public async Task ShouldFailToAuthenticateWithCallWithThrowAsync() {
+        public Task ShouldFailToAuthenticateWithCallWithThrowAsync() {
             var tokenRequest = new TokenRequest {
                 AuthorityUrl = "https://demo.duendesoftware.com",
                 GrantType = "client_credentials",
@@ -231,7 +231,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
             var request = new RestApiRequest("foo", Method.Get);
 
             // act && assert
-            await Assert.ThrowsAsync<AuthenticationException>(async () => await client.GetAsync(request));
+            return Assert.ThrowsAsync<AuthenticationException>(async () => await client.GetAsync(request));
         }
 
         [Fact]

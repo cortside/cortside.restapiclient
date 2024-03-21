@@ -101,9 +101,9 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                 var jwtToken = handler.ReadJwtToken(token.Replace("Bearer ", ""));
                 var delegation = jwtToken.Claims.Any(x => x.Type == "grant_type" && x.Value == "delegation");
                 // check to see if token is for the client to be used for 
-                //var self = jwtToken.Claims.Any(x => x.Type == "client_id" && x.Value == tokenRequest.ClientId);
+                //this might be needed var self = jwtToken.Claims.Any(x => x.Type == "client_id" && x.Value == tokenRequest.ClientId)
 
-                //return delegation && !self;
+                //and then this return delegation && !self
                 return delegation;
             } catch (Exception ex) {
                 logger.LogDebug(ex, "Unable to read token as JWT token to figure out if token has grant_type claim for delegation");

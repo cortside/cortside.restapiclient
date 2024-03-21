@@ -9,13 +9,13 @@ namespace Cortside.RestApiClient.Tests.Clients {
 
         public TestAuthenticator() : base(String.Empty) { }
 
-        protected override async ValueTask<Parameter> GetAuthenticationParameter(string accessToken) {
+        protected override ValueTask<Parameter> GetAuthenticationParameter(string accessToken) {
             if (string.IsNullOrEmpty(Token) || expirationDate >= DateTime.UtcNow) {
                 Token = Guid.NewGuid().ToString();
                 expirationDate = DateTime.UtcNow.AddDays(1);
             }
 
-            return new HeaderParameter(KnownHeaders.Authorization, Token);
+            return ValueTask.FromResult<Parameter>(new HeaderParameter(KnownHeaders.Authorization, Token));
         }
 
         public override void HandleUnauthorizedClientRequest() {

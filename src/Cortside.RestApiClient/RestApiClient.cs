@@ -114,8 +114,8 @@ namespace Cortside.RestApiClient {
                     throw exception;
                 }
 
-                if (response.StatusCode == HttpStatusCode.SeeOther && (request.FollowRedirects ?? options.FollowRedirects) && response.Headers?.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)) == true) {
-                    var url = response.Headers.FirstOrDefault(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
+                if (response.StatusCode == HttpStatusCode.SeeOther && (request.FollowRedirects ?? options.FollowRedirects) && response.Headers != null && response.Headers.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)) == true) {
+                    var url = response.Headers.First(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
                     logger.LogInformation($"Following redirect to {url}");
                     var redirectRequest = new RestApiRequest(url, Method.Get);
                     var redirectResponse = await InnerExecuteAsync(redirectRequest).ConfigureAwait(false);
@@ -273,7 +273,7 @@ namespace Cortside.RestApiClient {
 
             //Acquire the actual exception
             Exception ex;
-            if (response?.ErrorException != null) {
+            if (response.ErrorException != null) {
                 ex = response.ErrorException;
             } else {
                 ex = new Exception(info);

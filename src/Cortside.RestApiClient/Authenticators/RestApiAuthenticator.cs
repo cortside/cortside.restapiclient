@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿#pragma warning disable VSTHRD200
+
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace Cortside.RestApiClient.Authenticators {
