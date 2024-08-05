@@ -19,7 +19,7 @@ namespace Cortside.RestApiClient.Tests.Clients.HttpStatusApi {
 
         public async Task<string> Get200RetryAsync() {
             var request = new RestApiRequest("200retry", Method.Get) {
-                Timeout = 1000,
+                Timeout = TimeSpan.FromMilliseconds(1000),
                 Policy = PolicyBuilderExtensions
                     .HandleTransientHttpError()
                     .Or<TimeoutException>()
@@ -33,7 +33,7 @@ namespace Cortside.RestApiClient.Tests.Clients.HttpStatusApi {
 
         public async Task<RestResponse> Get200Async() {
             var request = new RestApiRequest("200", Method.Get) {
-                Timeout = 1000,
+                Timeout = TimeSpan.FromMilliseconds(1000),
                 Policy = PolicyBuilderExtensions
                     .HandleTransientHttpError()
                     .Or<TimeoutException>()
@@ -47,7 +47,7 @@ namespace Cortside.RestApiClient.Tests.Clients.HttpStatusApi {
 
         public async Task<RestResponse> Get401Async() {
             var request = new RestApiRequest("401", Method.Get) {
-                Timeout = 1000,
+                Timeout = TimeSpan.FromMilliseconds(1000),
                 Policy = PolicyBuilderExtensions
                     .HandleTransientHttpError()
                     .Or<TimeoutException>()
@@ -61,14 +61,14 @@ namespace Cortside.RestApiClient.Tests.Clients.HttpStatusApi {
 
         public async Task<string> GetTimeoutAsync() {
             var request = new RestApiRequest("api/v1/timeout", Method.Get) {
-                Timeout = 1000
+                Timeout = TimeSpan.FromMilliseconds(1000)
             };
             var response = await client.GetAsync(request).ConfigureAwait(false);
             return response?.Content;
         }
         public async Task<RestResponse> ExecuteTimeoutAsync() {
             var request = new RestApiRequest("api/v1/timeout", Method.Get) {
-                Timeout = 1000
+                Timeout = TimeSpan.FromMilliseconds(1000)
             };
             var response = await client.ExecuteAsync(request).ConfigureAwait(false);
             return response;

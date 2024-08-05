@@ -153,9 +153,9 @@ namespace Cortside.RestApiClient {
             set => rcOptions.Encoding = value;
         }
 
-        public int MaxTimeout {
-            get => rcOptions.MaxTimeout;
-            set => rcOptions.MaxTimeout = value;
+        public TimeSpan? Timeout {
+            get => rcOptions.Timeout;
+            set => rcOptions.Timeout = value;
         }
 
         /// <summary>

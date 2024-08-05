@@ -29,7 +29,7 @@ namespace Cortside.RestApiClient {
         bool FailOnDeserializationError { get; set; }
         bool FollowRedirects { get; set; }
         int? MaxRedirects { get; set; }
-        int MaxTimeout { get; set; }
+        TimeSpan? Timeout { get; set; }
         RestClientOptions Options { get; }
         IAsyncPolicy<RestResponse> Policy { get; set; }
         bool PreAuthenticate { get; set; }

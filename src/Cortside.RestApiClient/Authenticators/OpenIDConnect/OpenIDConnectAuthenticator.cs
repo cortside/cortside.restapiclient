@@ -2,6 +2,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Authentication;
+using System.Threading;
 using System.Threading.Tasks;
 using Cortside.Common.Correlation;
 using Microsoft.AspNetCore.Http;
@@ -136,7 +137,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                 if (response.IsSuccessful) {
                     // TODO: handling of deserialization exception?
                     // https://github.com/restsharp/RestSharp/blob/5830af48cf85b8eaadf89d83fbc3bf46106f5873/src/RestSharp/Serializers/DeseralizationException.cs
-                    var rr = client.Deserialize<TokenResponse>(response);
+                    var rr = await client.Deserialize<TokenResponse>(response, new CancellationToken()).ConfigureAwait(false);
                     logger.LogDebug($"Successfully obtained {grantType} token for client_id {clientId} with scopes [{scope}]");
 
                     return rr;

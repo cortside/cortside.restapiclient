@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Cortside.Common.Correlation;
 using Cortside.RestApiClient.Authenticators;
@@ -65,15 +66,15 @@ namespace Cortside.RestApiClient {
                 LogError(request, response);
 
                 if (options.ThrowOnAnyError) {
-                    var timeouts = new int[] { request.Timeout, client.Options.MaxTimeout };
+                    var timeouts = new int[] { Convert.ToInt32(request.Timeout?.TotalMilliseconds ?? 0), Convert.ToInt32(client.Options.Timeout?.TotalMilliseconds ?? 0) };
                     var timeout = timeouts.Where(x => x > 0).Min();
                     throw new TimeoutException($"Timeout of {timeout} exceeded");
                 }
             }
         }
 
-        private RestResponse<T> DeserializeRestResponse<T>(IRestApiRequest request, RestResponse response) {
-            var result = client.Deserialize<T>(response);
+        private async Task<RestResponse<T>> DeserializeRestResponseAsync<T>(IRestApiRequest request, RestResponse response) {
+            var result = await client.Deserialize<T>(response, new CancellationToken()).ConfigureAwait(false);
 
             var ex = result.ErrorException;
             if ((options.ThrowOnDeserializationError || options.ThrowOnAnyError) && ex != null) {
@@ -116,7 +117,7 @@ namespace Cortside.RestApiClient {
 
                 if (response.StatusCode == HttpStatusCode.SeeOther && (request.FollowRedirects ?? options.FollowRedirects) && response.Headers != null && response.Headers.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)) == true) {
                     var url = response.Headers.First(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
-                    logger.LogInformation($"Following redirect to {url}");
+                    logger.LogInformation("Following redirect to {Url}", url);
                     var redirectRequest = new RestApiRequest(url, Method.Get);
                     var redirectResponse = await InnerExecuteAsync(redirectRequest).ConfigureAwait(false);
                     return redirectResponse;
@@ -181,7 +182,7 @@ namespace Cortside.RestApiClient {
 
         public async Task<RestResponse<T>> ExecuteAsync<T>(IRestApiRequest request) {
             var response = await InnerExecuteAsync(request).ConfigureAwait(false);
-            var result = DeserializeRestResponse<T>(request, response);
+            var result = await DeserializeRestResponseAsync<T>(request, response).ConfigureAwait(false);
 
             return result;
         }
@@ -192,7 +193,7 @@ namespace Cortside.RestApiClient {
 
             // TODO: move to InnerExecuteAsync and add as ErrorException?
             if (response.ResponseStatus == ResponseStatus.TimedOut && options.ThrowOnAnyError) {
-                var timeouts = new int[] { request.Timeout, client.Options.MaxTimeout };
+                var timeouts = new int[] { Convert.ToInt32(request.Timeout?.TotalMilliseconds ?? 0), Convert.ToInt32(client.Options.Timeout?.TotalMilliseconds ?? 0) };
                 var timeout = timeouts.Where(x => x > 0).Min();
                 throw new TimeoutException($"Timeout of {timeout} exceeded");
             }
@@ -224,7 +225,7 @@ namespace Cortside.RestApiClient {
             var response = await GetAsync(request).ConfigureAwait(false);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK) {
-                var result = DeserializeRestResponse<T>(request, response);
+                var result = await DeserializeRestResponseAsync<T>(request, response).ConfigureAwait(false);
                 return result;
             }
 
