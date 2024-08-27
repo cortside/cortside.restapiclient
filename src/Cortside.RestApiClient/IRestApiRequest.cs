@@ -21,7 +21,7 @@ namespace Cortside.RestApiClient {
         string Resource { get; set; }
         RestRequest RestRequest { get; }
         string RootElement { get; set; }
-        int Timeout { get; set; }
+        TimeSpan? Timeout { get; set; }
         RestApiRequest AddFile(string name, byte[] bytes, string filename, ContentType contentType = null);
         RestApiRequest AddFile(string name, Func<Stream> getFile, string fileName, ContentType contentType = null);
         RestApiRequest AddFile(string name, string path, ContentType contentType = null);

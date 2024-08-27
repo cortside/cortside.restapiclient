@@ -47,6 +47,7 @@ namespace Cortside.RestApiClient.Tests {
             // act
             var response = await client.GetTimeoutAsync();
 
+            // assert
             Assert.Null(response);
         }
 
@@ -57,9 +58,11 @@ namespace Cortside.RestApiClient.Tests {
                 BaseUrl = new Uri(Server.Url),
                 ThrowOnAnyError = true
             };
-            var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), new HttpContextAccessor(), options);
 
             // act
+            var client = new HttpStatusClient(new NullLogger<HttpStatusClient>(), new HttpContextAccessor(), options);
+
+            // assert
             return Assert.ThrowsAsync<TimeoutException>(() => client.GetTimeoutAsync());
         }
 

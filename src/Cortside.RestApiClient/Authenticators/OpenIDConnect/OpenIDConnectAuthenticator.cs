@@ -1,9 +1,8 @@
-#pragma warning disable _MissingAsync // TAP methods must end with Async.
-
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Authentication;
+using System.Threading;
 using System.Threading.Tasks;
 using Cortside.Common.Correlation;
 using Microsoft.AspNetCore.Http;
@@ -11,11 +10,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Polly;
 using RestSharp;
-using RestSharp.Authenticators;
 using RestSharp.Serializers.NewtonsoftJson;
 
 namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
-    public class OpenIDConnectAuthenticator : AuthenticatorBase {
+    public class OpenIDConnectAuthenticator : RestApiAuthenticator {
         private readonly TokenRequest tokenRequest;
         private IAsyncPolicy<RestResponse> policy = Policy.NoOpAsync<RestResponse>();
         private ILogger logger = new NullLogger<OpenIDConnectAuthenticator>();
@@ -104,9 +102,9 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                 var jwtToken = handler.ReadJwtToken(token.Replace("Bearer ", ""));
                 var delegation = jwtToken.Claims.Any(x => x.Type == "grant_type" && x.Value == "delegation");
                 // check to see if token is for the client to be used for 
-                //var self = jwtToken.Claims.Any(x => x.Type == "client_id" && x.Value == tokenRequest.ClientId);
+                //this might be needed var self = jwtToken.Claims.Any(x => x.Type == "client_id" && x.Value == tokenRequest.ClientId)
 
-                //return delegation && !self;
+                //and then this return delegation && !self
                 return delegation;
             } catch (Exception ex) {
                 logger.LogDebug(ex, "Unable to read token as JWT token to figure out if token has grant_type claim for delegation");
@@ -139,7 +137,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                 if (response.IsSuccessful) {
                     // TODO: handling of deserialization exception?
                     // https://github.com/restsharp/RestSharp/blob/5830af48cf85b8eaadf89d83fbc3bf46106f5873/src/RestSharp/Serializers/DeseralizationException.cs
-                    var rr = client.Deserialize<TokenResponse>(response);
+                    var rr = await client.Deserialize<TokenResponse>(response, new CancellationToken()).ConfigureAwait(false);
                     logger.LogDebug($"Successfully obtained {grantType} token for client_id {clientId} with scopes [{scope}]");
 
                     return rr;
@@ -148,6 +146,11 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                     return RestResponse<TokenResponse>.FromResponse(response);
                 }
             }
+        }
+
+        public override void HandleUnauthorizedClientRequest() {
+            Token = null;
+            tokenExpiration = DateTime.MinValue;
         }
     }
 }

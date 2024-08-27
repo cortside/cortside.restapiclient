@@ -99,12 +99,12 @@ namespace Cortside.RestApiClient.Tests {
 
             // act
             var request = new RestApiRequest() {
-                Timeout = value
+                Timeout = TimeSpan.FromMilliseconds(value)
             };
 
             // assert
-            Assert.Equal(value, request.Timeout);
-            Assert.Equal(value, request.RestRequest.Timeout);
+            Assert.Equal(value, request.Timeout?.Milliseconds);
+            Assert.Equal(value, request.RestRequest.Timeout?.Milliseconds);
         }
 
         [Fact]

@@ -29,7 +29,7 @@ namespace Cortside.RestApiClient.Tests.Clients.LexisNexisApi {
         public async Task<VerificationOfOccupancyResponse> VerificationOfOccupancyAsync() {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             var request = new RestRequest("/WsIdentity/VerificationOfOccupancy", Method.Post);
-            request.Timeout = 30000;
+            request.Timeout = TimeSpan.FromMilliseconds(30000);
 
             var response = await client.ExecuteAsync<VerificationOfOccupancyResponse>(RestApiRequest.From(request)).ConfigureAwait(false);
             return response.Data;

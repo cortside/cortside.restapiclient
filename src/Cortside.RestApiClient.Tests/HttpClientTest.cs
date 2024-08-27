@@ -41,13 +41,6 @@ namespace Cortside.RestApiClient.Tests {
             var itemId = "wp-21";
             var url = $"/api/v1/items/{itemId}";
 
-            //var response = await this.client.GetAsync(url);
-
-            //Assert.NotNull(response);
-            //var content = await response.Content.ReadAsStringAsync();
-            //var item = JsonConvert.DeserializeObject<CatalogItem>(content);
-            //Assert.Contains(itemId, item.Sku);
-
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             var response = await client.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();

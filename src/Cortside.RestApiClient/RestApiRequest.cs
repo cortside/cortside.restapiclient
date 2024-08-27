@@ -74,7 +74,7 @@ namespace Cortside.RestApiClient {
             get => request.RootElement;
             set => request.RootElement = value;
         }
-        public int Timeout {
+        public TimeSpan? Timeout {
             get => request.Timeout;
             set => request.Timeout = value;
         }

@@ -62,12 +62,7 @@ namespace Cortside.RestApiClient {
 
         public IAuthenticator Authenticator {
             get { return rcOptions.Authenticator; }
-            set {
-                rcOptions.Authenticator = value;
-                if (rcOptions.Authenticator != null) {
-
-                }
-            }
+            set { rcOptions.Authenticator = value; }
         }
 
         public IRestSerializer Serializer { get; set; }
@@ -158,9 +153,9 @@ namespace Cortside.RestApiClient {
             set => rcOptions.Encoding = value;
         }
 
-        public int MaxTimeout {
-            get => rcOptions.MaxTimeout;
-            set => rcOptions.MaxTimeout = value;
+        public TimeSpan? Timeout {
+            get => rcOptions.Timeout;
+            set => rcOptions.Timeout = value;
         }
 
         /// <summary>
