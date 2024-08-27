@@ -132,6 +132,7 @@ namespace Cortside.RestApiClient {
 
             var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
 
+            // Clean up POST redirect errors BEFORE logging errors.
             if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod ||
                                                   response.StatusCode == HttpStatusCode.Redirect))
             {
