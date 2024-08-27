@@ -131,6 +131,15 @@ namespace Cortside.RestApiClient {
             logger.LogDebug("Request to {url}, attempt {attempt}, with body {body}", url, attempt, body);
 
             var response = await client.ExecuteAsync(request.RestRequest).ConfigureAwait(false);
+
+            if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod ||
+                                                  response.StatusCode == HttpStatusCode.Redirect))
+            {
+                response.IsSuccessStatusCode = true;
+                response.ResponseStatus = ResponseStatus.Completed;
+                response.ErrorException = null;
+            }
+
             if (response.ErrorException != null || !string.IsNullOrWhiteSpace(response.ErrorMessage)) {
                 logger.LogError(response.ErrorException,
                     "Response {attempt}: Status Code = {StatusCode} ErrorMessage = {ErrorMessage} Content = {Content}", attempt,
@@ -138,13 +147,6 @@ namespace Cortside.RestApiClient {
             } else {
                 logger.LogDebug("Response {attempt}: Status Code = {StatusCode} Content = {Content}", attempt, response.StatusCode,
                     response.Content);
-            }
-
-            if (request.Method == Method.Post && (response.StatusCode == HttpStatusCode.RedirectMethod ||
-                                                  response.StatusCode == HttpStatusCode.Redirect)) {
-                response.IsSuccessStatusCode = true;
-                response.ResponseStatus = ResponseStatus.Completed;
-                response.ErrorException = null;
             }
 
             TimeoutCheck(request, response);
