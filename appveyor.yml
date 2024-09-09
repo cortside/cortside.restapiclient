@@ -1,4 +1,5 @@
 ## https://www.appveyor.com/docs/appveyor-yml/
+
 image: Previous Visual Studio 2022
 
 version: 6.4.{build}
@@ -10,6 +11,9 @@ platform: Any CPU
 
 pull_requests:  
   do_not_increment_build_number: true
+  
+nuget:
+  disable_publish_on_pr: true
   
 skip_commits:
   files:
@@ -40,15 +44,14 @@ assembly_info:
   assembly_informational_version: '{version}'
 
 before_build:
-- appveyor-retry dotnet restore src -v Minimal
-- set DNX_BUILD_VERSION=%APPVEYOR_BUILD_NUMBER%
-- dotnet --info
-- ps: ./prebuild.ps1
+  - appveyor-retry dotnet restore src -v Minimal
+  - set DNX_BUILD_VERSION=%APPVEYOR_BUILD_NUMBER%
+  - dotnet --info
+  - ps: ./prebuild.ps1
 
 build:
   publish_nuget: true
   publish_nuget_symbols: true
-  use_snupkg_format: true 
   include_nuget_references: true
   verbosity: minimal
 
@@ -78,7 +81,6 @@ build_script:
     $env:SONAR_ARGUMENTS="$analysisArgs";
     echo "building version $version from branch $branch targeting $target with analysis arguments of $analysisArgs";
 - dotnet tool install --global dotnet-sonarscanner
-- echo "%SONAR_TOKEN%"
 - dotnet sonarscanner begin /n:"%SONAR_NAME%" /o:"cortside" /k:"%SONAR_PROJECT%" /v:"%APPVEYOR_BUILD_VERSION%" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="%SONAR_TOKEN%" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" %SONAR_ARGUMENTS%
 - dotnet build src --no-restore --configuration %Configuration% /property:"Version=%APPVEYOR_BUILD_VERSION%"
 - dotnet test src --no-restore --no-build --collect:"XPlat Code Coverage" --settings ./src/coverlet.runsettings.xml /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
@@ -92,7 +94,7 @@ after_build:
         $fileVersion = "${fileVersion}-${branch}"; 
     }
     
-    $fileVersion = $fileVersion.replace("release/", "");
+    $fileVersion = $fileVersion.replace("release/", "release-");
     $fileVersion = $fileVersion.replace("feature/", "");
     $fileVersion = $fileVersion.replace("bugfix/", "");
     dotnet pack src --include-symbols -p:SymbolPackageFormat=snupkg --configuration $env:configuration -o ((get-location).Path + '\artifacts') /property:Version=$fileVersion 
@@ -102,10 +104,7 @@ artifacts:
 
 cache:
 - '%USERPROFILE%\.nuget\packages'
-  
-nuget:
-  disable_publish_on_pr: true
-  
+   
 deploy:
 - provider: NuGet
   api_key:

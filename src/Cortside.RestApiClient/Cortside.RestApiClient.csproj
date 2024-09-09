@@ -4,12 +4,14 @@
     <Nullable>disable</Nullable>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Cortside.Common.Correlation" Version="6.2.408" />
-    <PackageReference Include="Cortside.Common.Json" Version="6.2.408" />
-    <PackageReference Include="Cortside.Common.Messages" Version="6.2.408" />
-    <PackageReference Include="Cortside.Common.Validation" Version="6.2.408" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Cortside.Common.Correlation" Version="6.3.452" />
+    <PackageReference Include="Cortside.Common.Json" Version="6.3.452" />
+    <PackageReference Include="Cortside.Common.Messages" Version="6.3.452" />
+    <PackageReference Include="Cortside.Common.Validation" Version="6.3.452" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
