@@ -1,5 +1,21 @@
 # Release 6.3
 
+## Breaking changes
+
+* Update RestSharp version and reflect differences in options
+    * RestApiClientOptions
+        * MaxTimeout as int changed to Timeout as TimeSpan
+    * RestApiRequest
+        * Timeout changed from int to TimeSpan
+
+## changes
+
+* Update nuget dependencies to latest stable versions
+* Change to redirect handling so that it does not log response error before handling redirect (ISSUE-29)
+* Added IRestApiAuthenticator interface with method for handling of unauthorized requests (ISSUE-20)
+* OpenIDConnectAuthenticator handles clearing a cached token
+
+
 |Commit|Date|Author|Message|
 |---|---|---|---|
 | 2fa4ab5 | <span style="white-space:nowrap;">2024-01-09</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update version
