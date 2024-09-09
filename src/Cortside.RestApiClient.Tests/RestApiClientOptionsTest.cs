@@ -156,12 +156,12 @@ namespace Cortside.RestApiClient.Tests {
         public void ShouldSetMaxTimeout() {
             // act
             RestApiClientOptions options = new RestApiClientOptions {
-                MaxTimeout = 99
+                Timeout = TimeSpan.FromMilliseconds(99)
             };
 
             // assert
-            Assert.Equal(99, options.MaxTimeout);
-            Assert.Equal(99, options.Options.MaxTimeout);
+            Assert.Equal(99, options.Timeout?.Milliseconds);
+            Assert.Equal(99, options.Options.Timeout?.Milliseconds);
         }
 
         [Fact]

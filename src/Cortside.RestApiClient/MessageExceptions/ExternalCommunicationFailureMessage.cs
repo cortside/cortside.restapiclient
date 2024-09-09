@@ -16,5 +16,11 @@ namespace Cortside.RestApiClient.MessageExceptions {
 
         public ExternalCommunicationFailureMessage(string message, Exception exception) : base(message, exception) {
         }
+
+        protected ExternalCommunicationFailureMessage(string key, string property, params object[] properties) : base(key, property, properties) {
+        }
+
+        protected ExternalCommunicationFailureMessage(string message, string property) : base(message, property) {
+        }
     }
 }

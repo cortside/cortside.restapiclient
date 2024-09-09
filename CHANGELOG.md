@@ -1,3 +1,35 @@
+# Release 6.3
+
+## Breaking changes
+
+* Update RestSharp version and reflect differences in options
+    * RestApiClientOptions
+        * MaxTimeout as int changed to Timeout as TimeSpan
+    * RestApiRequest
+        * Timeout changed from int to TimeSpan
+
+## changes
+
+* Update nuget dependencies to latest stable versions
+* Change to redirect handling so that it does not log response error before handling redirect (ISSUE-29)
+* Added IRestApiAuthenticator interface with method for handling of unauthorized requests (ISSUE-20)
+* OpenIDConnectAuthenticator handles clearing a cached token
+
+
+|Commit|Date|Author|Message|
+|---|---|---|---|
+| 2fa4ab5 | <span style="white-space:nowrap;">2024-01-09</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update version
+| 76b6769 | <span style="white-space:nowrap;">2024-01-09</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge branch 'master' into develop
+| 5faac7f | <span style="white-space:nowrap;">2024-03-19</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [SVC-2887] add support to authenticators to clear authorization in the case the called api return unauthorized from something like revoked token
+| e07e103 | <span style="white-space:nowrap;">2024-03-19</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [SVC-2887] add support to authenticators to clear authorization in the case the called api return unauthorized from something like revoked token
+| 8e673e1 | <span style="white-space:nowrap;">2024-03-20</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  [SVC-2887] add tests to ensure that authenticators can have tokens removed on authentication failure
+| b6be735 | <span style="white-space:nowrap;">2024-03-20</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (origin/SVC-2887, SVC-2887) [SVC-2887] add tests to ensure that authenticators can have tokens removed on authentication failure
+| ec1d897 | <span style="white-space:nowrap;">2024-03-20</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge pull request #27 from cortside/SVC-2887
+| 9b0b7de | <span style="white-space:nowrap;">2024-03-21</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  treat warnings as errors and cleanup lint warnings
+| dc81007 | <span style="white-space:nowrap;">2024-08-05</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update to latest nuget packages; update scripts; deal with restsharp breaking changes
+| 0d65e32 | <span style="white-space:nowrap;">2024-09-02</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (HEAD -> release/6.3, origin/develop, origin/HEAD, develop) update scripts; update nuget packages
+****
+
 # Release 6.2
 
 * Update nuget dependencies to latest stable versions

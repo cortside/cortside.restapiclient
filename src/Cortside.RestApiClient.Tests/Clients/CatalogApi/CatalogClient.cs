@@ -14,13 +14,6 @@ namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
     public class CatalogClient : IDisposable, ICatalogClient {
         private readonly RestApiClient client;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="clientConfiguration"></param>
-        /// <param name="context"></param>
-        /// <param name="throwOnAnyError">added this to make variable testing easier</param>
         public CatalogClient(ILogger<CatalogClient> logger, CatalogClientConfiguration clientConfiguration, IHttpContextAccessor context, bool throwOnAnyError = false) {
             var options = new RestApiClientOptions {
                 BaseUrl = new Uri(clientConfiguration.ServiceUrl),
