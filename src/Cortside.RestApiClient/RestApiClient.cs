@@ -115,8 +115,13 @@ namespace Cortside.RestApiClient {
                     throw exception;
                 }
 
+
+                // TODO: extension method to get Location header OR use response GetContentHeaderValue
                 if (response.StatusCode == HttpStatusCode.SeeOther && (request.FollowRedirects ?? options.FollowRedirects) && response.Headers != null && response.Headers.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)) == true) {
                     var url = response.Headers.First(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
+
+                    // TODO: should validate same scheme, host, other? when redirecting and passing authorization header
+
                     logger.LogInformation("Following redirect to {Url}", url);
                     var redirectRequest = new RestApiRequest(url, Method.Get);
                     var redirectResponse = await InnerExecuteAsync(redirectRequest).ConfigureAwait(false);
@@ -129,6 +134,9 @@ namespace Cortside.RestApiClient {
 
         private async Task<RestResponse> InnerExecuteAttemptAsync(IRestApiRequest request, int attempt) {
             var url = client.BuildUri(request.RestRequest);
+
+            // TODO: should be setting the content-type here somewhere
+
             var body = BuildContent(request);
             logger.LogDebug("Request to {url}, attempt {attempt}, with body {body}", url, attempt, body);
 
@@ -190,6 +198,9 @@ namespace Cortside.RestApiClient {
         }
 
         public async Task<RestResponse> GetAsync(IRestApiRequest request) {
+
+            // TODO: handling of accept header
+
             request.Method = Method.Get;
             var response = await InnerExecuteAsync(request).ConfigureAwait(false);
 
@@ -227,6 +238,11 @@ namespace Cortside.RestApiClient {
             var response = await GetAsync(request).ConfigureAwait(false);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK) {
+
+
+                // TODO: handling of accept header
+
+
                 var result = await DeserializeRestResponseAsync<T>(request, response).ConfigureAwait(false);
                 return result;
             }
