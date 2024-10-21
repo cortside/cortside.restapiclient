@@ -160,8 +160,8 @@ namespace Cortside.RestApiClient.Tests {
             };
 
             // assert
-            Assert.Equal(99, options.Timeout?.Milliseconds);
-            Assert.Equal(99, options.Options.Timeout?.Milliseconds);
+            Assert.Equal(99, options.Timeout?.TotalMilliseconds);
+            Assert.Equal(99, options.Options.Timeout?.TotalMilliseconds);
         }
 
         [Fact]
