@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/43l1ckgn806lqxjx?svg=true)](https://ci.appveyor.com/project/cortside/cortside-restapiclient)
+[![Build status](https://ci.appveyor.com/api/projects/status/uin64c4fqg946mou?svg=true)](https://ci.appveyor.com/project/cortside/cortside-restapiclient)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=cortside_cortside.restapiclient&metric=alert_status)](https://sonarcloud.io/dashboard?id=cortside_cortside.restapiclient)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=cortside_cortside.restapiclient&metric=coverage)](https://sonarcloud.io/dashboard?id=cortside_cortside.restapiclient)
 
