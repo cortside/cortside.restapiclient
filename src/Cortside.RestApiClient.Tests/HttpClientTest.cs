@@ -70,5 +70,39 @@ namespace Cortside.RestApiClient.Tests {
             var response = await rac.ExecuteAsync<CatalogItem>(request);
             Assert.Contains(itemId, response.Data.Sku);
         }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task ShouldSetForwardHeaders(bool setForwardHeaders) {
+            var itemId = "wp-21";
+            var url = $"/api/v1/items/{itemId}";
+            var options = new RestApiClientOptions() {
+                EnableForwardHeaders = setForwardHeaders
+            };
+            var defaultContext = new DefaultHttpContext {
+                Request = {
+                    Path = url,
+                    Host = new HostString("http://localhost"),
+                    Headers = { { "X-FORWARDED-FOR", "192.168.0.1" } }
+                }
+            };
+            var context = new HttpContextAccessor {
+                HttpContext = defaultContext
+            };
+
+            var rac = new RestApiClient(new NullLogger<RestApiClient>(), context, options, client);
+            var request = new RestApiRequest(url, Method.Get);
+            var response = await rac.ExecuteAsync<CatalogItem>(request);
+            var xForwardedFor = response.Request.Parameters.TryFind("X-Forwarded-For");
+            var xForwarded = response.Request.Parameters.TryFind("Forwarded");
+            if (setForwardHeaders) {
+                Assert.NotNull(xForwardedFor);
+                Assert.NotNull(xForwarded);
+            } else {
+                Assert.Null(xForwardedFor);
+                Assert.Null(xForwarded);
+            }
+        }
     }
 }
