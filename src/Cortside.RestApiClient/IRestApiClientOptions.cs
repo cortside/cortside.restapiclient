@@ -40,5 +40,6 @@ namespace Cortside.RestApiClient {
         bool ThrowOnDeserializationError { get; set; }
         bool UseDefaultCredentials { get; set; }
         string UserAgent { get; set; }
+        bool EnableForwardHeaders { get; set; }
     }
 }

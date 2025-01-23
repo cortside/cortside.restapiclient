@@ -91,7 +91,9 @@ namespace Cortside.RestApiClient {
             var correlationId = CorrelationContext.GetCorrelationId();
             request.AddHeader("Request-Id", correlationId);
             request.AddHeader("X-Correlation-Id", correlationId);
-            SetForwardedHeader(request);
+            if (options.EnableForwardHeaders) {
+                SetForwardedHeader(request);
+            }
 
             RestResponse response;
             using (logger.BeginScope(new Dictionary<string, object> { ["RequestUrl"] = client.BuildUri(request.RestRequest) })) {

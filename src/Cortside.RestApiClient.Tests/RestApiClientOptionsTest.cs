@@ -360,5 +360,18 @@ namespace Cortside.RestApiClient.Tests {
             Assert.NotNull(options.ConfigureMessageHandler);
             Assert.NotNull(options.Options.ConfigureMessageHandler);
         }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void ShouldSetEnableForwardHeaders(bool value) {
+            // act
+            RestApiClientOptions options = new RestApiClientOptions {
+                EnableForwardHeaders = value
+            };
+
+            // assert
+            Assert.Equal(value, options.EnableForwardHeaders);
+        }
     }
 }
