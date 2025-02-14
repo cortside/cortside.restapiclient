@@ -3,7 +3,6 @@
     <TargetFramework>net8.0</TargetFramework>
     <NoWarn>1701;1702;VSTHRD200;_MissingAsync;</NoWarn>
     <IsPackable>false</IsPackable>
-    <LangVersion>11.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
