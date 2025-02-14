@@ -17,7 +17,7 @@ namespace Cortside.RestApiClient.Tests {
             };
 
             if (!string.IsNullOrWhiteSpace(header.Value)) {
-                context.Request.Headers.Add(header.Key, header.Value);
+                context.Request.Headers.Append(header.Key, header.Value);
             }
 
             accessor.HttpContext = context;

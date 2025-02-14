@@ -119,7 +119,7 @@ namespace Cortside.RestApiClient {
 
 
                 // TODO: extension method to get Location header OR use response GetContentHeaderValue
-                if (response.StatusCode == HttpStatusCode.SeeOther && (request.FollowRedirects ?? options.FollowRedirects) && response.Headers != null && response.Headers.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)) == true) {
+                if (response.StatusCode == HttpStatusCode.SeeOther && (request.FollowRedirects ?? options.FollowRedirects) && response.Headers != null && response.Headers.Any(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase))) {
                     var url = response.Headers.First(h => h.Name.Equals("location", StringComparison.InvariantCultureIgnoreCase)).Value.ToString();
 
                     // TODO: should validate same scheme, host, other? when redirecting and passing authorization header

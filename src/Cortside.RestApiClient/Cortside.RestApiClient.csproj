@@ -1,6 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>disable</Nullable>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
@@ -8,22 +8,30 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Cortside.Common.Correlation" Version="6.3.458" />
-    <PackageReference Include="Cortside.Common.Json" Version="6.3.458" />
-    <PackageReference Include="Cortside.Common.Messages" Version="6.3.458" />
-    <PackageReference Include="Cortside.Common.Validation" Version="6.3.458" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
+    <PackageReference Include="Cortside.Common.Correlation" Version="8.0.473-develop" />
+    <PackageReference Include="Cortside.Common.Json" Version="8.0.473-develop" />
+    <PackageReference Include="Cortside.Common.Messages" Version="8.0.473-develop" />
+    <PackageReference Include="Cortside.Common.Validation" Version="8.0.473-develop" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Polly" Version="8.4.2" />
+    <PackageReference Include="Polly" Version="8.5.2" />
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="112.1.0" />
     <PackageReference Include="RestSharp.Serializers.Xml" Version="112.1.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.2" />
+    <PackageReference Include="Roslynator.Analyzers" Version="4.13.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.6.0.109712">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.4.0" />
   </ItemGroup>
 </Project>

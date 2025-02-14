@@ -247,10 +247,11 @@ coverage.json
 coverage.opencover.xml
 *.ncrunchsolution
 *.ncrunchproject
-.NCrunch_*
 
 *.zip
 .vscode/*
 
 *.local.json
 .refsignored
+.env.local
+.NCrunch_*
