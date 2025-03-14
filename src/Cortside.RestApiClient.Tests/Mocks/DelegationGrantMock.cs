@@ -1,4 +1,4 @@
-﻿using Cortside.MockServer;
+using Cortside.MockServer;
 using Cortside.MockServer.AccessControl.Models;
 using Cortside.MockServer.Builder;
 using Newtonsoft.Json;

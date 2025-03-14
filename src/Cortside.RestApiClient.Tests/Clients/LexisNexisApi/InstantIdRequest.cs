@@ -1,4 +1,4 @@
-﻿using System.Xml.Serialization;
+using System.Xml.Serialization;
 
 // name space is intentionally off so as not to conflict with xmlelements in response file
 namespace Cortside.RestApiClient.Tests.Clients.LexisNexisApi {

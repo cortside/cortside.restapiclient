@@ -1,4 +1,4 @@
-﻿using Cortside.RestApiClient.Authenticators.OpenIDConnect;
+using Cortside.RestApiClient.Authenticators.OpenIDConnect;
 
 namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
     public class CatalogClientConfiguration {
