@@ -1,3 +1,21 @@
+# Release 8.0
+
+|Commit|Date|Author|Message|
+|---|---|---|---|
+| 2a102ba | <span style="white-space:nowrap;">2024-09-02</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update version
+| 47879c6 | <span style="white-space:nowrap;">2024-09-09</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge branch 'master' into develop
+| e7fbc5e | <span style="white-space:nowrap;">2024-10-21</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge branch 'master' into develop
+| d5aff26 | <span style="white-space:nowrap;">2024-10-21</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  add notes for future changes
+| 25bb813 | <span style="white-space:nowrap;">2024-10-24</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update nuget packages
+| c511b46 | <span style="white-space:nowrap;">2024-12-30</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  add badges to README.md
+| 265e437 | <span style="white-space:nowrap;">2024-12-30</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  add badges to README.md
+| 29a8bea | <span style="white-space:nowrap;">2025-01-23</span> | <span style="white-space:nowrap;">Braden Edmunds</span> |  (origin/configurable-forward-headers) RestSharpOption to enable forward headers
+| f85b925 | <span style="white-space:nowrap;">2025-01-23</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  Merge pull request #32 from cortside/configurable-forward-headers
+| 88c7dc3 | <span style="white-space:nowrap;">2025-02-14</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update to net8
+| 63f3be9 | <span style="white-space:nowrap;">2025-02-14</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update to net8
+| 4f02b7c | <span style="white-space:nowrap;">2025-03-13</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  (HEAD -> release/8.0, origin/develop, origin/HEAD, develop) Use Shouldly instead of FluentAssertions because of new licensing; update nuget packages;
+****
+
 # Release 6.3
 
 ## Breaking changes
