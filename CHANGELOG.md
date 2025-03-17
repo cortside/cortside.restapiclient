@@ -1,5 +1,13 @@
 # Release 8.0
 
+* Updated powershell scripts to latest versions from coeus/shoppingcart-api
+* Standardized library build files and resolved code coverage issues
+* Update target framework to net8.0
+* Update all dependency nuget packages
+* Add/Fix build badges
+* Transition to use Shouldly instead of FluentAssertions
+* Add property for EnableForwardHeaders to IRestApiClientOptions to optionally configure forwarding headers, defaults to true for backwards compatability
+
 |Commit|Date|Author|Message|
 |---|---|---|---|
 | 2a102ba | <span style="white-space:nowrap;">2024-09-02</span> | <span style="white-space:nowrap;">Cort Schaefer</span> |  update version
