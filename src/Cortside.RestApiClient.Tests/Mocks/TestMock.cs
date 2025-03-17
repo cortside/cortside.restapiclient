@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cortside.MockServer;
 using Cortside.MockServer.Builder;
 using Cortside.RestApiClient.Tests.Clients.CatalogApi;

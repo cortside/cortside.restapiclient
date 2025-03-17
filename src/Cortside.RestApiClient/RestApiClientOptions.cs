@@ -208,5 +208,11 @@ namespace Cortside.RestApiClient {
             get => rcOptions.AllowMultipleDefaultParametersWithSameName;
             set => rcOptions.AllowMultipleDefaultParametersWithSameName = value;
         }
+
+        /// <summary>
+        /// This flag allows the consumer to conditionally set the x-forward-* headers on the rest sharp request
+        /// Enabled by default to prevent backwards compatibility issues
+        /// </summary>
+        public bool EnableForwardHeaders { get; set; } = true;
     }
 }

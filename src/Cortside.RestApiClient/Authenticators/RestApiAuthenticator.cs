@@ -1,4 +1,4 @@
-﻿#pragma warning disable VSTHRD200
+#pragma warning disable VSTHRD200
 
 using System.Threading.Tasks;
 using RestSharp;

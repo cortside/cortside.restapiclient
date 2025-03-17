@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -359,6 +359,19 @@ namespace Cortside.RestApiClient.Tests {
             // assert
             Assert.NotNull(options.ConfigureMessageHandler);
             Assert.NotNull(options.Options.ConfigureMessageHandler);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void ShouldSetEnableForwardHeaders(bool value) {
+            // act
+            RestApiClientOptions options = new RestApiClientOptions {
+                EnableForwardHeaders = value
+            };
+
+            // assert
+            Assert.Equal(value, options.EnableForwardHeaders);
         }
     }
 }

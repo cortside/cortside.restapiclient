@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Cortside.RestApiClient.Tests.Clients.IdentityApi {
     public class OutputLogger : HttpTracer.Logger.ILogger {

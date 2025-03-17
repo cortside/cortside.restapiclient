@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Cortside.RestApiClient.Tests.Exceptions;
-using FluentAssertions;
+using Shouldly;
 using Polly;
 using RestSharp;
 using Xunit;
@@ -12,7 +12,7 @@ namespace Cortside.RestApiClient.Tests {
         [Fact]
         public void Should_be_able_to_reference_HandleTransientHttpError() {
             PolicyBuilderExtensions.HandleTransientHttpError()
-                .Should().BeOfType<PolicyBuilder<RestResponse>>();
+                .ShouldBeOfType<PolicyBuilder<RestResponse>>();
         }
 
         [Fact]
@@ -26,7 +26,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => throw new HttpRequestException());
 
-            policyHandled.Should().BeTrue();
+            policyHandled.ShouldBeTrue();
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.RequestTimeout)));
 
-            policyHandled.Should().BeTrue();
+            policyHandled.ShouldBeTrue();
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.InternalServerError)));
 
-            policyHandled.Should().BeTrue();
+            policyHandled.ShouldBeTrue();
         }
 
         [Fact]
@@ -68,13 +68,13 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.BadRequest)));
 
-            policyHandled.Should().BeFalse();
+            policyHandled.ShouldBeFalse();
         }
 
         [Fact]
         public void Should_be_able_to_reference_OrTransientHttpError() {
             Policy.Handle<CustomException>().OrTransientHttpError()
-                .Should().BeOfType<PolicyBuilder<RestResponse>>();
+                .ShouldBeOfType<PolicyBuilder<RestResponse>>();
         }
 
         [Fact]
@@ -88,7 +88,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => throw new HttpRequestException());
 
-            policyHandled.Should().BeTrue();
+            policyHandled.ShouldBeTrue();
         }
 
         [Fact]
@@ -102,7 +102,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.RequestTimeout)));
 
-            policyHandled.Should().BeTrue();
+            policyHandled.ShouldBeTrue();
         }
 
         [Fact]
@@ -116,7 +116,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.InternalServerError)));
 
-            policyHandled.Should().BeTrue();
+            policyHandled.ShouldBeTrue();
         }
 
         [Fact]
@@ -130,13 +130,13 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.BadRequest)));
 
-            policyHandled.Should().BeFalse();
+            policyHandled.ShouldBeFalse();
         }
 
         [Fact]
         public void Should_be_able_to_reference_OrTransientHttpError_onGenericPolicyBuilder() {
             Policy<RestResponse>.Handle<CustomException>().OrTransientHttpError()
-                .Should().BeOfType<PolicyBuilder<RestResponse>>();
+                .ShouldBeOfType<PolicyBuilder<RestResponse>>();
         }
 
         [Fact]
@@ -150,7 +150,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => throw new HttpRequestException());
 
-            policyHandled.Should().BeTrue();
+            policyHandled.ShouldBeTrue();
         }
 
         [Fact]
@@ -164,7 +164,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.RequestTimeout)));
 
-            policyHandled.Should().BeTrue();
+            policyHandled.ShouldBeTrue();
         }
 
         [Fact]
@@ -178,7 +178,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.InternalServerError)));
 
-            policyHandled.Should().BeTrue();
+            policyHandled.ShouldBeTrue();
         }
 
         [Fact]
@@ -192,19 +192,19 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.BadRequest)));
 
-            policyHandled.Should().BeFalse();
+            policyHandled.ShouldBeFalse();
         }
 
         [Fact]
         public void Should_be_able_to_reference_OrTransientHttpStatusCode() {
             Policy.Handle<CustomException>().OrTransientHttpStatusCode()
-                .Should().BeOfType<PolicyBuilder<RestResponse>>();
+                .ShouldBeOfType<PolicyBuilder<RestResponse>>();
         }
 
         [Fact]
         public void Should_be_able_to_reference_OrTransientHttpStatusCode_onGenericPolicyBuilder() {
             Policy<RestResponse>.Handle<CustomException>().OrTransientHttpStatusCode()
-                .Should().BeOfType<PolicyBuilder<RestResponse>>();
+                .ShouldBeOfType<PolicyBuilder<RestResponse>>();
         }
 
         [Fact]
@@ -218,7 +218,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => throw new CustomException());
 
-            policyHandled.Should().BeTrue();
+            policyHandled.ShouldBeTrue();
         }
 
         [Fact]
@@ -232,7 +232,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.RequestTimeout)));
 
-            policyHandled.Should().BeTrue();
+            policyHandled.ShouldBeTrue();
         }
 
         [Fact]
@@ -246,7 +246,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.InternalServerError)));
 
-            policyHandled.Should().BeTrue();
+            policyHandled.ShouldBeTrue();
         }
 
         [Fact]
@@ -260,7 +260,7 @@ namespace Cortside.RestApiClient.Tests {
 
             await policy.ExecuteAsync(() => Task.FromResult(RestResponseExtensions.FromStatusCode(HttpStatusCode.BadRequest)));
 
-            policyHandled.Should().BeFalse();
+            policyHandled.ShouldBeFalse();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using RestSharp.Authenticators;
+using RestSharp.Authenticators;
 
 namespace Cortside.RestApiClient.Authenticators {
     public interface IRestApiAuthenticator : IAuthenticator {

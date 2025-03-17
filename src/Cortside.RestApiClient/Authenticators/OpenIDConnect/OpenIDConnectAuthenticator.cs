@@ -1,3 +1,5 @@
+#pragma warning disable S2629 // interpolation should be used to concatenate strings
+
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -68,7 +70,7 @@ namespace Cortside.RestApiClient.Authenticators.OpenIDConnect {
                 clientAllowsDelegation = AllowsDelegation(currentToken);
 
                 if (clientAllowsDelegation) {
-                    logger.LogInformation($"Token for client_id {tokenRequest.ClientId} allows delegation");
+                    logger.LogInformation("Token for client_id {ClientId} allows delegation", tokenRequest.ClientId);
                 }
             }
 

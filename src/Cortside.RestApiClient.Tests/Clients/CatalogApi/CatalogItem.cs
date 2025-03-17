@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Cortside.RestApiClient.Tests.Clients.CatalogApi {
     public class CatalogItem {

@@ -1,4 +1,4 @@
-﻿namespace Cortside.RestApiClient {
+namespace Cortside.RestApiClient {
     using System;
 
     public static class StringExtensions {

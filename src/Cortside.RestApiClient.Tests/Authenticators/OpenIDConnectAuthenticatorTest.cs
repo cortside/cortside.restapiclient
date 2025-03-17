@@ -52,7 +52,7 @@ namespace Cortside.RestApiClient.Tests.Authenticators {
                 }
             };
 
-            context.Request.Headers.Add(header.Key, header.Value);
+            context.Request.Headers.Append(header.Key, header.Value);
 
             var obj = new HttpContextAccessor();
             obj.HttpContext = context;
