@@ -8,8 +8,8 @@
     <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Cortside.Common.Testing" Version="8.0.482" />
-    <PackageReference Include="Cortside.MockServer.AccessControl" Version="8.1.84-develop" />
+    <PackageReference Include="Cortside.Common.Testing" Version="8.1.504-develop" />
+    <PackageReference Include="Cortside.MockServer.AccessControl" Version="8.1.88-develop" />
     <PackageReference Include="HttpTracer" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.14" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
@@ -29,7 +29,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Shouldly" Version="4.3.0" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.20.0.135146">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.21.0.135717">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
