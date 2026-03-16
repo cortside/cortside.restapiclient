@@ -111,6 +111,7 @@ _TeamCity*
 
 # NCrunch
 _NCrunch_*
+.NCrunch_*
 .*crunch*.local.xml
 nCrunchTemp_*
 
@@ -135,7 +136,7 @@ DocProject/Help/Html2
 DocProject/Help/html
 
 # Click-Once directory
-publish/
+#publish/
 
 # Publish Web Output
 *.[Pp]ublish.xml
@@ -249,10 +250,11 @@ coverage.opencover.xml
 *.ncrunchproject
 
 *.zip
-.vscode/*
 
 *.local.json
 .refsignored
 .env.local
 
-.NCrunch_*
+amqptools.json
+event.json
+event-json/**
