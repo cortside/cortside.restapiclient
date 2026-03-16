@@ -8,8 +8,8 @@
     <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Cortside.Common.Testing" Version="8.1.504-develop" />
-    <PackageReference Include="Cortside.MockServer.AccessControl" Version="8.1.88-develop" />
+    <PackageReference Include="Cortside.Common.Testing" Version="8.1.506" />
+    <PackageReference Include="Cortside.MockServer.AccessControl" Version="8.1.89" />
     <PackageReference Include="HttpTracer" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.14" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
