@@ -1,5 +1,6 @@
 #pragma warning disable VSTHRD200
 
+using System.Threading;
 using System.Threading.Tasks;
 using RestSharp;
 
@@ -11,7 +12,7 @@ namespace Cortside.RestApiClient.Authenticators {
 
         protected abstract ValueTask<Parameter> GetAuthenticationParameter(string accessToken);
 
-        public async ValueTask Authenticate(IRestClient client, RestRequest request)
+        public async ValueTask Authenticate(IRestClient client, RestRequest request, CancellationToken cancellationToken = default(CancellationToken))
             => request.AddOrUpdateParameter(await GetAuthenticationParameter(Token).ConfigureAwait(false));
 
         public virtual void HandleUnauthorizedClientRequest() {

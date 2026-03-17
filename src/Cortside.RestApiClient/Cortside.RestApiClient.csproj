@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>disable</Nullable>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
   </PropertyGroup>
@@ -8,12 +8,12 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Cortside.Common.Correlation" Version="8.1.506" />
-    <PackageReference Include="Cortside.Common.Json" Version="8.1.506" />
-    <PackageReference Include="Cortside.Common.Messages" Version="8.1.506" />
-    <PackageReference Include="Cortside.Common.Validation" Version="8.1.506" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.14" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.14" />
+    <PackageReference Include="Cortside.Common.Correlation" Version="10.0.507-develop" />
+    <PackageReference Include="Cortside.Common.Json" Version="10.0.507-develop" />
+    <PackageReference Include="Cortside.Common.Messages" Version="10.0.507-develop" />
+    <PackageReference Include="Cortside.Common.Validation" Version="10.0.507-develop" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.5" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -25,9 +25,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="RestSharp" Version="112.1.0" />
-    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="112.1.0" />
-    <PackageReference Include="RestSharp.Serializers.Xml" Version="112.1.0" />
+    <PackageReference Include="RestSharp" Version="114.0.0" />
+    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="114.0.0" />
+    <PackageReference Include="RestSharp.Serializers.Xml" Version="114.0.0" />
     <PackageReference Include="Roslynator.Analyzers" Version="4.15.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
