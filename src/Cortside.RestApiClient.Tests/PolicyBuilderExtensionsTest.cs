@@ -2,9 +2,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Cortside.RestApiClient.Tests.Exceptions;
-using Shouldly;
 using Polly;
 using RestSharp;
+using Shouldly;
 using Xunit;
 
 namespace Cortside.RestApiClient.Tests {
